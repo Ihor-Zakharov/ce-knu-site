@@ -1,0 +1,84 @@
+---
+import '@/styles/global.css';
+import SiteFooter from '@/components/SiteFooter.astro';
+import SiteHeader from '@/components/SiteHeader.astro';
+import { defaultLang, languages, toLang, useTranslations, type Lang } from '@/i18n/ui';
+import { translatedUrl, withBase } from '@/lib/url';
+
+interface Props {
+  /** Page title without the site name; omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Error pages are served at any URL: no canonical, no language versions, not indexed. */
+  errorPage?: boolean;
+}
+
+const { title, description, errorPage = false } = Astro.props;
+const lang = toLang(Astro.currentLocale);
+const t = useTranslations(lang);
+
+const fullTitle = title ? `${title} | ${t('site.name')}` : t('site.name');
+const canonical = errorPage ? undefined : new URL(Astro.url.pathname, Astro.site).href;
+const alternates = errorPage
+  ? []
+  : (Object.keys(languages) as Lang[]).map((alt) => ({
+      hreflang: alt,
+      href: new URL(translatedUrl(Astro.url.pathname, alt), Astro.site).href,
+    }));
+const xDefault = alternates.find((alt) => alt.hreflang === defaultLang);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description ?? t('site.description')} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {errorPage && <meta name="robots" content="noindex" />}
+    {alternates.map((alt) => (
+      <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+    ))}
+    {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
+    <link rel="icon" href={withBase('favicon.png')} type="image/png" />
+    <link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      {t('nav.skip')}
+    </a>
+    <SiteHeader languageSwitcher={!errorPage} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    z-index: var(--z-skip-link);
+    top: var(--space-2);
+    left: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-bg);
+    background: var(--color-text);
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+
+  main {
+    max-width: var(--size-content);
+    margin-inline: auto;
+    padding: var(--space-8) var(--space-4);
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

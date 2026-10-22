@@ -1,0 +1,42 @@
+---
+// The server returns one 404 page for every language, so it shows both.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { ui } from '@/i18n/ui';
+import { localizedUrl } from '@/lib/url';
+---
+
+<BaseLayout title={ui.uk['notFound.title']} errorPage>
+  <section class="not-found">
+    <h1>{ui.uk['notFound.title']}</h1>
+    <p>{ui.uk['notFound.text']}</p>
+    <p>
+      <a href={localizedUrl('uk')}>{ui.uk['notFound.home']}</a>
+    </p>
+  </section>
+  <section class="not-found" lang="en">
+    <h2>{ui.en['notFound.title']}</h2>
+    <p>{ui.en['notFound.text']}</p>
+    <p>
+      <a href={localizedUrl('en')}>{ui.en['notFound.home']}</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--size-prose);
+  }
+
+  .not-found + .not-found {
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  h1,
+  h2 {
+    font-size: var(--text-xl);
+  }
+</style>

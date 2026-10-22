@@ -1,0 +1,27 @@
+---
+import { toLang, useTranslations } from '@/i18n/ui';
+
+const t = useTranslations(toLang(Astro.currentLocale));
+---
+
+<footer class="footer">
+  <div class="inner">
+    <p>{t('site.name')}</p>
+    <p>{t('site.university')}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--space-12);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+  }
+
+  .inner {
+    max-width: var(--size-content);
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-4);
+  }
+</style>

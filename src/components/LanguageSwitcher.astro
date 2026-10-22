@@ -1,0 +1,41 @@
+---
+import { languages, toLang, useTranslations, type Lang } from '@/i18n/ui';
+import { translatedUrl } from '@/lib/url';
+
+const current = toLang(Astro.currentLocale);
+const t = useTranslations(current);
+const items = (Object.keys(languages) as Lang[]).map((lang) => ({
+  lang,
+  label: languages[lang],
+  href: translatedUrl(Astro.url.pathname, lang),
+}));
+---
+
+<nav class="switcher" aria-label={t('lang.label')}>
+  <ul>
+    {items.map(({ lang, label, href }) => (
+      <li>
+        {lang === current ? (
+          <span aria-current="true">{label}</span>
+        ) : (
+          <a href={href} hreflang={lang} lang={lang}>
+            {label}
+          </a>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  [aria-current] {
+    font-weight: var(--weight-bold);
+  }
+</style>

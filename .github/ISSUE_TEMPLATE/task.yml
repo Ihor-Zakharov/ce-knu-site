@@ -1,0 +1,41 @@
+name: Задача
+description: Робота з критеріями приймання
+labels: ['type:feature']
+body:
+  - type: dropdown
+    id: role
+    attributes:
+      label: Роль
+      options:
+        - Керівник проєкту
+        - Дизайнер
+        - Розробник
+        - Інженер CI/CD
+        - Тестувальник
+        - Доступність і швидкодія
+        - Вміст і англомовна версія
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Мета
+      description: Що треба зробити і навіщо.
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Критерії приймання
+      description: Що можна перевірити. Для інтерфейсу ще обидві мови, телефон і комп'ютер.
+      value: |
+        - [ ] ...
+        - [ ] Працює українською й англійською
+        - [ ] `npm run verify` проходить
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Посилання
+      description: Макет, сторінка чинного сайту, пов'язані задачі.

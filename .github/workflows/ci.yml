@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+  HUSKY: 0
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci --no-audit
+
+      - name: Lint (ESLint, Stylelint, Prettier)
+        run: npm run lint
+
+      - name: Type check (astro check, TypeScript 7)
+        run: npm run check
+
+      - name: Build for GitHub Pages
+        run: |
+          export ASTRO_SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
+          export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/"
+          npm run build
+
+      - name: Validate HTML
+        run: npm run validate:html
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist
+          include-hidden-files: true
+          retention-days: 7
+
+  pr-title:
+    name: pr-title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            content
+            style
+            a11y
+            perf
+            test
+            ci
+            docs
+            refactor
+            build
+            chore
+            revert
+          subjectPattern: ^[^A-Z].+$
+          subjectPatternError: 'Start the summary with a lower-case letter, e.g. "feat(news): add news list page".'
+
+  deploy:
+    name: deploy
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      # Publishes to the gh-pages branch; pr-preview/ is kept for future PR previews.
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean-exclude: pr-preview/

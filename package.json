@@ -1,0 +1,71 @@
+{
+  "name": "ce-knu-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Новий сайт кафедри комп'ютерної інженерії КНУ (ce.knu.ua)",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && npm run typecheck",
+    "typecheck": "node node_modules/typescript-7/bin/tsc --noEmit -p tsconfig.json",
+    "lint": "npm run lint:js && npm run lint:css && npm run format:check",
+    "lint:js": "eslint . --max-warnings 0",
+    "lint:css": "stylelint \"src/**/*.{css,astro}\" --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:html": "html-validate \"dist/**/*.html\"",
+    "verify": "npm run lint && npm run check && npm run build && npm run validate:html",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.astro": [
+      "eslint --fix --max-warnings 0",
+      "stylelint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{js,mjs,cjs,ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.css": [
+      "stylelint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": "prettier --write"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.1.1",
+    "astro": "^7.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^10.13.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "eslint-plugin-jsx-a11y-x": "^0.2.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "html-validate": "^11.17.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "postcss-html": "^2.0.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "stylelint": "^17.16.0",
+    "stylelint-config-html": "^2.0.0",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^6.0.3",
+    "typescript-7": "npm:typescript@^7.0.2",
+    "typescript-eslint": "^8.72.0"
+  }
+}

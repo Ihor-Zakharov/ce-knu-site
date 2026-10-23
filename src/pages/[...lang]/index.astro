@@ -5,7 +5,6 @@ import { T, url, langOf, langParams } from '../../lib/i18n';
 import { page } from '../../lib/content';
 import { HISTORY, PARTNERS } from '../../lib/home';
 import AlumniStrip from '../../components/AlumniStrip.astro';
-import Mascot from '../../components/Mascot.astro';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
@@ -76,7 +75,6 @@ const scopeKeys = [
       <div class="sec-head rv"><div><p class="eyebrow">{uk ? 'Про кафедру' : 'About'}</p><h2 class="mt-s" id="h-about">{home.data.title}</h2></div></div>
       <div class="page">
         <article class="prose"><Content /></article>
-        <aside class="page__aside"><Mascot src={home.data.mascot} alt={home.data.mascotAlt} /></aside>
       </div>
     </div>
   </section>

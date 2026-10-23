@@ -57,10 +57,10 @@ if (nav) {
     if (!FINE.matches) return;
     clearTimeout(hideT);
     const first = !nav.classList.contains('is-hover');
-    nav.classList.add('is-hover'); moveInk(nav, a, { immediate: first });
+    nav.classList.add('is-hover'); moveInk(nav, $('.nav__t', a), { immediate: first });   // лінза — по слову, симетрично
   }));
   nav.addEventListener('pointerleave', () => { hideT = setTimeout(() => nav.classList.remove('is-hover'), 60); });
-  $$('a', nav).forEach(a => a.addEventListener('focus', () => { nav.classList.add('is-hover'); moveInk(nav, a); }));
+  $$('a', nav).forEach(a => a.addEventListener('focus', () => { nav.classList.add('is-hover'); moveInk(nav, $('.nav__t', a)); }));
   nav.addEventListener('focusout', e => { if (!nav.contains(e.relatedTarget)) nav.classList.remove('is-hover'); });
 }
 const hd = $('.hd');

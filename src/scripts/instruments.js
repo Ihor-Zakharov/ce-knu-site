@@ -1,6 +1,6 @@
 // Прилади в героях розділів. Кожен розділ — своє радіофізичне явище:
 //   ticker   — новини: світлодіодна матриця, що біжить заголовками
-//   nnet     — дослідження: нейронна мережа, прямий прохід сигналу (ШІ — напрям кафедри)
+//   lorenz   — дослідження: атрактор Лоренца, детермінований хаос
 //   field    — (запасний) інтерференція двох джерел
 //   fourier  — НМЗ: меандр, що складається з гармонік ряду Фур'є
 //   mobius   — вступникам: стрічка Мебіуса, хвиля після обходу інвертує фазу
@@ -9,7 +9,8 @@
 //   chladni  — випускники: фігури Хладні, вузлові лінії стоячих хвиль
 //   array    — (запасний) фазована антенна решітка
 //   liss     — персоналії: фігури Ліссажу, що перетікають між відношеннями частот
-//   life     — роботодавцям: «Життя» Конвея, клітинний автомат B3/S23
+//   nnet     — роботодавцям: нейронна мережа, синхронна хвиля прямого проходу
+//   life     — (запасний) «Життя» Конвея
 //   tess     — (запасний) тесеракт у 4D-обертанні
 //   smith    — (запасний) діаграма Сміта, імпеданс сходиться до узгодження
 // Без руху (prefers-reduced-motion) малюється один статичний кадр. Поза екраном — пауза.
@@ -427,15 +428,15 @@ function mobius(c, st, cv) {
   };
 }
 
-/* ── Дослідження: нейронна мережа — прямий прохід сигналу шарами ── */
+/* ── Роботодавцям: нейронна мережа — синхронна хвиля прямого проходу ── */
 // Ваги — товщина й яскравість зв'язків; імпульси біжать від входів до виходів, нейрони спалахують за активацією.
 // Курсор біля нейрона підсвічує його зв'язки.
 function nnet(c, st, cv) {
   const box = cv.closest('.inst');
-  const LAYERS = [4, 7, 7, 5, 2];
-  let nodes = [], edges = [], pulses = [], act = [], shown = [], hl = [], hover = -1, waveT = .4, pass = 0;
+  const LAYERS = [4, 7, 7, 5, 2], SEG = 1.7, REST = 1.1;           // секунд на шар і пауза між прикладами
+  let nodes = [], edges = [], act = [], shown = [], hl = [], hover = -1, clock = 0, pass = 0, live = [];
   const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
-  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;   // плавний розгін і гальмування імпульсу
+  const sine = x => .5 - .5 * Math.cos(Math.PI * x);               // м'яка синусоїдальна крива: повільний старт і фініш
   function build() {
     const { W, H } = st, padX = W * .1, top = 36, bot = H - 36;
     nodes = []; edges = [];
@@ -443,16 +444,15 @@ function nnet(c, st, cv) {
     let base = 0;
     for (let l = 0; l < LAYERS.length - 1; l++) {
       const nb = base + LAYERS[l];
-      for (let i = 0; i < LAYERS[l]; i++) for (let j = 0; j < LAYERS[l + 1]; j++) edges.push({ a: base + i, b: nb + j, w: rnd() * 2 - 1 });
+      for (let i = 0; i < LAYERS[l]; i++) for (let j = 0; j < LAYERS[l + 1]; j++) edges.push({ a: base + i, b: nb + j, w: rnd() * 2 - 1, l });
       base = nb;
     }
-    act = nodes.map(() => 0); shown = nodes.map(() => 0); hl = edges.map(() => 0);
+    act = nodes.map(() => 0); shown = nodes.map(() => 0); hl = edges.map(() => 0); newPass();
   }
-  const spawn = e => pulses.push({ e, p: -Math.random() * .6, v: .42 + Math.random() * .22 });
-  function fire() {                                   // новий приклад на вході — повільна хвиля шар за шаром
-    pass++;
-    nodes.forEach((n, i) => { if (n.l === 0) act[i] = .35 + rnd() * .65; });
-    edges.forEach(e => { if (nodes[e.a].l === 0 && Math.abs(e.w) > .3 && Math.random() < .7) spawn(e); });
+  function newPass() {                               // новий приклад: які зв'язки «проведуть» сигнал цього разу
+    pass++; clock = 0;
+    live = edges.map(e => Math.abs(e.w) > .35 && Math.random() < .55);
+    nodes.forEach((n, i) => { if (n.l === 0) act[i] = .45 + rnd() * .55; });
   }
   cv.addEventListener('pointermove', e => {
     const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
@@ -460,22 +460,18 @@ function nnet(c, st, cv) {
   });
   cv.addEventListener('pointerleave', () => { hover = -1; });
   return {
-    still: 2.6,
+    still: SEG * 1.5,
     resize() { build(); },
     step(dt) {
       if (!nodes.length) build();
-      waveT -= dt; if (waveT <= 0) { fire(); waveT = 3.2; }
-      const next = [];
-      for (const p of pulses) {
-        p.p += dt * p.v;
-        if (p.p >= 1) {
-          const b = p.e.b; act[b] = Math.min(1, act[b] + Math.abs(p.e.w) * .5);
-          if (nodes[b].l < LAYERS.length - 1) edges.forEach(e => { if (e.a === b && Math.abs(e.w) > .4 && Math.random() < .3) spawn(e); });
-        } else next.push(p);
+      const before = Math.floor(clock / SEG); clock += dt;
+      const seg = Math.floor(clock / SEG);
+      if (seg > before && before < LAYERS.length - 1) {               // хвиля дійшла до наступного шару — він спалахує
+        edges.forEach((e, i) => { if (live[i] && e.l === before) act[e.b] = Math.min(1, act[e.b] + Math.abs(e.w) * .45); });
       }
-      pulses = next.length > 140 ? next.slice(-140) : next;
-      const k = 1 - Math.pow(.02, dt);                // м'яке «доганяння»: світіння розгорається й гасне плавно
-      for (let i = 0; i < act.length; i++) { act[i] *= Math.pow(.55, dt); shown[i] += (act[i] - shown[i]) * k; }
+      if (clock > SEG * (LAYERS.length - 1) + REST) newPass();
+      const k = 1 - Math.pow(.03, dt);
+      for (let i = 0; i < act.length; i++) { act[i] *= Math.pow(.6, dt); shown[i] += (act[i] - shown[i]) * k; }
       const kh = 1 - Math.pow(.001, dt);
       edges.forEach((e, i) => { hl[i] += ((hover === e.a || hover === e.b ? 1 : 0) - hl[i]) * kh; });
       hud(box, 'pass', String(pass));
@@ -489,17 +485,21 @@ function nnet(c, st, cv) {
         c.globalAlpha = .08 + Math.abs(e.w) * .2 + h * .6; c.lineWidth = .6 + Math.abs(e.w) * .7 + h * .6;
         c.beginPath(); c.moveTo(A.x, A.y); c.lineTo(B.x, B.y); c.stroke();
       });
-      c.lineCap = 'round';
-      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 8; }
-      for (const p of pulses) {
-        if (p.p <= 0) continue;
-        const A = nodes[p.e.a], B = nodes[p.e.b], hd = ease(p.p), tl = ease(Math.max(0, p.p - .22));   // комета: голова й довгий м'який хвіст
-        const x0 = A.x + (B.x - A.x) * tl, y0 = A.y + (B.y - A.y) * tl, x1 = A.x + (B.x - A.x) * hd, y1 = A.y + (B.y - A.y) * hd;
-        const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, col.ph);
-        c.globalAlpha = Math.min(1, Math.sin(Math.PI * Math.min(1, p.p)) * 1.6); c.strokeStyle = g; c.lineWidth = 2;
-        c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+      // синхронна хвиля: усі імпульси шару рухаються разом
+      const seg = Math.floor(clock / SEG), u = (clock % SEG) / SEG;
+      if (seg < LAYERS.length - 1) {
+        const hd = sine(u), tl = sine(Math.max(0, u - .26)), fade = Math.sin(Math.PI * u);
+        c.lineCap = 'round'; if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 8; }
+        edges.forEach((e, i) => {
+          if (!live[i] || e.l !== seg) return;
+          const A = nodes[e.a], B = nodes[e.b];
+          const x0 = A.x + (B.x - A.x) * tl, y0 = A.y + (B.y - A.y) * tl, x1 = A.x + (B.x - A.x) * hd, y1 = A.y + (B.y - A.y) * hd;
+          const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, col.ph);
+          c.globalAlpha = Math.min(1, .25 + fade) * (.5 + Math.abs(e.w) * .5); c.strokeStyle = g; c.lineWidth = 2;
+          c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+        });
+        c.shadowBlur = 0;
       }
-      c.shadowBlur = 0;
       nodes.forEach((n, i) => {
         const v = shown[i], r = 5.5 + v * 2;
         c.globalAlpha = 1; c.fillStyle = col.dark ? '#141211' : '#F1EBE0'; c.beginPath(); c.arc(n.x, n.y, r, 0, TAU); c.fill();
@@ -507,6 +507,46 @@ function nnet(c, st, cv) {
         if (v > .02) { c.globalAlpha = Math.min(1, v * 1.2); c.fillStyle = col.ph; if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 10 * v; } c.beginPath(); c.arc(n.x, n.y, r - 1.6, 0, TAU); c.fill(); c.shadowBlur = 0; }
       });
       c.globalAlpha = 1;
+    },
+  };
+}
+
+/* ── Дослідження: атрактор Лоренца — детермінований хаос ── */
+// dx/dt = σ(y − x), dy/dt = x(ρ − z) − y, dz/dt = xy − βz; σ = 10, ρ = 28, β = 8/3.
+// Траєкторія будується наживо (Рунге — Кутта 4), повільно обертається; старі ділянки згасають; курсор нахиляє вигляд.
+function lorenz(c, st, cv) {
+  const box = cv.closest('.inst');
+  const S = 10, Rr = 28, B = 8 / 3, N = 2600, DT = .006;
+  const pts = []; let p = [0.1, 0, 20], tt = 0;
+  const yaw = new Spring({ value: 0, response: 1.2, damping: .9 }), tilt = new Spring({ value: 0, response: 1.2, damping: .9 });
+  const f = ([x, y, z]) => [S * (y - x), x * (Rr - z) - y, x * y - B * z];
+  const rk = q => { const k1 = f(q), k2 = f(q.map((v, i) => v + k1[i] * DT / 2)), k3 = f(q.map((v, i) => v + k2[i] * DT / 2)), k4 = f(q.map((v, i) => v + k3[i] * DT)); return q.map((v, i) => v + DT / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i])); };
+  for (let i = 0; i < 400; i++) p = rk(p);                          // вихід на атрактор
+  for (let i = 0; i < N; i++) { p = rk(p); pts.push(p); }
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); yaw.set(((e.clientX - r.left) / r.width - .5) * 1.4); tilt.set(((e.clientY - r.top) / r.height - .5) * .8); });
+  cv.addEventListener('pointerleave', () => { yaw.set(0); tilt.set(0); });
+  return {
+    still: 0,
+    step(dt) { for (let i = 0; i < 5; i++) { p = rk(p); pts.push(p); pts.shift(); } tt += dt; },
+    draw() {
+      // вигляд «метелика» спереди, ледь погойдується; курсор нахиляє
+      const { W, H, col } = st, a = .45 * Math.sin(tt * .09) + yaw.value, b = .12 + tilt.value, s = Math.min(W / 42, (H - 64) / 44), cx = W / 2, cy = H / 2 + 6;
+      const pr = ([x, y, z]) => { const X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a), Z = z - 25; return [cx + X * s, cy - (Z * Math.cos(b) - Y * Math.sin(b)) * s]; };
+      c.lineJoin = 'round'; c.lineCap = 'round';
+      const CH = 26, step = Math.ceil(pts.length / CH);
+      for (let k = 0; k < CH; k++) {                                  // відрізками: що старіше — то блідіше
+        const i0 = k * step, i1 = Math.min(pts.length - 1, i0 + step);
+        c.globalAlpha = .06 + .94 * (k / (CH - 1)) ** 2; c.strokeStyle = col.ph; c.lineWidth = .9 + .7 * (k / CH);
+        if (col.dark && k > CH - 6) { c.shadowColor = col.ph; c.shadowBlur = 6; } else c.shadowBlur = 0;
+        c.beginPath(); let q = pr(pts[i0]); c.moveTo(q[0], q[1]);
+        for (let i = i0 + 1; i <= i1; i++) { q = pr(pts[i]); c.lineTo(q[0], q[1]); }
+        c.stroke();
+      }
+      c.shadowBlur = 0; c.globalAlpha = 1;
+      const hdp = pr(pts[pts.length - 1]), g = c.createRadialGradient(hdp[0], hdp[1], 0, hdp[0], hdp[1], 10);
+      g.addColorStop(0, col.ph); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(hdp[0] - 10, hdp[1] - 10, 20, 20);
+      c.fillStyle = col.gold; c.beginPath(); c.arc(hdp[0], hdp[1], 2.2, 0, TAU); c.fill();
+      hud(box, 'z', p[2].toFixed(1).replace('.', ','));
     },
   };
 }
@@ -610,7 +650,7 @@ function tess(c, st, cv) {
   };
 }
 
-const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius, nnet, life };
+const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius, nnet, life, lorenz };
 export function mountInstruments() {
   document.querySelectorAll('.inst[data-inst] canvas[data-draw]').forEach(cv => {
     const kind = KINDS[cv.closest('.inst').dataset.inst];

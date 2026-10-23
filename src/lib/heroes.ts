@@ -20,9 +20,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Байт свіжих подій', 'Тримаю в полі зору', 'Є сигнал для новини'], en: ['A byte of news', 'Keeping news in focus', 'Picking up a news signal'] },
   },
   research: {
-    ch: 'CH 02 · RSRC', inst: 'nnet', acc: 'tube',
+    ch: 'CH 02 · RSRC', inst: 'lorenz', acc: 'tube',
     lead: { uk: 'Високопродуктивні обчислення, цифровий зв’язок і штучний інтелект.', en: 'High-performance computing, digital communications and artificial intelligence.' },
-    hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['NEURAL NETWORK · FORWARD PASS', 'MOVE CURSOR'] },
+    hud: { top: ['σ 10 · ρ 28 · β 8/3', 'z = <b data-hud="z">0</b>'], bot: ['LORENZ ATTRACTOR', 'MOVE CURSOR'] },
     lines: { uk: ['Дві хвилі — одна картина', 'Додаю трохи інтерференції', 'Звіряю з експериментом'], en: ['Two waves, one pattern', 'A little interference', 'Checking the experiment'] },
   },
   'medu-guide': {
@@ -56,9 +56,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Готуюся до лекції', 'У кожного своя частота', 'Сьогодні в режимі X–Y'], en: ['Getting ready to lecture', 'A frequency for everyone', 'In X–Y mode today'] },
   },
   stateholders: {
-    ch: 'CH 08 · EMPL', inst: 'life', acc: 'tie',
+    ch: 'CH 08 · EMPL', inst: 'nnet', acc: 'tie',
     lead: { uk: 'Знання випускників і пропозиції щодо змісту освіти.', en: 'Graduate skills and suggestions for educational content.' },
-    hud: { top: ['GEN <b data-hud="gen">0</b>', 'POP <b data-hud="pop">0</b>'], bot: ['CONWAY’S LIFE · B3/S23', 'MOVE CURSOR'] },
+    hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['NEURAL NETWORK · FORWARD PASS', 'MOVE CURSOR'] },
     lines: { uk: ['Звіряємо протоколи', 'Знайдемо спільну частоту', 'Краватка в чотирьох вимірах'], en: ['Comparing protocols', 'Finding a shared frequency', 'A tie in four dimensions'] },
   },
   studying: {

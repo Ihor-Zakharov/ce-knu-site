@@ -8,7 +8,7 @@ legacy: "/posts/iarmarka-vakansii-2018/"
 source: "posts/iarmarka-vakansii-2018.rst"
 ---
 
-![](../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg)
+![Photo: Job Fair 2018](../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg)
 
 On 10 October 2018, a job fair was held on the faculty premises.
 

@@ -8,7 +8,7 @@ legacy: "/posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v
 source: "posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r.rst"
 ---
 
-![](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)
+![Photo: S. D. Pohorilyi and Yu. V. Boiko: Laureates of the 2018 State Prize of Ukraine in Science and Technology](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)
 
 By Decree of the President of Ukraine, two members of staff of the Department of Computer Engineering have received the country's highest award in their field for the research work "Methods and Novel Approaches to the Design, Management and Application of High-Performance IT Infrastructures".
 

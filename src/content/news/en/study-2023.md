@@ -8,7 +8,7 @@ legacy: "/posts/study-2023/"
 source: "posts/22-study-23-24.rst"
 ---
 
-![](../../../assets/images/news/study-2023.jpg)
+![Photo: Information on the organisation of the educational process](../../../assets/images/news/study-2023.jpg)
 
 Students, please note the information on the organisation of the educational process for students of the Faculty of Radiophysics, Electronics and Computer Systems in the 2023-24 academic year.
 

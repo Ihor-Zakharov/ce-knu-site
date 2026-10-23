@@ -8,7 +8,7 @@ legacy: "/posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-d
 source: "posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r.rst"
 ---
 
-![](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)
+![Фото: Сальніков А.О. і Слюсар Є.А. – лауреати премії Президента України для молодих вчених 2018 р](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)
 
 [Указом Президента України](https://www.president.gov.ua/documents/4192018-25730) два співробітники кафедри Комп’ютерної інженерії отримали високу відзнаку країни в своїй сфері за наукову роботу «\`Створення високопродуктивної інфраструктури в грід для досліджень конформаційних змін біополімерів \<http://www.kdpu-nt.gov.ua/work/stvorennya-visokoproduktivnoyi-infrastrukturi-v-grid-dlya-doslidzhen-konformaciynih-zmin-biopol\>\`\_\_».
 

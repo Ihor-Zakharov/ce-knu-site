@@ -8,6 +8,6 @@ legacy: "/posts/den-vidkritikh-dverei-2018/"
 source: "posts/den-vidkritikh-dverei-2018.rst"
 ---
 
-![](../../../assets/images/news/48ee1e8a0a8f50dce4f8cb9ab418e211_M.jpg)
+![Фото: День відкритих дверей 2018](../../../assets/images/news/48ee1e8a0a8f50dce4f8cb9ab418e211_M.jpg)
 
 14 квітня відбувся загальноуніверситетський день відкритих дверей.

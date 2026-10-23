@@ -2,9 +2,11 @@
 import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { render } from 'astro:content';
-import { T, url, langOf, langParams, fmtDate, isoDate, NAV } from '../../lib/i18n';
+import { T, url, langOf, langParams, fmtDate, isoDate } from '../../lib/i18n';
 import { news, page, slugOf } from '../../lib/content';
-import { HEROES } from '../../lib/heroes';
+import { HISTORY, PARTNERS } from '../../lib/home';
+import NewsArt from '../../components/NewsArt.astro';
+import Mascot from '../../components/Mascot.astro';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
@@ -20,9 +22,8 @@ const scopeKeys = [
   { mode: 'am', label: 'AM', title: uk ? 'Амплітудна модуляція' : 'Amplitude modulation' },
   { mode: 'chirp', label: 'CHIRP', title: uk ? 'Лінійна частотна модуляція' : 'Linear frequency sweep' },
 ];
-const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research', '/medu-guide/': 'medu-guide', '/entrant/': 'entrant', '/documents/': 'documents', '/graduates/': 'graduates', '/personas/': 'personas', '/stateholders/': 'stateholders' };
 ---
-<Base lang={lang} title={t.dept} description={home.data.description}>
+<Base lang={lang} title={t.dept} description={(uk ? 'Кафедра комп’ютерної інженерії КНУ імені Тараса Шевченка: ' : 'Department of Computer Engineering, Taras Shevchenko National University of Kyiv: ') + (uk ? 'бакалаврат, магістратура й аспірантура F7 «Комп’ютерна інженерія», лабораторії Huawei, IBM, Cisco.' : 'Bachelor’s, Master’s and PhD programmes in F7 Computer Engineering, Huawei, IBM and Cisco labs.')} og="home">
   <section class="ph hero-home">
     <div class="wrap ph__grid">
       <div class="ph__text">
@@ -34,6 +35,7 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
           <a class="btn btn--line" href={url(lang, '/news/')}>{t.news}</a>
         </div>
       </div>
+      <div class="inst-wrap" data-dockable>
       <figure class="scope scope-home" aria-label={uk ? 'Демонстраційний сигнал на осцилографі; по променю біжить КІ-Рекс' : 'Demo signal on an oscilloscope; KI-Rex runs along the trace'}>
         <div class="scope__screen">
           <svg viewBox="0 0 1000 667" preserveAspectRatio="none" aria-hidden="true">
@@ -44,7 +46,6 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
             <path class="trace trace--ghost"/>
             <path class="trace trace--main"/>
           </svg>
-          <canvas class="scope-rex" aria-hidden="true"></canvas>
           <div class="scope__hud scope__hud--top"><span>CH1 · <b data-scope-mode>SIN</b></span><span>2,0 V/DIV · 250 µs/DIV</span></div>
           <div class="scope__hud scope__hud--bot"><span>f = <b data-scope-f>{uk ? '0,80 кГц' : '0.80 kHz'}</b></span><span>KI-REX · {uk ? 'ДЕМО-СИГНАЛ' : 'DEMO SIGNAL'}</span></div>
         </div>
@@ -54,13 +55,17 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
           <button type="button" class="key" data-scope-play aria-pressed="false" aria-label={uk ? 'Пауза' : 'Pause'} title={uk ? 'Пауза' : 'Pause'}><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
         </div>
       </figure>
+      </div>
     </div>
     <div class="wrap">
-      <div class="figures mt-l rv">
-        <div><b>100</b><span>{uk ? 'місць на 1-й курс бакалаврату' : 'first-year Bachelor’s places'}</span></div>
-        <div><b>50</b><span>{uk ? 'місць у магістратурі' : 'Master’s places'}</span></div>
-        <div><b>10</b><span>{uk ? 'місць в аспірантурі (PhD)' : 'PhD places'}</span></div>
-        <div><b>1991</b><span>{uk ? 'рік, коли почалася підготовка з автоматизації наукових досліджень' : 'the year scientific-research automation training began'}</span></div>
+      <div class="figures-wrap mt-l" data-rex-scope>
+      <div class="perch perch--line" data-acc="" data-start="460" data-lines={JSON.stringify(uk ? ['Привіт! Я КІ-Рекс', 'Гуляю по шині даних', '100 місць — поспішай!', 'Клацни ще раз!'] : ['Hi! I’m KI-Rex', 'Walking along the data bus', '100 places — hurry up!', 'Click me again!'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
+      <div class="figures rv">
+        <div data-rex-say={uk ? '100 місць — встигни!' : '100 places — hurry!'}><b>100</b><span>{uk ? 'місць на 1-й курс бакалаврату' : 'first-year Bachelor’s places'}</span></div>
+        <div data-rex-say={uk ? 'Магістратура: 2 роки' : 'Master’s: 2 years'}><b>50</b><span>{uk ? 'місць у магістратурі' : 'Master’s places'}</span></div>
+        <div data-rex-say={uk ? 'PhD — для найдопитливіших' : 'PhD — for the most curious'}><b>10</b><span>{uk ? 'місць в аспірантурі (PhD)' : 'PhD places'}</span></div>
+        <div data-rex-say={uk ? 'Я тоді ще був яйцем' : 'I was still an egg back then'}><b>1991</b><span>{uk ? 'рік заснування спеціалізації' : 'specialisation founded'}</span></div>
+      </div>
       </div>
     </div>
   </section>
@@ -84,7 +89,7 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
         <div class="cards mt-l">
           {rest.slice(0, 3).map((n, i) => (
             <a class="card rv" style={`--i:${i}`} href={url(lang, `/posts/${slugOf(n.id)}/`)}>
-              <figure class="plate"><div class="plate__f">{n.data.cover && <Image src={n.data.cover} alt="" widths={[360, 640]} sizes="(max-width: 640px) 100vw, 33vw" />}</div></figure>
+              <figure class="plate"><div class="plate__f">{n.data.cover ? <Image src={n.data.cover} alt="" widths={[360, 640]} sizes="(max-width: 640px) 100vw, 33vw" /> : <NewsArt slug={slugOf(n.id)} date={n.data.date} label="KI · NEWS" />}</div></figure>
               <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
               <h3>{n.data.title}</h3>
             </a>
@@ -94,19 +99,19 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
     </section>
   )}
 
-  <section class="section" aria-labelledby="h-channels">
-    <div class="wrap">
-      <div class="sec-head rv"><div><p class="eyebrow">{uk ? 'Канали' : 'Channels'}</p><h2 class="mt-s" id="h-channels">{t.sections}</h2></div></div>
-      <ul class="channels">
-        {NAV.map((n, i) => { const h = HEROES[CHAN[n.path]]; return (
-          <li class="rv" style={`--i:${i % 4}`}><a href={url(lang, n.path)}>
-            <span class="ch">{h.ch}</span>
-            <b>{n[lang]}</b>
-            <span class="d">{h.lead[lang]}</span>
-            <svg class="w" viewBox="0 0 120 20" preserveAspectRatio="none" aria-hidden="true"><path d={'M' + Array.from({ length: 61 }, (_, k) => `${k * 2} ${(10 - 7 * Math.sin(k * 2 * (0.06 + i * 0.022)) * (i % 2 ? Math.sin(k / 60 * Math.PI) : 1)).toFixed(2)}`).join(' L')}/></svg>
-          </a></li>
-        ); })}
-      </ul>
+  <div class="wrap inst-dock inst-dock--home" data-inst-dock hidden></div>
+
+  <section class="section" aria-labelledby="h-history">
+    <div class="wrap history">
+      <div class="rv">
+        <p class="eyebrow">{uk ? 'Хронологія' : 'Timeline'}</p>
+        <h2 class="mt-s sec-h2" id="h-history">{uk ? 'Від радіоелектроніки до комп’ютерної інженерії' : 'From radioelectronics to computer engineering'}</h2>
+        <p class="lead mt-m">{uk ? 'Понад тридцять років кафедра поєднує фізику, електроніку й програмування.' : 'For more than thirty years the department has combined physics, electronics and programming.'}</p>
+        <div class="mt-l"><p class="cap"><b>{uk ? 'Академії й партнери' : 'Academies and partners'}</b></p><div class="logos mt-m">{PARTNERS.map(p => <span>{p}</span>)}</div></div>
+      </div>
+      <ol class="timeline rv" style="--prog:100%">
+        {HISTORY[lang].map(h => <li class="done"><time>{h.y}</time><b>{h.t}</b>{h.d && <span>{h.d}</span>}</li>)}
+      </ol>
     </div>
   </section>
 
@@ -115,9 +120,7 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
       <div class="sec-head rv"><div><p class="eyebrow">{uk ? 'Про кафедру' : 'About'}</p><h2 class="mt-s" id="h-about">{home.data.title}</h2></div></div>
       <div class="page">
         <article class="prose"><Content /></article>
-        <aside class="page__aside">
-          {home.data.mascot && <figure class="mascot"><Image src={home.data.mascot} alt={home.data.mascotAlt ?? ''} widths={[200, 380]} sizes="190px" /><figcaption>{home.data.mascotAlt}</figcaption></figure>}
-        </aside>
+        <aside class="page__aside"><Mascot src={home.data.mascot} alt={home.data.mascotAlt} /></aside>
       </div>
     </div>
   </section>

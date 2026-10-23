@@ -16,7 +16,7 @@ export const HEROES: Record<string, Hero> = {
   news: {
     ch: 'CH 01 · NEWS', inst: 'ticker', acc: 'magnifier',
     lead: { uk: 'Події кафедри: конкурси, відкриті лекції, захисти, нові академії та підручники.', en: 'Department life: competitions, open lectures, defences, new academies and textbooks.' },
-    hud: { top: ['LED 9 × N', 'SCROLL 14 col/s'], bot: ['DAILY BYTE', 'RX ●'] },
+    hud: { top: ['LED 5×7 · MSG <b data-hud="msg">1/3</b>', 'DAILY BYTE'], bot: ['NEWS / YEAR', 'RX ●'] },
     lines: { uk: ['Свіжий байт новин!', 'Розслідую нові події…', 'Елементарно, колего'], en: ['A fresh byte of news!', 'Investigating new events…', 'Elementary, colleague'] },
   },
   research: {
@@ -32,10 +32,10 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Ще одна гармоніка — і буде меандр', 'Конспект готовий!', 'Читаю методичку'], en: ['One more harmonic and it’s a square wave', 'Notes are ready!', 'Reading the lab manual'] },
   },
   entrant: {
-    ch: 'CH 04 · ADM', inst: 'spectrum', acc: 'backpack',
+    ch: 'CH 04 · ADM', inst: 'mobius', acc: 'backpack',
     lead: { uk: 'Спеціальність F7 «Комп’ютерна інженерія»: що вивчають, як вступити й ким працюють випускники.', en: 'Speciality F7 “Computer Engineering”: what you study, how to apply and where graduates work.' },
-    hud: { top: ['RBW 30 kHz', 'SPAN 5 GHz'], bot: ['F7 · BACHELOR · MASTER · PHD', 'PEAK HOLD'] },
-    lines: { uk: ['LET’S CODE!', 'Рюкзак зібрано!', 'До зустрічі на першому курсі'], en: ['LET’S CODE!', 'Backpack packed!', 'See you in the first year'] },
+    hud: { top: ['LAP <b data-hud="lap">1</b> / 2', 'φ = <b data-hud="phase">0°</b>'], bot: ['MÖBIUS STRIP', 'MOVE CURSOR'] },
+    lines: { uk: ['LET’S CODE!', 'Рюкзак зібрано!', 'Навчання — без кінця, як стрічка Мебіуса', 'До зустрічі на першому курсі'], en: ['LET’S CODE!', 'Backpack packed!', 'Learning never ends — like a Möbius strip', 'See you in the first year'] },
   },
   documents: {
     ch: 'CH 05 · DOCS', inst: 'tape', acc: 'glasses',
@@ -56,15 +56,15 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Готуюся до лекції', 'Знайдіть викладача за літерою', 'Кожен — своя частота'], en: ['Getting ready for a lecture', 'Find a teacher by letter', 'Everyone has their own frequency'] },
   },
   stateholders: {
-    ch: 'CH 08 · EMPL', inst: 'smith', acc: 'tie',
+    ch: 'CH 08 · EMPL', inst: 'tess', acc: 'tie',
     lead: { uk: 'Співпраця з роботодавцями: практики, спільні лабораторії, авторизовані академії й рада роботодавців.', en: 'Working with employers: internships, joint laboratories, authorised academies and the employers’ council.' },
-    hud: { top: ['|Γ| = <b data-hud="g">0</b>', 'VSWR <b data-hud="vswr">1</b>'], bot: ['SMITH CHART', 'Z → 50 Ω MATCHED'] },
-    lines: { uk: ['Узгоджуємо імпеданс з бізнесом', 'КСХ = 1, ідеальне узгодження', 'Чекаємо на співпрацю'], en: ['Matching impedance with industry', 'VSWR = 1, a perfect match', 'Looking forward to working together'] },
+    hud: { top: ['4D · ROT XW · YZ', 'W-PERSPECTIVE'], bot: ['TESSERACT', 'MOVE CURSOR'] },
+    lines: { uk: ['Мислимо в чотирьох вимірах', 'Чекаємо на співпрацю', 'Практика — найкращий вимір'], en: ['Thinking in four dimensions', 'Looking forward to working together', 'Practice is the best dimension'] },
   },
   studying: {
-    ch: 'CH 09 · STUD', inst: 'tess', acc: 'laptop',
+    ch: 'CH 09 · STUD', inst: 'spectrum', acc: 'laptop',
     lead: { uk: 'Навчальні плани, програми дисциплін, розклад і графік сесії.', en: 'Curricula, course syllabi, the timetable and the examination schedule.' },
-    hud: { top: ['4D · ROT XW', 'W-PERSPECTIVE'], bot: ['TESSERACT', 'MOVE CURSOR'] },
-    lines: { uk: ['Компілюю розклад…', 'Вчимося в чотирьох вимірах', 'Ще одна лабораторна!'], en: ['Compiling the timetable…', 'Learning in four dimensions', 'One more lab!'] },
+    hud: { top: ['RBW 30 kHz', 'SPAN 5 GHz'], bot: ['SPECTRUM ANALYZER', 'PEAK HOLD'] },
+    lines: { uk: ['Компілюю розклад…', 'Ще одна лабораторна!', 'Сесія — на піку'], en: ['Compiling the timetable…', 'One more lab!', 'Exams at their peak'] },
   },
 };

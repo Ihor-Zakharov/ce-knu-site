@@ -8,7 +8,7 @@ legacy: "/posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it
 source: "posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe.rst"
 ---
 
-![](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)
+![Фото: Студент кафедри здобув золоту медаль на міжнародній олімпіаді IT-Universe](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)
 
 Студент кафедри комп’ютерної інженерії Костянтин Дєєв здобув золоту медаль у конкурсі від компаніі D-Link «Протоколи, сервіси і обладнання».
 

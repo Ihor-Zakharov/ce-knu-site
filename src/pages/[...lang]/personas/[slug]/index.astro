@@ -4,6 +4,7 @@ import Base from '../../../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { T, url, langOf, type Lang } from '../../../../lib/i18n';
 import { slugOf } from '../../../../lib/content';
+import { personLd } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
   const all = await getCollection('people', p => !!p.data.legacy);
@@ -23,20 +24,21 @@ const RATIOS = [[3, 2], [5, 4], [3, 4], [2, 3], [4, 5], [5, 6], [4, 3], [6, 5]];
 const [a, b] = RATIOS[h % RATIOS.length];
 let d = ''; for (let i = 0; i <= 400; i++) { const s = i / 400 * Math.PI * 2; d += (i ? 'L' : 'M') + (50 + 44 * Math.sin(a * s + Math.PI / 2)).toFixed(2) + ' ' + (50 + 44 * Math.sin(b * s)).toFixed(2); }
 const words = entry.data.name.split(/\s+/);
+const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: `/personas/${slug}/`, image: entry.data.photo?.src, site: Astro.site! });
 ---
-<Base lang={lang} title={entry.data.name} description={entry.data.role}>
+<Base lang={lang} title={entry.data.name} description={`${entry.data.name}. ${entry.data.role}`} og="personas" type="profile" crumbs={[{ name: t.people, path: '/personas/' }]} jsonld={[ld]}>
   <section class="ph">
     <div class="wrap">
       <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
         <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li><a href={url(lang, '/personas/')}>{t.people}</a></li><li aria-current="page">{entry.data.name}</li></ol>
       </nav>
-      <div class="profile-hero mt-l">
+      <div class="profile-hero mt-m">
         <div class="profile-hero__ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[200, 400]} sizes="200px" loading="eager" />}</div>
         <div>
           <p class="ph__eyebrow"><b>CH 07</b>{entry.data.group}</p>
           <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{' '}</>)}</h1>
           {entry.data.role && <p class="role">{entry.data.role}</p>}
-          <div class="row mt-m" style="align-items:center;gap:18px">
+          <div class="row mt-s" style="align-items:center;gap:14px">
             <svg class="profile-hero__sig" viewBox="0 0 100 100" aria-hidden="true"><path d={d} pathLength="1"/></svg>
             <span class="cap">{lang === 'uk' ? 'Підпис-Ліссажу' : 'Lissajous signature'} · <b>{a}:{b}</b></span>
           </div>
@@ -47,9 +49,7 @@ const words = entry.data.name.split(/\s+/);
   <section class="section">
     <div class="wrap page">
       <article class="prose"><Content /></article>
-      <aside class="page__aside">
-        <a class="btn btn--line btn--sm" href={url(lang, '/personas/')}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg>{t.people}</a>
-      </aside>
+      <a class="btn btn--line btn--sm mt-l" href={url(lang, '/personas/')}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg>{lang === 'uk' ? 'Усі персоналії' : 'All people'}</a>
     </div>
   </section>
 </Base>

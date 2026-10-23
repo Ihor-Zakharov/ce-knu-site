@@ -8,7 +8,7 @@ legacy: "/posts/APHYS-2023/"
 source: "posts/21-aphys-2023.rst"
 ---
 
-![](../../../assets/images/news/aphys-2023.jpg)
+![Photo: The 19th International Conference on Electronics and Applied Physics APHYS’2023](../../../assets/images/news/aphys-2023.jpg)
 
 Dear Colleagues,
 

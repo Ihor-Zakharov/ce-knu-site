@@ -8,7 +8,7 @@ legacy: "/posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v
 source: "posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r.rst"
 ---
 
-![](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)
+![Фото: Погорілий С.Д. і Бойко Ю.В. – лауреати Державної премії України в галузі науки і техніки 2018 р](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)
 
 Указом Президента України два співробітники кафедри Комп’ютерної інженерії отримали найвищу відзнаку країни в своїй сфері за наукову роботу «Методи та новітні підходи до проектування, управління і застосування високопродуктивних IT-інфраструктур».
 

@@ -8,7 +8,7 @@ legacy: "/posts/greeting-filipov/"
 source: "posts/greeting-filipov.rst"
 ---
 
-![](../../../assets/images/news/greeting-filipov.jpg)
+![Photo: Congratulations to our student Mykyta Filipov on his victory at the World Championship](../../../assets/images/news/greeting-filipov.jpg)
 
 We are proud!2
 

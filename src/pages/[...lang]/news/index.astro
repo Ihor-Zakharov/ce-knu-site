@@ -3,17 +3,21 @@ import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
 import { T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
-import { news, page, slugOf } from '../../../lib/content';
+import { news, slugOf } from '../../../lib/content';
+import { HEROES } from '../../../lib/heroes';
+import NewsArt from '../../../components/NewsArt.astro';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
 const list = await news(lang);
 const years = [...new Set(list.map(n => n.data.date.getUTCFullYear()))];
-const ticker = list.slice(0, 6).map(n => n.data.title.replace(/[.!]+$/, '')).join('   ◆   ');
+const last = list[0]?.data.date;
+const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', t.newsCount(list.length).toUpperCase(), last ? last.toISOString().slice(0, 10).split('-').reverse().join('.') : ''].filter(Boolean);
+const perYear = [...years].reverse().map(y => [y, list.filter(n => n.data.date.getUTCFullYear() === y).length]);
 ---
-<Base lang={lang} title={t.news} description={T[lang].footNote}>
-  <PageHero lang={lang} title={t.news} kind="news" text={ticker}
+<Base lang={lang} title={t.news} description={HEROES.news.lead[lang]} og="news" crumbs={[]}>
+  <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs), years: JSON.stringify(perYear) }}
     meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`, `${years.at(-1)}–${years[0]}`, `<a href="${url(lang, '/rss.xml')}">RSS</a>`]} />
   <section class="section">
     <div class="wrap">
@@ -28,7 +32,7 @@ const ticker = list.slice(0, 6).map(n => n.data.title.replace(/[.!]+$/, '')).joi
               <a class="newsrow" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
                 <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
                 <div><h3>{n.data.title}</h3><p>{n.data.summary}</p></div>
-                <span class="thumb">{n.data.cover && <Image src={n.data.cover} alt="" width={192} height={144} fit="cover" />}</span>
+                <span class="thumb">{n.data.cover ? <Image src={n.data.cover} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} date={n.data.date} small />}</span>
                 <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
               </a>
             ))}

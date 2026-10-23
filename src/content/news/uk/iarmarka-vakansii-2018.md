@@ -8,7 +8,7 @@ legacy: "/posts/iarmarka-vakansii-2018/"
 source: "posts/iarmarka-vakansii-2018.rst"
 ---
 
-![](../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg)
+![Фото: Ярмарка вакансій 2018](../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg)
 
 10 жовтня 2018 у приміщенні факультету відбулась ярмарка вакансій.
 

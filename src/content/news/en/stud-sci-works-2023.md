@@ -8,7 +8,7 @@ legacy: "/posts/stud-sci-works-2023/"
 source: "posts/20-stud-sci-works.rst"
 ---
 
-![](../../../assets/images/news/stud-sci-works-2023.jpg)
+![Photo: Award ceremony for the winners of the All-Ukrainian Student Research Paper Competition and their supervisors](../../../assets/images/news/stud-sci-works-2023.jpg)
 
 Round I of the All-Ukrainian Student Research Paper Competition in the fields of information technology; natural sciences; and electronics, automation and electronic communications has taken place.
 

@@ -2,14 +2,16 @@
 //   ticker   — новини: світлодіодна матриця, що біжить заголовками
 //   field    — дослідження: інтерференція двох джерел (друге йде за курсором)
 //   fourier  — НМЗ: меандр, що складається з гармонік ряду Фур'є
-//   spectrum — вступникам: аналізатор спектра з утриманням піків
+//   mobius   — вступникам: стрічка Мебіуса, хвиля після обходу інвертує фазу
+//   spectrum — навчання: аналізатор спектра з утриманням піків
 //   tape     — документи: перфострічка, що кодує назви документів ASCII
 //   array    — випускники: фазована антенна решітка, промінь сканує світ
 //   liss     — персоналії: фігури Ліссажу, що перетікають між відношеннями частот
-//   smith    — роботодавцям: діаграма Сміта, імпеданс сходиться до узгодження
-//   tess     — навчання: тесеракт у 4D-обертанні
+//   tess     — роботодавцям: тесеракт у 4D-обертанні
+//   smith    — (запасний) діаграма Сміта, імпеданс сходиться до узгодження
 // Без руху (prefers-reduced-motion) малюється один статичний кадр. Поза екраном — пауза.
 import { REDUCED, Spring } from './spring.js';
+import { columns } from './dotfont.js';
 
 const root = document.documentElement;
 const css = v => getComputedStyle(root).getPropertyValue(v).trim();
@@ -37,53 +39,50 @@ function mount(cv, make) {
 }
 const hud = (el, k, v) => { const n = el?.querySelector(`[data-hud="${k}"]`); if (n && n.textContent !== v) n.textContent = v; };
 
-/* ── Новини: світлодіодна матриця ─────────────────────────── */
+/* ── Новини: світлодіодне табло ─────────────────────────── */
+// Короткі повідомлення шрифтом 5×7 по черзі («НОВИНИ» → «33 НОВИНИ» → дата останньої), кожне
+// прокреслюється стовпчиками зліва направо; знизу — справжня гістограма новин за роками.
 function ticker(c, st, cv) {
   const box = cv.closest('.inst');
-  const text = (box.dataset.text || 'KI-REX NEWS').toUpperCase() + '   ◆   ';
-  const ROWS = 9;
-  let bits = null, cols = 0;
-  // текст → бітова маска: рендеримо дрібно в позаекранний канвас і читаємо пікселі
-  function raster() {
-    const o = document.createElement('canvas'), oc = o.getContext('2d', { willReadFrequently: true });
-    oc.font = '700 9px "Signal Mono", monospace';
-    cols = Math.ceil(oc.measureText(text).width) + 2;
-    o.width = cols; o.height = ROWS + 2;
-    oc.font = '700 9px "Signal Mono", monospace'; oc.textBaseline = 'top'; oc.fillStyle = '#000';
-    oc.fillText(text, 1, 1);
-    const d = oc.getImageData(0, 0, cols, ROWS + 2).data;
-    bits = new Uint8Array(cols * ROWS);
-    for (let y = 0; y < ROWS; y++) for (let x = 0; x < cols; x++) bits[y * cols + x] = d[((y + 1) * cols + x) * 4 + 3] > 110 ? 1 : 0;
-  }
-  document.fonts?.ready.then(() => { raster(); });
-  raster();
+  const msgs = JSON.parse(box.dataset.msgs || '["NEWS"]').map(m => ({ m, cols: columns(m) }));
+  const years = JSON.parse(box.dataset.years || '[]');
+  const HOLD = 3.2, WIPE = .7;
   return {
-    still: 0,
+    still: WIPE + .1,
     draw(t) {
       const { W, H, col } = st;
-      const pitch = Math.max(5, Math.floor(H / 20)), r = pitch * .36;
-      const vis = Math.floor(W / pitch), y0 = Math.round(H / 2 - ROWS * pitch / 2 - pitch * 1.2);
-      const off = Math.floor(t * 14) % cols;
-      const x0 = (W - vis * pitch) / 2 + pitch / 2;
-      // нижній рядок: «спектр» новин за роками — тихі стовпчики
-      for (let y = 0; y < ROWS; y++) {
-        for (let i = 0; i < vis; i++) {
-          const on = bits[y * cols + ((i + off) % cols)];
-          c.globalAlpha = on ? 1 : (col.dark ? .1 : .14);
-          c.fillStyle = on ? col.ph : col.line;
-          if (on && col.dark) { c.shadowColor = col.ph; c.shadowBlur = 6; } else c.shadowBlur = 0;
+      const span = Math.max(...msgs.map(x => x.cols.length)) + 4;
+      const pitch = Math.max(4, Math.min(Math.floor((W - 24) / span), Math.floor(H / 15)));
+      const r = pitch * .38, k = Math.floor(t / HOLD) % msgs.length, phase = t % HOLD;
+      const { cols } = msgs[k];
+      const n = Math.floor((W - 24) / pitch), x0 = (W - n * pitch) / 2 + pitch / 2;
+      const y0 = Math.round(H * .4 - 3 * pitch), start = Math.floor((n - cols.length) / 2);
+      const lit = Math.floor(Math.min(1, phase / WIPE) * (cols.length + 2));       // скільки стовпців уже «прокреслено»
+      for (let i = 0; i < n; i++) {
+        const ci = i - start, on = ci >= 0 && ci < cols.length && ci < lit ? cols[ci] : 0;
+        for (let y = 0; y < 7; y++) {
+          const b = on >> y & 1;
+          c.globalAlpha = b ? 1 : (col.dark ? .09 : .12);
+          c.fillStyle = b ? col.ph : col.line;
+          c.shadowBlur = b && col.dark ? 7 : 0; c.shadowColor = col.ph;
           c.beginPath(); c.arc(x0 + i * pitch, y0 + y * pitch, r, 0, TAU); c.fill();
         }
       }
-      c.shadowBlur = 0;
-      const by = y0 + ROWS * pitch + pitch * 1.6, n = Math.floor(W / (pitch * 1.4));
-      for (let i = 0; i < n; i++) {
-        const v = .35 + .65 * Math.abs(Math.sin(i * .7 + t * 1.3) * Math.cos(i * .23 - t * .7));
-        const h = Math.max(1, v * (H - by - 26));
-        c.globalAlpha = .28; c.fillStyle = col.gold;
-        c.fillRect(W / 2 - n * pitch * .7 + i * pitch * 1.4, by + (H - by - 26) - h, pitch * .9, h);
+      c.shadowBlur = 0; c.globalAlpha = 1;
+      // гістограма за роками
+      if (years.length) {
+        const top = y0 + 7 * pitch + pitch * 1.4, bottom = H - 44, h = bottom - top, max = Math.max(...years.map(y => y[1]));
+        const bw = Math.min(28, (W - 48) / years.length), gx = (W - bw * years.length) / 2;
+        c.font = '500 9.5px "Signal Mono", monospace'; c.textAlign = 'center';
+        years.forEach(([yr, cnt], i) => {
+          const bh = Math.max(2, cnt / max * h), x = gx + i * bw;
+          c.fillStyle = col.gold; c.globalAlpha = .45; c.fillRect(x + 3, bottom - bh, bw - 6, bh);
+          c.globalAlpha = .9; c.fillStyle = col.ink3;
+          if (years.length < 10 || i % 2 === 0 || i === years.length - 1) c.fillText(String(yr).slice(2), x + bw / 2, bottom + 13);
+        });
+        c.globalAlpha = 1;
       }
-      c.globalAlpha = 1;
+      hud(box, 'msg', `${k + 1}/${msgs.length}`);
     },
   };
 }
@@ -317,7 +316,50 @@ function smith(c, st, cv) {
   };
 }
 
-/* ── Навчання: тесеракт ───────────────────────────────────── */
+/* ── Вступникам: стрічка Мебіуса — по ній біжить хвиля, що після обходу інвертує фазу ── */
+function mobius(c, st, cv) {
+  const yaw = new Spring({ value: .6, response: 1.1, damping: .9 }), pitch = new Spring({ value: .55, response: 1.1, damping: .9 });
+  const U = 160;
+  const P = (u, v) => { const r = 1 + v / 2 * Math.cos(u / 2); return [r * Math.cos(u), r * Math.sin(u), v / 2 * Math.sin(u / 2)]; };
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); yaw.set(.6 + ((e.clientX - r.left) / r.width - .5) * 1.6); pitch.set(.55 + ((e.clientY - r.top) / r.height - .5) * 1.1); });
+  cv.addEventListener('pointerleave', () => { yaw.set(.6); pitch.set(.55); });
+  let tt = 0;
+  const proj = ([x, y, z]) => {
+    const { W, H } = st, a = yaw.value + tt * .12, b = pitch.value;
+    const X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a), Z = z;
+    const Y2 = Y * Math.cos(b) - Z * Math.sin(b), Z2 = Y * Math.sin(b) + Z * Math.cos(b);
+    const s = Math.min(W * .26, H * .36) / (1 + Y2 * .18);
+    return [W / 2 + X * s, H / 2 + 4 - Z2 * s * 1.05, Y2];
+  };
+  const wave = u => .78 * Math.sin(u * 3.5) * Math.cos(u / 2 - Math.floor(u / (Math.PI * 2)) * Math.PI);
+  return {
+    still: 2,
+    draw(t) {
+      tt = t; const { col } = st;
+      const segs = [];
+      for (let i = 0; i < U; i++) { const u = i / U * TAU; const a = proj(P(u, -1)), b = proj(P(u, 1)); segs.push([(a[2] + b[2]) / 2, a, b, i]); }
+      segs.sort((p, q) => q[0] - p[0]);
+      c.lineWidth = 1;
+      for (const [d, a, b, i] of segs) { c.globalAlpha = .12 + .5 * (1 - (d + 1.6) / 3.2); c.strokeStyle = i % 8 ? col.line : col.gold; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); }
+      // єдиний край стрічки: обходить її двічі
+      c.globalAlpha = .9; c.strokeStyle = col.gold; c.lineWidth = 1.2; c.beginPath();
+      for (let i = 0; i <= U * 2; i++) { const p = proj(P(i / U * TAU, 1)); i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); }
+      c.stroke();
+      c.strokeStyle = col.ph; c.lineWidth = 1.8; c.shadowColor = col.ph; c.shadowBlur = col.dark ? 8 : 0;
+      const head = (t * .9) % (Math.PI * 4);
+      c.beginPath();
+      for (let i = 0; i <= 260; i++) { const u = head - i / 260 * Math.PI * 1.6, p = proj(P(u, wave(u) * (1 - i / 260))); i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); }
+      c.globalAlpha = 1; c.stroke(); c.shadowBlur = 0;
+      const hp = proj(P(head, wave(head)));
+      const g = c.createRadialGradient(hp[0], hp[1], 0, hp[0], hp[1], 12); g.addColorStop(0, col.ph); g.addColorStop(1, 'transparent');
+      c.fillStyle = g; c.fillRect(hp[0] - 12, hp[1] - 12, 24, 24);
+      hud(cv.closest('.inst'), 'lap', head < TAU ? '1' : '2');
+      hud(cv.closest('.inst'), 'phase', head < TAU ? '0°' : '180°');
+    },
+  };
+}
+
+/* ── Роботодавцям: тесеракт ───────────────────────────────── */
 function tess(c, st, cv) {
   const V = []; for (let i = 0; i < 16; i++) V.push([i & 1 ? 1 : -1, i & 2 ? 1 : -1, i & 4 ? 1 : -1, i & 8 ? 1 : -1]);
   const E = []; for (let i = 0; i < 16; i++) for (let k = 0; k < 4; k++) { const j = i ^ (1 << k); if (j > i) E.push([i, j, k]); }
@@ -357,7 +399,7 @@ function tess(c, st, cv) {
   };
 }
 
-const KINDS = { ticker, field, fourier, spectrum, tape, array, liss, smith, tess };
+const KINDS = { ticker, field, fourier, spectrum, tape, array, liss, smith, tess, mobius };
 export function mountInstruments() {
   document.querySelectorAll('.inst[data-inst] canvas[data-draw]').forEach(cv => {
     const kind = KINDS[cv.closest('.inst').dataset.inst];

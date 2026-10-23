@@ -1,0 +1,17 @@
+---
+// Заставка для новини без фото: графікон, фігура Ліссажу (своя для кожної новини) і дата — замість порожнього кадру
+interface Props { slug: string; date: Date; label?: string; small?: boolean }
+const { slug, date, label = '', small = false } = Astro.props;
+let h = 7; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+const R = [[3, 2], [5, 4], [3, 4], [2, 3], [4, 5], [5, 6], [4, 3], [1, 2]];
+const [a, b] = R[h % R.length], ph = (h % 7) / 7 * Math.PI;
+let d = ''; for (let i = 0; i <= 500; i++) { const s = i / 500 * Math.PI * 2; d += (i ? 'L' : 'M') + (150 + 70 * Math.sin(a * s + ph)).toFixed(1) + ' ' + (100 + 70 * Math.sin(b * s)).toFixed(1); }
+const dd = date.toISOString().slice(0, 10).split('-').reverse().join('.');
+---
+<svg class:list={['news-art', small && 'news-art--sm']} viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g class="news-art__grat">{[1, 2, 3, 4, 5].map(i => <path d={`M${i * 50} 0V200`} />)}{[1, 2, 3].map(i => <path d={`M0 ${i * 50}H300`} />)}</g>
+  <path class="news-art__axis" d="M150 0V200M0 100H300" />
+  <path class="news-art__trace" d={d} />
+  {!small && <text x="14" y="186" class="news-art__t">{dd}</text>}
+  {!small && label && <text x="286" y="186" text-anchor="end" class="news-art__t">{label}</text>}
+</svg>

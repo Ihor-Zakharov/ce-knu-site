@@ -8,7 +8,7 @@ legacy: "/posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim
 source: "posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim-universitetom-imeni-tarasa-shevchenka-ta-kompaniieiu-huawei-technologies-ukraine.rst"
 ---
 
-![](../../../assets/images/news/1610-huawei-01.jpg "On 28 October, a Memorandum on expanding cooperation was signed in the Main (Red) Building of Taras Shevchenko National University of Kyiv (photo by Andrii Yelovikov)")
+![On 28 October, a Memorandum on expanding cooperation was signed in the Main (Red) Building of Taras Shevchenko National University of Kyiv (photo by Andrii Yelovikov)](../../../assets/images/news/1610-huawei-01.jpg "On 28 October, a Memorandum on expanding cooperation was signed in the Main (Red) Building of Taras Shevchenko National University of Kyiv (photo by Andrii Yelovikov)")
 
 It was signed at a formal ceremony by the Rector of Taras Shevchenko National University of Kyiv and the Director of **Huawei Ukraine**, Zhou Haoze, in the presence of the Deputy Minister of Education and Science of Ukraine, Maksym Strikha, and representatives of the university administration and students.
 

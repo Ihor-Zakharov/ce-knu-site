@@ -7,7 +7,7 @@ legacy: "/"
 source: "pages/index.rst"
 ---
 
-![](../../../assets/images/studying/01.jpg)
+![Photo: Computer Engineering](../../../assets/images/studying/01.jpg)
 
 **"Computer Engineering"** covers the hardware platforms and system software of general-purpose and special-purpose computer systems and networks, as well as their components.
 
@@ -81,10 +81,10 @@ The department's Digital Communications Laboratory has modern equipment from MIP
 
 In spring 2017, a memorandum was signed between the Faculty of Radiophysics, Electronics and Computer Systems of Taras Shevchenko National University of Kyiv and the representative office of IBM Corporation, "IBM Ukraine". As part of this cooperation, a modern IBM Power 550 server with the AIX Unix platform was handed over to the Department of Computer Engineering for operation.
 
-![](../../../assets/images/studying/ibm-1.jpg "IBM Power 550 server used in the educational process")
+![IBM Power 550 server used in the educational process](../../../assets/images/studying/ibm-1.jpg "IBM Power 550 server used in the educational process")
 
-![](../../../assets/images/studying/ibm-2.jpg "Professor S. D. Pohorilyi and O. M. Danko, representative of “IBM Ukraine”, in the department's IBM laboratory classroom")
+![Professor S. D. Pohorilyi and O. M. Danko, representative of “IBM Ukraine”, in the department's IBM laboratory classroom](../../../assets/images/studying/ibm-2.jpg "Professor S. D. Pohorilyi and O. M. Danko, representative of “IBM Ukraine”, in the department's IBM laboratory classroom")
 
 In addition to its own equipped laboratories, the Department of Computer Engineering uses in the educational process the shared resources of the university maintained by the Computing Centre (ICC). In particular: - the first high-performance computing cluster, built at the ICC with the support of Intel Corporation. This resource is also actively used for scientific research in various fields. - the highly reliable IBM Z800 mainframe - network equipment of the Cisco laboratory
 
-![](../../../assets/images/studying/06.jpg "Discussion and analysis of scientific computations by Professor S. D. Pohorilyi and Associate Professor Yu. V. Boiko")
+![Discussion and analysis of scientific computations by Professor S. D. Pohorilyi and Associate Professor Yu. V. Boiko](../../../assets/images/studying/06.jpg "Discussion and analysis of scientific computations by Professor S. D. Pohorilyi and Associate Professor Yu. V. Boiko")

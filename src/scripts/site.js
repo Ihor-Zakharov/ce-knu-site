@@ -1,6 +1,6 @@
 // Поведінка сайту. Без JS усі сторінки повністю читаються й навігуються;
 // скрипт лише додає рух, тему, меню на телефоні, пошук і перегляд фото.
-import { REDUCED, FINE, Spring, attachPress, attachGlow, moveInk } from './spring.js';
+import { REDUCED, FINE, attachPress, attachGlow, moveInk } from './spring.js';
 import { perch, paintStatic, rexFrame, drawGrid, REX_GRID } from './rex.js';
 import { mountInstruments } from './instruments.js';
 
@@ -207,10 +207,18 @@ $$('canvas[data-rex]').forEach(paintStatic);
 $$('.perch').forEach(perch);
 mountInstruments();
 
-/* ── Головна: осцилограф, по променю якого біжить КІ-Рекс ──── */
+/* ── На телефоні прилад з КІ-Рексом — після змісту сторінки, а не перед ним ── */
+const dock = $('[data-inst-dock]'), dockable = $('[data-dockable]');
+if (dock && dockable) {
+  const home = document.createComment('inst'); dockable.before(home);
+  const place = mq => { if (mq.matches) { dock.hidden = false; dock.append(dockable); } else { home.after(dockable); dock.hidden = true; } };
+  const mq = matchMedia('(max-width: 900px)'); place(mq); mq.addEventListener('change', place);
+}
+
+/* ── Головна: осцилограф — промінь плавно перетікає між формами сигналу ── */
 const scope = $('.scope-home');
 if (scope) {
-  const main = $('.trace--main', scope), ghost = $('.trace--ghost', scope), rexCv = $('.scope-rex', scope);
+  const main = $('.trace--main', scope), ghost = $('.trace--ghost', scope);
   const keys = $$('.key[data-mode]', scope), label = $('[data-scope-mode]', scope), freq = $('[data-scope-f]', scope), play = $('[data-scope-play]', scope), nextOut = $('[data-scope-next]', scope);
   const DIV_T = 250e-6, DIVS = 10;
   const MODES = {
@@ -224,29 +232,15 @@ if (scope) {
   const NEXT = L === 'uk' ? 'далі' : 'next', MANUAL = L === 'uk' ? 'ручний режим' : 'manual', SEC = L === 'uk' ? 'с' : 's';
   let from = 'sine', to = 'sine', mt = performance.now(), t0 = performance.now(), raf = 0, auto = !REDUCED, playing = !REDUCED, frozen = performance.now();
   const ease = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
-  // Рекс: x пливе вздовж екрана, y — пружина, що «стрибає» на кожному перепаді сигналу
-  const rc = rexCv.getContext('2d'), PX = 2; rexCv.width = REX_GRID.w * PX; rexCv.height = REX_GRID.h * PX;
-  const ry = new Spring({ value: H / 2, response: .32, damping: .62 });
-  let rxp = .12, walk = 0;
   const yAt = (x, t, e) => H / 2 - (MODES[from].fn(x, t) * (1 - e) + MODES[to].fn(x, t) * e) * H * .4;
   function path(now) {
     const t = ((playing ? now : frozen) - t0) / 1000 * 1.4, e = ease(Math.min(1, (now - mt) / 1200));
     let d = '';
     for (let px = 0; px <= W; px += 3) d += (px ? 'L' : 'M') + px + ' ' + yAt(px / W, t, e).toFixed(1);
     main.setAttribute('d', d); ghost.setAttribute('d', d);
-    // для AM Рекс біжить по обвідній, а не по несучій — інакше він би тремтів
-    const env = to === 'am' && e > .5;
-    const ty = env ? H / 2 - .55 * (.55 + .45 * Math.sin(2 * Math.PI * 1.5 * rxp - t * .5)) * H * .4 : yAt(rxp, t, e);
-    ry.set(ty);
-    const box = scope.querySelector('.scope__screen').getBoundingClientRect(), k = box.width / W;
-    const legs = playing ? (Math.floor(walk) % 2 ? 1 : 2) : 0;
-    rc.clearRect(0, 0, rexCv.width, rexCv.height); drawGrid(rc, rexFrame({ legs, blink: Math.sin(now / 900) > .985 }), PX);
-    rexCv.style.transform = `translate(${(rxp * W * k - 30).toFixed(1)}px, ${(ry.value * k - (REX_GRID.h - 1) * PX).toFixed(1)}px)`;
     return e < 1;
   }
   function frame(now) {
-    const dt = Math.min(.05, (now - (frame.last || now)) / 1000); frame.last = now;
-    if (playing) { rxp += dt * .045; if (rxp > .94) rxp = .06; walk += dt * 8; }
     const morphing = path(now);
     const next = keys.find(k => k.dataset.mode === order[(order.indexOf(to) + 1) % order.length]);
     if (auto && playing) {
@@ -257,7 +251,7 @@ if (scope) {
     }
     raf = playing || morphing ? requestAnimationFrame(frame) : 0;
   }
-  const start = () => { if (!raf) { frame.last = performance.now(); raf = requestAnimationFrame(frame); } };
+  const start = () => { if (!raf) raf = requestAnimationFrame(frame); };
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
   function go(m, manual = true) {
     if (manual) { auto = false; keys.forEach(k => k.style.setProperty('--p', 0)); nextOut.textContent = MANUAL; }
@@ -278,7 +272,6 @@ if (scope) {
   });
   if (REDUCED) { play?.setAttribute('aria-pressed', 'true'); $('use', play)?.setAttribute('href', '#i-play'); }
   path(performance.now());
-  new ResizeObserver(() => path(performance.now())).observe(scope);
   let seen = false;
   const upd = () => (seen && !document.hidden ? start() : stop());
   new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }, { rootMargin: '80px' }).observe(scope);

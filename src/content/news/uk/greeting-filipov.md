@@ -8,7 +8,7 @@ legacy: "/posts/greeting-filipov/"
 source: "posts/greeting-filipov.rst"
 ---
 
-![](../../../assets/images/news/greeting-filipov.jpg)
+![Фото: Вітаємо нашого студента – Філіпова Микиту з перемогою на Чемпіонату Світу](../../../assets/images/news/greeting-filipov.jpg)
 
 Пишаємося!2
 

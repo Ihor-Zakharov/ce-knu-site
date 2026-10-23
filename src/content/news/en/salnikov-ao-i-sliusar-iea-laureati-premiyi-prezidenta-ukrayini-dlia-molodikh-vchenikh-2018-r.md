@@ -8,7 +8,7 @@ legacy: "/posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-d
 source: "posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r.rst"
 ---
 
-![](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)
+![Photo: A. O. Salnikov and Ye. A. Sliusar: Laureates of the 2018 President of Ukraine's Prize for Young Scientists](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)
 
 [By Decree of the President of Ukraine](https://www.president.gov.ua/documents/4192018-25730), two members of staff of the Department of Computer Engineering have received a high national award in their field for the research work "\`Creation of a High-Performance Grid Infrastructure for Research into Conformational Changes of Biopolymers \<http://www.kdpu-nt.gov.ua/work/stvorennya-visokoproduktivnoyi-infrastrukturi-v-grid-dlya-doslidzhen-konformaciynih-zmin-biopol\>\`\_\_".
 

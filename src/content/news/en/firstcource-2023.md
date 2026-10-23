@@ -8,7 +8,7 @@ legacy: "/posts/firstcource-2023/"
 source: "posts/23-firstcource23.rst"
 ---
 
-![](../../../assets/images/news/firstcource-2023.jpg)
+![Photo: Welcome ceremony for first-year students](../../../assets/images/news/firstcource-2023.jpg)
 
 On 1 September 2023, the Faculty of Radiophysics, Electronics and Computer Systems held a welcome ceremony for first-year Bachelor's students and their parents. The event took place in an exceptionally solemn, yet warm and moving atmosphere. Heartfelt wishes to the faculty's students were expressed by the Dean of the Faculty Andrii Netreba, the Heads of Departments Yurii Boiko, Serhii Radchenko, Serhii Savenkov and Hanna Karlash, the Deputy Deans Nataliia Bashmakova, Yuliia Veremii and Nataliia Horbovtsova, as well as the faculty's curators and lecturers.
 

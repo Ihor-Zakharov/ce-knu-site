@@ -9,7 +9,8 @@ const REX = [
   '..d.....dggggggggdd...', '..dd...ddggggggd......', '..dgd.dgnnnnnnndgd....', '..dggddgnnyyynndgd....',
   '...dggggnnyynnnd......', '....dgggnnnyynnd......', '.....dggbbbbbbd.......', '......dggbbbbd........',
 ];
-const LEGS = [['.......dgg..dgg.......', '.......dd....dd.......'], ['........dgg.dg........', '........dd..dd........'], ['.......dgg...dg.......', '.......dd....dd.......']];
+// ноги: 0 — стоїть, 1 — крок урозкид, 2 — ноги разом (проміжна фаза кроку)
+const LEGS = [['.......dgg..dgg.......', '.......dd....dd.......'], ['......dgg....dgg......', '.....dd.......dd......'], ['........dggdgg........', '........dd.dd.........']];
 const BLINK = { 2: '........dgggggggggd...', 3: '........dggdddgggggd..' };
 const PAL = { d: '#1E3416', g: '#5E9B3A', w: '#FFFFFF', k: '#111111', n: '#23305A', y: '#D8B56E', b: '#E9D9A6',
   W: '#5E1424', r: '#A4202A', s: '#B9B3A8', c: '#CFE6F2', G: '#7FD36B', K: '#2A2420', o: '#E6D3A3' };
@@ -51,33 +52,85 @@ export function paintStatic(cv) {
   drawGrid(c, rexFrame({ acc: cv.dataset.rex || null }), px);
 }
 
-/* Рекс, що гуляє по верхньому краю приладу: ходить, кліпає, на клік підстрибує й каже репліку */
+/* Рекс, що гуляє по краю (верх приладу, лінія над цифрами). Поведінка:
+   • ходить між випадковими точками, зупиняється, озирається, кліпає;
+   • курсор поруч — зупиняється й дивиться на нього; клік — стрибок (над шапкою) і репліка;
+   • згори часом падає світний біт 0/1 — Рекс біжить і з'їдає його (лічильник у браузері: 8 біт = байт);
+   • наведення на елемент з data-rex-say (на головній — цифри) — підбігає під нього й коментує;
+   • довго ніхто не чіпає — засинає; зміна теми — коментує.
+   Без руху (prefers-reduced-motion) — стоїть і лише відповідає на клік. */
+export const PERCH_PX = 3;                                    // цілий масштаб: піксель спрайта = 3 px
+const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* приватний режим */ } } };
 export function perch(box) {
   const cv = box.querySelector('canvas'), say = box.querySelector('.perch__say');
   const c = cv.getContext('2d'), acc = box.dataset.acc || null;
+  const uk = document.documentElement.lang !== 'en';
   const lines = JSON.parse(box.dataset.lines || '[]');
-  const PX = 3, CW = GW * PX, CH = GH * PX;
-  cv.width = CW; cv.height = CH;
-  let x = 24, target = 24, dir = 1, walk = 0, jump = 0, vy = 0, blinkT = 2.5, blinking = 0, pause = 1.5, raf = 0, last = 0, li = 0, sayT = 0;
-  const maxX = () => Math.max(0, box.clientWidth - CW + 6);
+  const PX = PERCH_PX, CW = GW * PX, CH = GH * PX, HALF = CW / 2;
+  cv.width = CW; cv.height = CH; cv.style.width = CW + 'px'; cv.style.height = CH + 'px';
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  const maxX = () => Math.max(0, box.clientWidth - CW);
+  const clamp = v => Math.min(maxX(), Math.max(0, v));
+  let x = clamp(+(box.dataset.start || 24)), target = x, dir = 1, walk = 0, jump = 0, vy = 0, speed = 30;
+  let blinkT = 2 + Math.random() * 2, blinking = 0, pause = 1.2, curious = 0, raf = 0, last = 0, li = 0, sayT = 0, seen = false;
+  let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
+  const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
+
+  function speak(text, sec = 2.8) { say.textContent = text; say.classList.add('on'); sayT = sec; render(); }
+  function wake() { idle = 0; if (asleep) { asleep = false; zz.classList.remove('on'); pause = .6; } }
+  function goTo(px, run, then) { target = clamp(px - HALF); dir = target > x ? 1 : -1; speed = run ? 95 : 30; pause = 0; curious = 0; goal = then || null; }
+
   function render() {
     c.clearRect(0, 0, CW, CH);
-    const moving = Math.abs(target - x) > 1 && !pause;
-    const legs = jump < 0 ? 0 : moving ? (Math.floor(walk) % 2 ? 1 : 2) : 0;
-    drawGrid(c, rexFrame({ legs, blink: blinking > 0, acc, flip: dir < 0 }), PX);
-    cv.style.transform = `translate(${x.toFixed(1)}px, ${jump.toFixed(1)}px)`;
-    say.style.left = Math.min(x, Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
+    const moving = pause <= 0 && curious <= 0 && !asleep && Math.abs(target - x) > .5;
+    const legs = jump < 0 ? 1 : moving ? (Math.floor(walk) % 2 ? 1 : 2) : 0;
+    drawGrid(c, rexFrame({ legs, blink: asleep || blinking > 0, acc, flip: dir < 0 }), PX);
+    const px = Math.round(x);                                  // ціла позиція — піксель-арт без розмиття
+    cv.style.transform = `translate(${px}px, ${Math.round(jump)}px)`;
+    cv.style.zIndex = jump < 0 ? '70' : '';                   // у стрибку — над шапкою; на місці — під нею
+    zz.style.left = px + (dir > 0 ? 62 : 6) + 'px';
+    if (say.classList.contains('on')) {
+      say.style.left = Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
+      say.style.transform = `translateY(${Math.round(jump)}px)`;      // репліка завжди над головою — і в стрибку
+      say.style.setProperty('--tail', Math.min(Math.max(10, px - parseFloat(say.style.left) + (dir > 0 ? 50 : 26)), say.offsetWidth - 16) + 'px');
+    }
+  }
+  function dropBit() {
+    const el = document.createElement('i'); el.className = 'perch__bit'; el.textContent = Math.random() < .5 ? '0' : '1';
+    const bx = 20 + Math.random() * Math.max(0, box.clientWidth - 40);
+    el.style.left = bx + 'px'; box.append(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('down')));
+    bit = { el, x: bx };
+    setTimeout(() => { if (bit?.el === el) { wake(); goTo(bx, true, eat); } }, 700);
+  }
+  function eat() {
+    if (!bit) return;
+    bit.el.classList.add('eaten'); const el = bit.el; setTimeout(() => el.remove(), 500); bit = null;
+    bits++; store.set('ki-bits', bits);
+    const n = bits % 8;
+    if (!REDUCED) { vy = -170; jump = -.01; }
+    speak(n === 0 ? (uk ? `+1 байт! Разом ${bits / 8}` : `+1 byte! ${bits / 8} total`) : (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`), 2.2);
   }
   function step(dt) {
-    if (pause > 0) { pause -= dt; if (pause <= 0) { target = 12 + Math.random() * (maxX() - 12); dir = target > x ? 1 : -1; } }
-    else {
-      const d = target - x, v = 34 * dt;
-      if (Math.abs(d) <= v) { x = target; pause = 2.5 + Math.random() * 4; } else { x += Math.sign(d) * v; walk += dt * 7; }
+    idle += dt;
+    if (!asleep && idle > 28 && !bit && !goal) { asleep = true; zz.classList.add('on'); pause = 1e9; }
+    if (asleep) return;
+    if (curious > 0) curious -= dt;
+    else if (pause > 0) {
+      pause -= dt;
+      if (pause <= 0) { goTo(Math.random() * box.clientWidth, false); if (Math.abs(target - x) < 40) target = clamp(x + (x > maxX() / 2 ? -90 : 90)); dir = target > x ? 1 : -1; }
+    } else {
+      const d = target - x, v = speed * dt;
+      if (Math.abs(d) <= v) {
+        x = target; pause = 2.4 + Math.random() * 4.5; speed = 30;
+        if (goal) { const g = goal; goal = null; g(); } else if (Math.random() < .35) dir *= -1;   // інколи озирається
+      } else { x += Math.sign(d) * v; walk += dt * (speed > 40 ? 12 : 6.5); }
     }
-    if (jump < 0 || vy) { vy += 900 * dt; jump = Math.min(0, jump + vy * dt); if (jump === 0) vy = 0; }
-    blinkT -= dt; if (blinkT <= 0) { blinking = .14; blinkT = 2.5 + Math.random() * 3; }
+    if (jump < 0 || vy) { vy += 1100 * dt; jump = Math.min(0, jump + vy * dt); if (jump === 0) vy = 0; }
+    blinkT -= dt; if (blinkT <= 0) { blinking = .13; blinkT = 2.2 + Math.random() * 3.5; }
     if (blinking > 0) blinking -= dt;
     if (sayT > 0) { sayT -= dt; if (sayT <= 0) say.classList.remove('on'); }
+    bitT -= dt; if (bitT <= 0 && !bit) { dropBit(); bitT = 14 + Math.random() * 16; }
   }
   function loop(now) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
@@ -85,14 +138,34 @@ export function perch(box) {
   }
   const start = () => { if (!raf && !REDUCED) { last = performance.now(); raf = requestAnimationFrame(loop); } };
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+
   cv.addEventListener('click', () => {
-    if (!REDUCED) { vy = -260; jump = -.01; }
-    if (lines.length) { say.textContent = lines[li++ % lines.length]; say.classList.add('on'); sayT = 2.6; }
-    if (REDUCED) render();
+    const was = asleep; wake();
+    if (!REDUCED && jump === 0) { vy = -480; jump = -.01; }   // ≈105 px угору — у стрибку перекриває шапку
+    if (was) speak(uk ? 'А? Я не спав!' : 'Huh? I wasn’t asleep!');
+    else if (lines.length) speak(lines[li++ % lines.length]);
+    render();
   });
-  cv.setAttribute('role', 'img');
+  // курсор поруч — зупиняється й дивиться на нього; будить
+  addEventListener('pointermove', e => {
+    if (!fine.matches || !raf) return;
+    const r = cv.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (Math.abs(e.clientX - cx) < 160 && Math.abs(e.clientY - cy) < 110) { wake(); if (!goal && !bit) { dir = e.clientX >= cx ? 1 : -1; curious = .9; } }
+  }, { passive: true });
+  // наведення на ціль із data-rex-say — підбігає під неї й коментує
+  const scope = box.closest('[data-rex-scope]') || box.parentElement;
+  scope.querySelectorAll('[data-rex-say]').forEach(el => el.addEventListener('pointerenter', () => {
+    if (!raf || bit) return;
+    wake();
+    const r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+    goTo(r.left + Math.min(r.width / 2, 70) - b.left, true, () => { dir = 1; speak(el.dataset.rexSay, 2.6); });
+  }));
+  document.addEventListener('themechange', () => {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    if (seen) { wake(); speak(dark ? (uk ? 'Нічний режим: час кодити' : 'Night mode: time to code') : (uk ? 'Доброго ранку!' : 'Good morning!'), 2.2); }
+  });
+  new ResizeObserver(() => { x = clamp(x); target = clamp(target); render(); }).observe(box);
   render();
-  let seen = false;
   const upd = () => (seen && !document.hidden ? start() : stop());
   new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }).observe(box);
   document.addEventListener('visibilitychange', upd);

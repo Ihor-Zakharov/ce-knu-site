@@ -8,7 +8,7 @@ legacy: "/posts/KNUEXPO-2023/"
 source: "posts/24-knuexpo23.rst"
 ---
 
-![](../../../assets/images/news/knuexpo-2023.jpg)
+![Photo: KNU EXPO university-wide Open Day](../../../assets/images/news/knuexpo-2023.jpg)
 
 Dear friends, we invite you to the traditional university-wide Open Day KNU EXPO.
 

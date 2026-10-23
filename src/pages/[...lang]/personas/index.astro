@@ -6,6 +6,7 @@ import PageHero from '../../../components/PageHero.astro';
 import Mascot from '../../../components/Mascot.astro';
 import { T, url, langOf, langParams } from '../../../lib/i18n';
 import { people, page, slugOf, initial, ALPHABET } from '../../../lib/content';
+import { HEROES } from '../../../lib/heroes';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
@@ -20,15 +21,15 @@ const anchorFor = (slug: string) => [...firstOf].filter(([, s]) => s === slug).m
 const letters = ALPHABET[lang];
 const initials = (n: string) => n.split(/\s+/).slice(0, 2).map(w => w[0]).join('');
 ---
-<Base lang={lang} title={meta.data.title} description={t.people}>
+<Base lang={lang} title={meta.data.title} description={HEROES.personas.lead[lang]} og="personas" crumbs={[]}>
   <PageHero lang={lang} title={meta.data.title} kind="personas" meta={[`<b>${all.length}</b> ${t.peopleCount(all.length).replace(/^\d+ /, '')}`, `${groups.length} ${lang === 'uk' ? 'груп' : 'groups'}`]} />
   <section class="section" style="padding-top:clamp(24px,3vw,40px)">
     <div class="wrap">
       <nav class="az-bar" aria-label={t.azLabel}>
         {letters.map(L => firstOf.has(L) ? <a href={`#az-${L}`} title={`${t.azJump} ${L}`}>{L}</a> : <span aria-hidden="true">{L}</span>)}
       </nav>
-      <div class="page">
-        <div>
+      <div class="page page--wide">
+        <div class="page__main">
           {groups.map(g => {
             const ps = all.filter(p => p.data.group === g);
             return (

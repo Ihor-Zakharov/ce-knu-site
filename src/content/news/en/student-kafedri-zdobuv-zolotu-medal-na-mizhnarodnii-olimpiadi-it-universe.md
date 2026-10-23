@@ -8,7 +8,7 @@ legacy: "/posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it
 source: "posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe.rst"
 ---
 
-![](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)
+![Photo: Department student wins gold medal at the IT-Universe international olympiad](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)
 
 Kostiantyn Dieiev, a student of the Department of Computer Engineering, won a gold medal in the D-Link competition "Protocols, Services and Equipment".
 

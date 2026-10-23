@@ -37,6 +37,16 @@ function toMarkdown(rst) {
     .replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
 
+// фото без alt: підпис, інакше найближчий заголовок (для сторінок) або назва новини — «Фото: …»
+function fillAlt(md, title, isPage) {
+  let heading = null;
+  return md.split('\n').map(line => {
+    const h = line.match(/^#{1,4}\s+(.+)/); if (h) heading = h[1].replace(/[*_`]/g, '').trim();
+    return line.replace(/!\[\]\(([^ )]+)(?: "([^"]*)")?\)/g, (_, p, cap) =>
+      `![${(cap || 'Фото: ' + ((isPage && heading) || title).replace(/[.!]+$/, '')).replace(/[[\]]/g, '')}](${p}${cap ? ` "${cap}"` : ''})`);
+  }).join('\n');
+}
+
 // /images/a/b.jpg → відносний шлях від src/content/<колекція>/uk/ до src/assets/images
 const IMG = '../../../assets/images/';
 const relImages = md => md.replace(/\]\(\/images\//g, `](${IMG}`);
@@ -82,7 +92,7 @@ for (const f of readdirSync(join(SRC, 'posts')).filter(f => f.endsWith('.rst')).
     cover: cover && IMG + cover, coverAlt: cover ? meta.title : undefined,
     tags: meta.tags ? meta.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
     legacy: `/posts/${meta.slug}/`, source: `posts/${f}`,
-  }) + relImages(md));
+  }) + relImages(fillAlt(md, meta.title, false)));
   report.news++;
 }
 
@@ -96,7 +106,7 @@ for (const f of readdirSync(join(SRC, 'pages')).filter(f => f.endsWith('.rst')))
   out('pages', meta.slug, frontmatter({
     title: meta.title, description: clip(plain(md), 160), mascot, mascotAlt,
     legacy: meta.slug === 'index' ? '/' : `/${meta.slug}/`, source: `pages/${f}`,
-  }) + relImages(md));
+  }) + relImages(fillAlt(md, meta.title, true)));
   report.pages++;
 }
 

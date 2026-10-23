@@ -9,7 +9,7 @@ source: "pages/graduates.rst"
 
 ## Dmytro Kalyta
 
-![](../../../assets/images/abiturient/d_kalita.jpg)
+![Photo: Dmytro Kalyta](../../../assets/images/abiturient/d_kalita.jpg)
 
 *Director of the Intel Corporation office for Ukraine, Belarus and Moldova from 2014 to 2017.*
 
@@ -47,7 +47,7 @@ Graduates work as programmers and software test engineers, in particular in the 
 
 ## Artem Andriiovych Kramov
 
-![](../../../assets/images/abiturient/a_kramov.jpg)
+![Photo: Artem Andriiovych Kramov](../../../assets/images/abiturient/a_kramov.jpg)
 
 Position: research engineer in natural language processing; his tasks involve applying artificial intelligence tools to the automated analysis of texts in various languages (English, French, Hebrew): creating summaries of articles and conversations, finding key sentences, analysing the coherence of Ukrainian-language texts and the emotional component of documents, etc. Company: One AI Inc., Tel Aviv, Israel
 
@@ -65,7 +65,7 @@ The combination of fundamental knowledge, an understanding of modern technologie
 
 ## Maksym Slynko
 
-![](../../../assets/images/abiturient/m_slynko.png)
+![Photo: Maksym Slynko](../../../assets/images/abiturient/m_slynko.png)
 
 Software Project Manager at Lyft
 

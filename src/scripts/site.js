@@ -217,6 +217,9 @@ if (!FINE.matches) $$('.inst__hud span').forEach(s => { if (/MOVE CURSOR/.test(s
 const dock = $('[data-inst-dock]'), dockable = $('[data-dockable]');
 if (dock && dockable) {
   const home = document.createComment('inst'); dockable.before(home);
+  // на головній осцилограф стає в текст «Про кафедру» — після абзацу про лабораторії й академії Huawei, Cisco
+  const labs = [...document.querySelectorAll('#h-about ~ * .prose > p, [aria-labelledby="h-about"] .prose > p')].find(p => /Huawei, Cisco/.test(p.textContent));
+  if (labs && dock.classList.contains('inst-dock--home')) labs.after(dock);
   const place = mq => { if (mq.matches) { dock.hidden = false; dock.append(dockable); } else { home.after(dockable); dock.hidden = true; } };
   const mq = matchMedia('(max-width: 900px)'); place(mq); mq.addEventListener('change', place);
 }

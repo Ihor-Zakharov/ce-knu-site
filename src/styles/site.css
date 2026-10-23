@@ -519,3 +519,6 @@ a:hover .news-art { animation: none; }
 .theme-switching :not(.theme-toggle, .theme-toggle *), .theme-switching :not(.theme-toggle *)::before, .theme-switching :not(.theme-toggle *)::after { transition: none !important; }   /* іконка сонця/місяця — з морфінгом */
 /* на телефоні ілюстрацію КІ-Рекса з чинного сайту не показуємо — зміст важливіший */
 @media (max-width: 760px) { .rex-sign { display: none !important; } }
+
+/* осцилограф усередині тексту «Про кафедру» на телефоні */
+.prose > .inst-dock--home { padding: 8px 0 0; margin-block: 1.6em; border: 0; }

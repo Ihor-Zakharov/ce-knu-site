@@ -116,8 +116,10 @@ test.describe('доступність (axe)', () => {
     for (const p of [...TYPICAL.flatMap(both), 'POST']) {
       test(`${p} · ${theme}: 0 критичних і серйозних порушень`, async ({ page }) => {
         const url = p === 'POST' ? await firstPost(page) : p;
+        // контраст міряємо за остаточними кольорами, а не посеред анімації появи (.rv)
+        await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.goto(url + '?theme=' + theme);
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(300);
         const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
         const bad = r.violations.filter(v => v.impact === 'critical' || v.impact === 'serious');
         expect(bad.map(v => `${v.id}: ${v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(' | ')}`)).toEqual([]);

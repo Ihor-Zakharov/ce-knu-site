@@ -4,7 +4,9 @@
 
 ## Стек
 - Astro 7 (SSG), без фреймворку інтерфейсу. Стилі — UI-кіт «Сигнал» (`src/styles/tokens.css`, `kit.css`) + `site.css`.
-- Node 24. Команди: `npm ci`, `npm run dev`, `npm run build`, `npm run check:content`, `npm test`, `npm run lhci`.
+- Node 24 (`.nvmrc`), лише npm, `package-lock.json` — у репозиторії.
+- Команди: `npm ci`, `npm run dev`, `npm run build`, `npm run check:content`, `npm test`, `npm run lhci`; `npm run verify` — усе разом перед завершенням задачі.
+- Docker: `docker compose up` — сервер розробки (http://localhost:4321); `docker compose up --build site` — збірка на Apache, як на сервері кафедри (http://localhost:4322).
 
 ## Вміст
 - Новини: `src/content/news/{uk,en}/<slug>.md`; сторінки: `src/content/pages/{uk,en}/`; люди: `src/content/people/{uk,en}/`.
@@ -17,6 +19,12 @@
 ## Гілки й запити на злиття
 - Гілки: `feature/…`, `fix/…`, `content/…`, `ci/…`, `docs/…`. Пряма зміна `main` заборонена.
 - Запит на злиття — з описом і `Closes #N`; потрібні рецензія іншого учасника й зелені перевірки CI.
+
+## Як працюють агенти
+- Починати з задачі в Issues: прочитати критерії приймання, коротко описати план, потім змінювати.
+- Змінювати лише потрібні задачі файли; не переформатовувати й не рефакторити зайвого.
+- Якщо правило заважає задачі — зупинитися й спитати людину.
+- Перед завершенням — `npm run verify` і звіт про результат.
 
 ## Заборони
 - Без серверної частини, без зовнішніх CDN і трекерів; шрифти й скрипти — лише локальні.

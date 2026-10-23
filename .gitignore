@@ -6,3 +6,8 @@ playwright-report/
 .lighthouseci/
 *.log
 .env*
+coverage/
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
+!.env.example

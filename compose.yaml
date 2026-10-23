@@ -1,0 +1,28 @@
+name: ce-knu-site
+
+services:
+  # docker compose up -> http://localhost:4321 (dev server, changes apply instantly)
+  dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - '4321:4321'
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      ASTRO_DEV_POLLING: '1'
+
+  # docker compose up --build site -> http://localhost:4322 (built site on Apache)
+  site:
+    build:
+      context: .
+      target: site
+    ports:
+      - '4322:80'
+    profiles:
+      - site
+
+volumes:
+  node_modules:

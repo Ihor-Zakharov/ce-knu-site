@@ -1,0 +1,44 @@
+name: Дефект
+description: Щось працює не так
+labels: ['type:bug']
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Адреса сторінки
+    validations:
+      required: true
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Мова
+      options: [uk, en, обидві]
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Пристрій і браузер
+      placeholder: телефон 360 px, Chrome
+  - type: textarea
+    id: steps
+    attributes:
+      label: Як відтворити
+      value: |
+        1.
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Що мало бути і що є
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Важливість
+      options: [блокує роботу, серйозний, дрібний]
+    validations:
+      required: true

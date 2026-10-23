@@ -1,4 +1,6 @@
 # Для Apache (типовий спільний хостинг). На nginx цей файл ігнорується — див. deploy/nginx.conf.
+# Локально перевірити: docker compose up --build site → http://localhost:4322
+Options -Indexes
 AddDefaultCharset utf-8
 DirectoryIndex index.html
 ErrorDocument 404 /404.html

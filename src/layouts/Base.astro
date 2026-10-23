@@ -13,7 +13,8 @@ const { lang, title, description = '', image, type = 'website', noindex = false 
 const t = T[lang];
 const path = stripLang(Astro.url.pathname);
 const other: Lang = lang === 'uk' ? 'en' : 'uk';
-const alt = url(other, path);
+// 404: українська — /404.html (так її шукає сервер), англійська — /en/404/
+const alt = path.startsWith('/404') ? (other === 'uk' ? url('uk', '/404.html') : url('en', '/404/')) : url(other, path);
 const canonical = new URL(url(lang, path), Astro.site).href;
 const full = title === t.dept ? `${t.dept} · ${t.uniShort}` : `${title} · ${t.dept}`;
 const ogImage = image ? new URL(image, Astro.site).href : undefined;

@@ -1,0 +1,44 @@
+# Перегляд сайту: main — на GitHub Pages, кожен запит на злиття — у підкаталозі pr-preview/pr-N/.
+# Pages: Settings → Pages → Source: Deploy from a branch → gh-pages / (root).
+name: Preview
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+concurrency: preview-${{ github.ref }}
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+        if: github.event.action != 'closed'
+      - name: Збирання для GitHub Pages
+        if: github.event.action != 'closed'
+        run: npm run build
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+          BASE_PATH: /${{ github.event.repository.name }}/${{ github.event_name == 'pull_request' && format('pr-preview/pr-{0}/', github.event.number) || '' }}
+      - name: Основна гілка → корінь gh-pages
+        if: github.event_name == 'push'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean-exclude: pr-preview/
+      - name: Запит на злиття → pr-preview/pr-N
+        if: github.event_name == 'pull_request'
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: dist
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview

@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import Base from '../../../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { T, url, langOf, fmtDate, isoDate, type Lang } from '../../../../lib/i18n';
@@ -33,7 +33,7 @@ const words = entry.data.title.split(/\s+/);
         {entry.data.cover && (
           <figure class="plate post-cover rv">
             <div class="perch" data-acc="magnifier" data-lines={JSON.stringify(lang === 'uk' ? ['Читаю цю новину', 'Свіжий байт!', 'Гарні фото!'] : ['Reading this story', 'A fresh byte!', 'Nice photos!'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
-            <div class="plate__f"><Image src={entry.data.cover} alt={entry.data.coverAlt ?? ''} widths={[640, 1000, 1400, 1800]} sizes="(max-width: 1320px) 100vw, 1320px" loading="eager" fetchpriority="high" /></div></figure>
+            <div class="plate__f"><Picture src={entry.data.cover} formats={['avif', 'webp']} alt={entry.data.coverAlt ?? ''} widths={[480, 800, 1200, 1600]} sizes="(max-width: 1320px) 100vw, 1320px" quality={68} loading="eager" fetchpriority="high" /></div></figure>
         )}
       </div>
     </header>

@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { render } from 'astro:content';
 import { T, url, langOf, langParams, fmtDate, isoDate, NAV } from '../../lib/i18n';
@@ -73,7 +73,7 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
           <a class="arrow-link" href={url(lang, '/news/')}>{t.allNews} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </div>
         <a class="feat rv" href={url(lang, `/posts/${slugOf(lead.id)}/`)}>
-          <figure class="plate rv"><div class="plate__f" style="--ar:16/10">{lead.data.cover && <Image src={lead.data.cover} alt={lead.data.coverAlt ?? ''} widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 56vw" loading="eager" />}</div></figure>
+          <figure class="plate rv"><div class="plate__f" style="--ar:16/10">{lead.data.cover && <Picture src={lead.data.cover} formats={['avif', 'webp']} alt={lead.data.coverAlt ?? ''} widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 56vw" quality={70} />}</div></figure>
           <div>
             <time datetime={isoDate(lead.data.date)}>{fmtDate(lead.data.date, lang)}</time>
             <h3>{lead.data.title}</h3>

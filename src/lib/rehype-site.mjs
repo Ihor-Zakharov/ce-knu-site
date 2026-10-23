@@ -1,11 +1,14 @@
 // Обробка HTML вмісту під час збирання:
 //  • одиноке зображення з title → <figure> з <figcaption>;
 //  • внутрішні посилання отримують базовий шлях і префікс мови (/en/…);
+//  • домени без схеми («manf.org.ua») отримують https://;
 //  • зовнішні посилання відкриваються в новій вкладці з rel="noopener";
 //  • таблиці обгортаються для горизонтальної прокрутки на телефоні.
 import { visit, SKIP } from 'unist-util-visit';
 
 const ASSET = /^\/(files|images|licenses)\//;
+// на чинному сайті частина посилань — домени без схеми («manf.org.ua»); браузер вважає їх відносними
+const BARE_DOMAIN = /^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:org|com|net|edu|gov|info|io|ua)(?:\/\S*)?$/i;
 
 export default function rehypeSite({ base = '/' } = {}) {
   const b = base.replace(/\/$/, '');
@@ -27,6 +30,7 @@ export default function rehypeSite({ base = '/' } = {}) {
       }
       if (node.tagName === 'a' && typeof node.properties.href === 'string') {
         let href = node.properties.href;
+        if (BARE_DOMAIN.test(href)) href = node.properties.href = 'https://' + href;
         if (/^https?:\/\//.test(href)) {
           node.properties.target = '_blank';
           node.properties.rel = ['noopener'];

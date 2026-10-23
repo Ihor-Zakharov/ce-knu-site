@@ -1,0 +1,41 @@
+# Перевірки на кожен запит на злиття й на кожну зміну main (критерій «Автоматичні перевірки»).
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Збирання, вміст, тести, Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Збирання (лише статичні файли)
+        run: npm run build
+      - name: Повнота вмісту й внутрішні посилання
+        run: npm run check:content
+      - name: Браузер для тестів
+        run: npx playwright install --with-deps chromium
+      - name: Автотести (навігація, мови, мобільний вигляд, клавіатура, axe)
+        run: npm test
+      - name: Lighthouse CI — мобільний і настільний профілі, медіана трьох запусків
+        run: npm run lhci
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            playwright-report/
+            .lighthouseci/
+          retention-days: 14

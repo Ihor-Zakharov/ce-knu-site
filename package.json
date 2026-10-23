@@ -9,7 +9,8 @@
     "migrate": "node scripts/migrate.mjs",
     "check:content": "node scripts/check-content.mjs",
     "test": "playwright test",
-    "lhci": "lhci autorun"
+    "lhci": "lhci autorun --config=lighthouserc.mobile.json && lhci autorun --config=lighthouserc.desktop.json",
+    "check": "npm run check:content && npm test"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.4",

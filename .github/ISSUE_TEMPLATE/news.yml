@@ -1,0 +1,17 @@
+name: Нова новина
+description: Запропонувати новину для сайту — її оформить хтось із команди
+title: "Новина: "
+labels: [content]
+body:
+  - type: input
+    id: title
+    attributes: { label: Заголовок }
+    validations: { required: true }
+  - type: input
+    id: date
+    attributes: { label: Дата події, placeholder: 2026-11-01 }
+    validations: { required: true }
+  - type: textarea
+    id: text
+    attributes: { label: Текст, description: Можна вставити фото прямо сюди — GitHub завантажить їх }
+    validations: { required: true }

@@ -9,7 +9,9 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = resolve(process.argv[2] ?? '../refs/ce-knu-site-practice/current-site/ce');
+// чинний сайт: аргумент, або current-site/ce у корені репозиторію команди, або локальна копія поруч
+const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '../refs/ce-knu-site-practice/current-site/ce'].filter(Boolean);
+const SRC = resolve(ROOT, CANDIDATES.find(c => existsSync(resolve(ROOT, c, 'conf.py'))) ?? CANDIDATES[0]);
 const FILTER = join(ROOT, 'scripts/nikola.lua');
 if (!existsSync(join(SRC, 'conf.py'))) throw new Error(`Не знайдено сайт Nikola: ${SRC}`);
 

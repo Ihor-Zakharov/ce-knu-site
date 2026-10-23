@@ -140,3 +140,25 @@ test.describe('персоналії', () => {
     await expect(page.locator(hash!)).toBeInViewport();
   });
 });
+
+test.describe('вітрина головної', () => {
+  test('шість експонатів; ручний вибір тримається, «АВТО» вмикає автозміну; без помилок', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', e => errors.push(String(e)));
+    page.on('console', m => { if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(m.text()); });
+    await page.goto('/');
+    const sc = page.locator('.showcase');
+    await sc.scrollIntoViewIfNeeded();
+    const keys = sc.locator('[data-view]'), auto = sc.locator('[data-sc-auto]');
+    await expect(keys).toHaveCount(6);
+    await expect(auto).toBeHidden();
+    for (let i = 0; i < 6; i++) { await keys.nth(i).click(); await expect(keys.nth(i)).toHaveAttribute('aria-pressed', 'true'); await page.waitForTimeout(1200); }
+    await expect(auto).toBeVisible();
+    await page.waitForTimeout(5500);
+    await expect(keys.nth(5)).toHaveAttribute('aria-pressed', 'true');
+    await auto.click();
+    await expect(auto).toBeHidden();
+    await expect(keys.nth(0)).toHaveAttribute('aria-pressed', 'true', { timeout: 7000 });
+    expect(errors).toEqual([]);
+  });
+});

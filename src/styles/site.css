@@ -129,7 +129,7 @@ html.menu-open { overflow: hidden; }
 .inst-dock[hidden] { display: none; }
 @media (max-width: 900px) { .ph__grid { grid-template-columns: 1fr; } .ph .ph__grid > .inst-wrap { display: none; } }
 .perch canvas { position: absolute; bottom: 0; left: 0; pointer-events: auto; cursor: pointer; image-rendering: pixelated; }
-.perch__say { position: absolute; bottom: 66px; left: 0; z-index: 71; width: max-content; max-width: min(260px, 100%); padding: 7px 11px; border-radius: 8px; background: var(--ink); color: var(--bg); font: 500 11px/1.35 var(--font-mono); letter-spacing: .03em; opacity: 0; translate: 0 6px; scale: .94; transform-origin: 20% 100%; transition: opacity 220ms var(--ease-out), translate 520ms var(--spring), scale 520ms var(--spring); pointer-events: none; }
+.perch__say { position: absolute; bottom: 66px; left: 0; width: max-content; max-width: min(260px, 100%); padding: 7px 11px; border-radius: 8px; background: var(--ink); color: var(--bg); font: 500 11px/1.35 var(--font-mono); letter-spacing: .03em; opacity: 0; translate: 0 6px; scale: .94; transform-origin: 20% 100%; transition: opacity 220ms var(--ease-out), translate 520ms var(--spring), scale 520ms var(--spring); pointer-events: none; }
 .perch__say::after { content: ""; position: absolute; left: var(--tail, 22px); top: 100%; border: 5px solid transparent; border-top-color: var(--ink); }
 .perch__say.on { opacity: 1; translate: 0 0; scale: 1; }
 

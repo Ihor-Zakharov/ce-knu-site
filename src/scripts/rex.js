@@ -97,10 +97,13 @@ export function perch(box) {
     zz.style.left = px + (dir > 0 ? 62 : 6) + 'px';
     if (say.classList.contains('on')) {
       say.style.left = Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
-      // репліка над головою й у стрибку, але не вище за 8 px від верху вікна — щоб її завжди було видно
+      // у стрибку репліка летить над головою над шапкою, але не вище 8 px від верху вікна;
+      // на місці — звичайний шар сторінки: прокручується разом із Рексом і ховається під шапку
+      const jumping = jump < 0;
       const top = say.getBoundingClientRect().top - (parseFloat(say.dataset.dy) || 0);
-      const dy = Math.max(Math.round(jump), 8 - top);
-      say.dataset.dy = dy; say.style.transform = `translateY(${dy}px)`;
+      const dy = jumping ? Math.max(Math.round(jump), 8 - top) : 0;
+      say.dataset.dy = dy; say.style.transform = dy ? `translateY(${dy}px)` : '';
+      say.style.zIndex = jumping ? '71' : '';
       say.style.setProperty('--tail', Math.min(Math.max(10, px - parseFloat(say.style.left) + (dir > 0 ? 50 : 26)), say.offsetWidth - 16) + 'px');
     }
   }
@@ -176,7 +179,7 @@ export function perch(box) {
   new ResizeObserver(() => { x = clamp(x); target = clamp(target); render(); }).observe(box);
   render();
   const upd = () => (seen && !document.hidden ? start() : stop());
-  new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }).observe(box);
+  new IntersectionObserver(([e]) => { seen = e.isIntersecting; if (!seen) { say.classList.remove('on'); sayT = 0; } upd(); }).observe(box);
   document.addEventListener('visibilitychange', upd);
 }
 

@@ -11,9 +11,12 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Збирання, вміст, тести, Lighthouse
+  # назви задач «build» і «pr-title» — обов'язкові перевірки в правилах гілки main
+  build:
+    name: build
     runs-on: ubuntu-latest
+    env:
+      ASTRO_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -39,3 +42,32 @@ jobs:
             playwright-report/
             .lighthouseci/
           retention-days: 14
+
+  pr-title:
+    name: pr-title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      # назва запиту на злиття: «тип: опис з малої літери», напр. «content: новина про день відкритих дверей»
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            content
+            style
+            a11y
+            perf
+            test
+            ci
+            docs
+            refactor
+            build
+            chore
+            revert
+          subjectPattern: ^[^A-ZА-ЯІЇЄҐ].+$
+          subjectPatternError: 'Опис — з малої літери, напр. «content: новина про день відкритих дверей».'

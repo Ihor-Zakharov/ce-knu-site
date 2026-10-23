@@ -224,68 +224,9 @@ if (dock && dockable) {
   const mq = matchMedia('(max-width: 900px)'); place(mq); mq.addEventListener('change', place);
 }
 
-/* ── Головна: осцилограф — промінь плавно перетікає між формами сигналу ── */
-const scope = $('.scope-home');
-if (scope) {
-  const main = $('.trace--main', scope), ghost = $('.trace--ghost', scope);
-  const keys = $$('.key[data-mode]', scope), label = $('[data-scope-mode]', scope), freq = $('[data-scope-f]', scope), play = $('[data-scope-play]', scope), nextOut = $('[data-scope-next]', scope);
-  const DIV_T = 250e-6, DIVS = 10;
-  const MODES = {
-    sine: { label: 'SIN', cycles: 2, fn: (x, t) => .55 * Math.sin(2 * Math.PI * 2 * x - t) },
-    square: { label: 'SQUARE', cycles: 2, fn: (x, t) => { let y = 0; for (let k = 1; k <= 21; k += 2) y += Math.sin(k * (2 * Math.PI * 2 * x - t)) / k; return .45 * y * 4 / Math.PI; } },
-    am: { label: 'AM', cycles: 24, fn: (x, t) => .55 * (.55 + .45 * Math.sin(2 * Math.PI * 1.5 * x - t * .5)) * Math.sin(2 * Math.PI * 24 * x - t * 10) },
-    chirp: { label: 'CHIRP', cycles: 0, fn: (x, t) => .52 * Math.sin(2 * Math.PI * (x + 3 * x * x) - t) * (1 - .3 * x) },
-  };
-  const fmtF = m => m.cycles ? (m.cycles / (DIVS * DIV_T) / 1000).toFixed(2).replace('.', L === 'uk' ? ',' : '.') + (L === 'uk' ? ' кГц' : ' kHz') : (L === 'uk' ? '0,4 → 1,6 кГц' : '0.4 → 1.6 kHz');
-  const W = 1000, H = 667, order = ['sine', 'square', 'am', 'chirp'], HOLD = 6200;
-  const NEXT = L === 'uk' ? 'далі' : 'next', MANUAL = L === 'uk' ? 'ручний режим' : 'manual', SEC = L === 'uk' ? 'с' : 's';
-  let from = 'sine', to = 'sine', mt = performance.now(), t0 = performance.now(), raf = 0, auto = !REDUCED, playing = !REDUCED, frozen = performance.now();
-  const ease = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
-  const yAt = (x, t, e) => H / 2 - (MODES[from].fn(x, t) * (1 - e) + MODES[to].fn(x, t) * e) * H * .4;
-  function path(now) {
-    const t = ((playing ? now : frozen) - t0) / 1000 * 1.4, e = ease(Math.min(1, (now - mt) / 1200));
-    let d = '';
-    for (let px = 0; px <= W; px += 3) d += (px ? 'L' : 'M') + px + ' ' + yAt(px / W, t, e).toFixed(1);
-    main.setAttribute('d', d); ghost.setAttribute('d', d);
-    return e < 1;
-  }
-  function frame(now) {
-    const morphing = path(now);
-    const next = keys.find(k => k.dataset.mode === order[(order.indexOf(to) + 1) % order.length]);
-    if (auto && playing) {
-      const p = Math.min(1, (now - mt) / HOLD);
-      keys.forEach(k => k.style.setProperty('--p', k === next ? p.toFixed(4) : 0));
-      nextOut.textContent = `${NEXT} ${MODES[next.dataset.mode].label} · ${Math.max(0, (HOLD - (now - mt)) / 1000).toFixed(1).replace('.', L === 'uk' ? ',' : '.')} ${SEC}`;
-      if (now - mt > HOLD) go(next.dataset.mode, false);
-    }
-    raf = playing || morphing ? requestAnimationFrame(frame) : 0;
-  }
-  const start = () => { if (!raf) raf = requestAnimationFrame(frame); };
-  const stop = () => { cancelAnimationFrame(raf); raf = 0; };
-  function go(m, manual = true) {
-    if (manual) { auto = false; keys.forEach(k => k.style.setProperty('--p', 0)); nextOut.textContent = MANUAL; }
-    if (m === to && manual) return;
-    from = to; to = m; mt = performance.now();
-    label.textContent = MODES[m].label; freq.textContent = fmtF(MODES[m]);
-    keys.forEach(k => k.setAttribute('aria-pressed', String(k.dataset.mode === m)));
-    start();
-  }
-  keys.forEach(k => k.addEventListener('click', () => go(k.dataset.mode)));
-  const PL = L === 'uk' ? ['Пауза', 'Відтворити'] : ['Pause', 'Play'];
-  play?.addEventListener('click', () => {
-    playing = !playing;
-    if (playing) { const d = performance.now() - frozen; t0 += d; mt += d; } else frozen = performance.now();
-    play.setAttribute('aria-pressed', String(!playing)); play.setAttribute('aria-label', playing ? PL[0] : PL[1]); play.title = play.getAttribute('aria-label');
-    $('use', play).setAttribute('href', playing ? '#i-pause' : '#i-play');
-    start();
-  });
-  if (REDUCED) { play?.setAttribute('aria-pressed', 'true'); $('use', play)?.setAttribute('href', '#i-play'); }
-  path(performance.now());
-  let seen = false;
-  const upd = () => (seen && !document.hidden ? start() : stop());
-  new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }, { rootMargin: '80px' }).observe(scope);
-  document.addEventListener('visibilitychange', upd);
-}
+/* ── Головна: вітрина — одна машина, п'ять поглядів ── */
+const sc = $('.showcase');
+if (sc) import('./showcase.js').then(m => m.showcase(sc)).catch(e => console.error(e));
 
 /* ── Пасхалка: ↑↑↓↓←→←→BA — КІ-Рекс пробігає низом екрана ──── */
 const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];

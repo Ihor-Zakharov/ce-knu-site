@@ -12,12 +12,6 @@ const t = T[lang];
 const home = (await page(lang, 'index'))!;
 const { Content } = await render(home);
 const uk = lang === 'uk';
-const scopeKeys = [
-  { mode: 'sine', label: 'SIN', on: true },
-  { mode: 'square', label: '⊓⊔', sr: uk ? 'Меандр' : 'Square wave' },
-  { mode: 'am', label: 'AM', title: uk ? 'Амплітудна модуляція' : 'Amplitude modulation' },
-  { mode: 'chirp', label: 'CHIRP', title: uk ? 'Лінійна частотна модуляція' : 'Linear frequency sweep' },
-];
 ---
 <Base lang={lang} title={t.dept} description={(uk ? 'Кафедра комп’ютерної інженерії КНУ імені Тараса Шевченка: ' : 'Department of Computer Engineering, Taras Shevchenko National University of Kyiv: ') + (uk ? 'бакалаврат, магістратура й аспірантура F7 «Комп’ютерна інженерія», лабораторії Huawei, IBM, Cisco.' : 'Bachelor’s, Master’s and PhD programmes in F7 Computer Engineering, Huawei, IBM and Cisco labs.')} og="home">
   <section class="ph hero-home">
@@ -32,23 +26,16 @@ const scopeKeys = [
         </div>
       </div>
       <div class="inst-wrap" data-dockable>
-      <figure class="scope scope-home" aria-label={uk ? 'Демонстраційний сигнал на осцилографі; по променю біжить КІ-Рекс' : 'Demo signal on an oscilloscope; KI-Rex runs along the trace'}>
+      <figure class="scope scope-home showcase" aria-label={uk ? 'Вітрина: одна навчальна обчислювальна машина — процесор, пам’ять, код, логіка, мережа' : 'Showcase: one teaching computer — processor, memory, code, logic, network'}>
         <div class="scope__screen">
-          <svg viewBox="0 0 1000 667" preserveAspectRatio="none" aria-hidden="true">
-            <g class="grat">
-              <path d="M100 0V667M200 0V667M300 0V667M400 0V667M600 0V667M700 0V667M800 0V667M900 0V667M0 83H1000M0 167H1000M0 250H1000M0 417H1000M0 500H1000M0 583H1000"/>
-              <path class="axis" d="M500 0V667M0 333.5H1000"/>
-            </g>
-            <path class="trace trace--ghost"/>
-            <path class="trace trace--main"/>
-          </svg>
-          <div class="scope__hud scope__hud--top"><span>CH1 · <b data-scope-mode>SIN</b></span><span>2,0 V/DIV · 250 µs/DIV</span></div>
-          <div class="scope__hud scope__hud--bot"><span>f = <b data-scope-f>{uk ? '0,80 кГц' : '0.80 kHz'}</b></span><span>KI-REX · {uk ? 'ДЕМО-СИГНАЛ' : 'DEMO SIGNAL'}</span></div>
+          <canvas aria-hidden="true"></canvas>
+          <div class="scope__hud scope__hud--top"><span data-sc-tl></span><span data-sc-tr></span></div>
+          <div class="scope__hud scope__hud--bot"><span data-sc-bl></span><span data-sc-br></span></div>
         </div>
-        <div class="scope__keys" role="group" aria-label={uk ? 'Форма сигналу' : 'Waveform'}>
-          {scopeKeys.map(k => <button type="button" class="key" data-mode={k.mode} aria-pressed={k.on ? 'true' : 'false'} title={k.title}>{k.sr ? <><span aria-hidden="true">{k.label}</span><span class="sr-only">{k.sr}</span></> : k.label}</button>)}
-          <span class="sp"></span><span class="scope__auto cap" data-scope-next aria-live="off"></span>
-          <button type="button" class="key" data-scope-play aria-pressed="false" aria-label={uk ? 'Пауза' : 'Pause'} title={uk ? 'Пауза' : 'Pause'}><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+        <div class="scope__keys" role="group" aria-label={uk ? 'Що показати' : 'What to show'}>
+          {(uk ? ['ПРОЦЕСОР', 'ПАМ’ЯТЬ', 'КОД', 'ЛОГІКА', 'МЕРЕЖА'] : ['CPU', 'MEMORY', 'CODE', 'LOGIC', 'NETWORK']).map((k, i) => <button type="button" class="key" data-view={i} aria-pressed={i === 0 ? 'true' : 'false'}>{k}</button>)}
+          <span class="sp"></span><span class="scope__auto cap" data-sc-next aria-live="off"></span>
+          <button type="button" class="key" data-sc-play aria-pressed="false" aria-label={uk ? 'Пауза' : 'Pause'} title={uk ? 'Пауза' : 'Pause'}><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
         </div>
       </figure>
       </div>

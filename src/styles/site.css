@@ -522,3 +522,17 @@ a:hover .news-art { animation: none; }
 
 /* осцилограф усередині тексту «Про кафедру» на телефоні */
 .prose > .inst-dock--home { padding: 8px 0 0; margin-block: 1.6em; border: 0; }
+
+/* головна: ключові цифри з підписами видно одразу при відкритті (навіть на 1366×768) */
+@media (min-width: 901px) {
+  .hero-home { padding-block: clamp(12px, 1.6vw, 28px) 16px; }
+  .hero-home h1 { max-width: 20ch; font-size: clamp(2.5rem, 1.2rem + 2.8vw, 4.25rem); margin-top: 10px; }
+  .hero-home .lead { margin-top: 14px; }
+  .hero-home .cta { margin-top: 22px; }
+  .hero-home .scope__screen { aspect-ratio: 16 / 9; }
+  .hero-home .ph__grid > .inst-wrap { margin-top: 0; }
+  .hero-home .figures-wrap { margin-top: 76px !important; }
+  .hero-home .figures > div { padding-top: 14px; }
+  .hero-home .figures b { font-size: clamp(34px, 3.4vw, 52px); }
+  .hero-home .figures span { margin-top: 6px; }
+}

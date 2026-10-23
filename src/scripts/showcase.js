@@ -40,11 +40,12 @@ export function showcase(figure) {
     env.col.dark = isDark(); env.col.goldRGB = rgb(env.col.gold); env.gen++;
   }
   function size() {
-    const r = cv.getBoundingClientRect();
-    st.D = Math.min(2, devicePixelRatio || 1); st.W = r.width; st.H = r.height;
+    st.D = Math.min(2, devicePixelRatio || 1); st.W = cv.clientWidth; st.H = cv.clientHeight;   // розмір макета, без transform появи картки
     for (const k of [cv, A.k, B.k]) { k.width = Math.round(st.W * st.D); k.height = Math.round(st.H * st.D); }
     env.gen++; draw();
   }
+
+  const safe = (i, f) => { try { f(); } catch (e) { if (!failed.has(i)) { failed.add(i); console.error(e); } } };
 
   /* один експонат — у свій шар */
   function paint(i, k, dt) {
@@ -65,7 +66,7 @@ export function showcase(figure) {
   }
 
   function draw(dt = 0) {
-    if (!st.W) return;
+    if (!st.W || !st.H) return;
     const u = tr / T;
     if (prev < 0 || u >= 1) { hud(paint(cur, c, dt), cur, 1); return; }
     const ho = paint(prev, A.c, dt), hi = paint(cur, B.c, dt), o = soft(.04, .8, u), v = clamp((u - .12) / .88);
@@ -99,9 +100,10 @@ export function showcase(figure) {
     i = (i + n) % n;
     if (manual && auto) setAuto(false);
     if (i === cur) return;
+    if (prev >= 0) { tr = T; prev = -1; }                          // незавершений перехід — одразу до кінця
     prev = cur; cur = i; shown = 0;
     tr = playing ? 0 : T; if (tr >= T) prev = -1;
-    ex[cur].enter?.(t);
+    safe(cur, () => ex[cur].enter?.(t));
     keys.forEach((k, j) => k.setAttribute('aria-pressed', String(j === cur)));
     progress();
     if (!raf) draw();
@@ -110,7 +112,7 @@ export function showcase(figure) {
   function frame(now) {
     const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now;
     t += dt; acc += dt;
-    while (acc >= TICK) { acc -= TICK; const ev = env.m.tick(); ex.forEach(e => e.tick?.(ev, t)); }
+    while (acc >= TICK) { acc -= TICK; const ev = env.m.tick(); ex.forEach((e, i) => safe(i, () => e.tick?.(ev, t))); }
     if (tr < T) { tr += dt; if (tr >= T) prev = -1; }
     if (auto) { shown += dt; if (shown >= HOLD) go(cur + 1, false); }
     progress();
@@ -123,26 +125,30 @@ export function showcase(figure) {
   keys.forEach((k, j) => k.addEventListener('click', () => go(j, true)));
   figure.querySelector('.scope__keys').addEventListener('keydown', e => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' || !e.target.matches('[data-view]')) return;
-    const j = (cur + (e.key === 'ArrowRight' ? 1 : -1) + n) % n; go(j, true); keys[j].focus();
+    const j = (keys.indexOf(e.target) + (e.key === 'ArrowRight' ? 1 : -1) + n) % n; go(j, true); keys[j].focus();
   });
   autoBtn?.addEventListener('click', () => { setAuto(true); keys[cur].focus(); });
   cv.addEventListener('click', e => {                               // клік по екрану — «торкнутися» експоната
-    const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    if (ex[cur].poke) ex[cur].poke(x, y, t); else { const ev = env.m.tick(); ex.forEach(v => v.tick?.(ev, t)); }
+    const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * st.W / r.width, y = (e.clientY - r.top) * st.H / r.height;
+    if (ex[cur].poke) safe(cur, () => ex[cur].poke(x, y, t)); else { const ev = env.m.tick(); ex.forEach((v, i) => safe(i, () => v.tick?.(ev, t))); }
     if (!raf) draw();
   });
   const PL = L === 'uk' ? ['Пауза', 'Відтворити'] : ['Pause', 'Play'];
   const reflectPlay = () => {
     if (!play) return;
-    play.setAttribute('aria-pressed', String(!playing)); play.setAttribute('aria-label', playing ? PL[0] : PL[1]); play.title = play.getAttribute('aria-label');
+    play.setAttribute('aria-pressed', String(!playing)); play.title = playing ? PL[0] : PL[1];   // ім'я стале («Пауза»), стан — aria-pressed
     play.querySelector('use')?.setAttribute('href', playing ? '#i-pause' : '#i-play');
   };
-  play?.addEventListener('click', () => { playing = !playing; reflectPlay(); playing ? start() : (stop(), draw()); });
+  play?.addEventListener('click', () => {
+    playing = !playing; reflectPlay();
+    if (playing) start(); else { stop(); if (prev >= 0) { tr = T; prev = -1; } draw(); }
+  });
 
   theme();
   document.addEventListener('themechange', () => { theme(); draw(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { theme(); draw(); });   // тема системи без вибору на сайті
   if (REDUCED) { ex.forEach(e => e.still?.()); if (autoBtn) autoBtn.hidden = true; }
-  ex[cur].enter?.(0);
+  safe(cur, () => ex[cur].enter?.(0));
   reflectPlay(); progress();
   new ResizeObserver(size).observe(cv);
   new IntersectionObserver(([e]) => { seen = e.isIntersecting; seen ? start() : stop(); }, { rootMargin: '80px' }).observe(figure);

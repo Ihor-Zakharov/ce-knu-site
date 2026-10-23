@@ -397,7 +397,7 @@ export default function (env) {
 
   return {
     enter(t) { t0 = t; lastK = -1; cyc = prevCyc = null; },
-    tick(ev) { lastEv = ev; frozen = false; },          // лише запам'ятовуємо: візуально за кожним тактом машини (0,4 с) ми не йдемо
+    tick(ev) { lastEv = ev; },          // лише запам'ятовуємо: візуально за кожним тактом машини (0,4 с) ми не йдемо
     draw,
     still() { frozen = true; cyc = snap(-9, nowEv()); },
   };

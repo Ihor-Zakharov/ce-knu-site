@@ -29,8 +29,8 @@ const uk = lang === 'uk';
       <figure class="scope scope-home showcase" aria-label={uk ? 'Вітрина: процесор, пам’ять, логіка, код, мережі, штучний інтелект' : 'Showcase: processor, memory, logic, code, networks, artificial intelligence'}>
         <div class="scope__screen">
           <canvas aria-hidden="true"></canvas>
-          <div class="scope__hud scope__hud--top"><span data-sc-tl></span><span data-sc-tr></span></div>
-          <div class="scope__hud scope__hud--bot"><span data-sc-bl></span><span data-sc-br></span></div>
+          <div class="scope__hud scope__hud--top" aria-hidden="true"><span data-sc-tl></span><span data-sc-tr></span></div>
+          <div class="scope__hud scope__hud--bot" aria-hidden="true"><span data-sc-bl></span><span data-sc-br></span></div>
         </div>
         <div class="scope__keys" role="group" aria-label={uk ? 'Що показати' : 'What to show'}>
           {(uk ? [['ПРОЦЕСОР'], ['ПАМ’ЯТЬ'], ['ЛОГІКА'], ['КОД'], ['МЕРЕЖІ'], ['ШІ', 'Штучний інтелект']] : [['CPU'], ['MEMORY'], ['LOGIC'], ['CODE'], ['NETWORKS'], ['AI', 'Artificial intelligence']]).map(([k, name], i) => <button type="button" class="key" data-view={i} data-name={k} aria-label={name && `${k}, ${name}`} title={name} aria-pressed={i === 0 ? 'true' : 'false'}>{k}</button>)}

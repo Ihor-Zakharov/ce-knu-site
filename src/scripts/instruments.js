@@ -1,6 +1,7 @@
 // Прилади в героях розділів. Кожен розділ — своє радіофізичне явище:
 //   ticker   — новини: світлодіодна матриця, що біжить заголовками
-//   field    — дослідження: інтерференція двох джерел (друге йде за курсором)
+//   nnet     — дослідження: нейронна мережа, прямий прохід сигналу (ШІ — напрям кафедри)
+//   field    — (запасний) інтерференція двох джерел
 //   fourier  — НМЗ: меандр, що складається з гармонік ряду Фур'є
 //   mobius   — вступникам: стрічка Мебіуса, хвиля після обходу інвертує фазу
 //   spectrum — навчання: аналізатор спектра з утриманням піків
@@ -8,7 +9,8 @@
 //   chladni  — випускники: фігури Хладні, вузлові лінії стоячих хвиль
 //   array    — (запасний) фазована антенна решітка
 //   liss     — персоналії: фігури Ліссажу, що перетікають між відношеннями частот
-//   tess     — роботодавцям: тесеракт у 4D-обертанні
+//   life     — роботодавцям: «Життя» Конвея, клітинний автомат B3/S23
+//   tess     — (запасний) тесеракт у 4D-обертанні
 //   smith    — (запасний) діаграма Сміта, імпеданс сходиться до узгодження
 // Без руху (prefers-reduced-motion) малюється один статичний кадр. Поза екраном — пауза.
 import { REDUCED, Spring } from './spring.js';
@@ -91,32 +93,42 @@ function ticker(c, st, cv) {
 
 /* ── Дослідження: інтерференція ───────────────────────────── */
 function field(c, st, cv) {
-  const sx = new Spring({ value: .68, response: 1.1, damping: .9 }), sy = new Spring({ value: .62, response: 1.1, damping: .9 });
+  const box = cv.closest('.inst');
+  const sx = new Spring({ value: .66, response: 1.1, damping: .9 }), sy = new Spring({ value: .56, response: 1.1, damping: .9 });
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); sx.set(Math.min(.9, Math.max(.1, (e.clientX - r.left) / r.width))); sy.set(Math.min(.85, Math.max(.15, (e.clientY - r.top) / r.height))); });
+  cv.addEventListener('pointerleave', () => { sx.set(.66); sy.set(.56); });
   const o = document.createElement('canvas'), oc = o.getContext('2d');
   let img = null, GW = 0, GH = 0;
-  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); sx.set((e.clientX - r.left) / r.width); sy.set((e.clientY - r.top) / r.height); });
-  cv.addEventListener('pointerleave', () => { sx.set(.68); sy.set(.62); });
-  const rgb = h => { const n = parseInt(h.replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const rgb = h => { const n = parseInt((h || '#E2C27F').replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   return {
-    resize() { GW = Math.max(40, Math.round(st.W / 5)); GH = Math.max(28, Math.round(st.H / 5)); o.width = GW; o.height = GH; img = oc.createImageData(GW, GH); },
+    resize() { GW = Math.max(60, Math.round(st.W)); GH = Math.max(40, Math.round(st.H)); o.width = GW; o.height = GH; img = oc.createImageData(GW, GH); },
     draw(t) {
       if (!img) this.resize();
       const { W, H, col } = st, ph = rgb(col.ph.startsWith('#') ? col.ph : '#E2C27F');
-      const bgc = col.dark ? [12, 10, 9] : [241, 235, 224];
-      const s1 = [.3 * GW, .5 * GH], s2 = [sx.value * GW, sy.value * GH], k = TAU / 7.5, w = t * 3.2;
+      const lam = Math.min(W, H) / 9, s1 = [W * .34, H * .46], s2 = [sx.value * W, sy.value * H], k = W / GW;
+      // яскраві лінії максимумів: різниця ходу кратна довжині хвилі — сімейство гіпербол з фокусами в джерелах
       const d = img.data;
-      for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
-        const r1 = Math.hypot(x - s1[0], y - s1[1]), r2 = Math.hypot(x - s2[0], y - s2[1]);
-        let v = (Math.cos(k * r1 - w) / Math.sqrt(1 + r1 * .08) + Math.cos(k * r2 - w) / Math.sqrt(1 + r2 * .08));
-        v = Math.max(0, v) / 2; v = v * v * 1.6;
-        const i = (y * GW + x) * 4;
-        d[i] = bgc[0] + (ph[0] - bgc[0]) * v; d[i + 1] = bgc[1] + (ph[1] - bgc[1]) * v; d[i + 2] = bgc[2] + (ph[2] - bgc[2]) * v; d[i + 3] = 255;
+      for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+        const x = i * k, y = j * k, r1 = Math.hypot(x - s1[0], y - s1[1]), r2 = Math.hypot(x - s2[0], y - s2[1]);
+        const u = (r1 - r2) / lam, fr = Math.abs(u - Math.round(u));
+        const g1x = (x - s1[0]) / (r1 || 1) - (x - s2[0]) / (r2 || 1), g1y = (y - s1[1]) / (r1 || 1) - (y - s2[1]) / (r2 || 1);
+        const dist = fr * lam / (Math.hypot(g1x, g1y) + 1e-3);       // відстань у пікселях до найближчої гіперболи
+        const edge = Math.min(1, Math.max(0, (Math.min(y, H - y) - 22) / 26));   // під підписами вгорі й унизу лінії згасають
+        const a = Math.exp(-((dist / .85) ** 2)) * Math.min(1, (r1 + r2) / lam / 3) * edge;
+        const q = (j * GW + i) * 4; d[q] = ph[0]; d[q + 1] = ph[1]; d[q + 2] = ph[2]; d[q + 3] = Math.round(220 * a);
       }
       oc.putImageData(img, 0, 0);
-      c.imageSmoothingEnabled = true; c.globalAlpha = col.dark ? .95 : .7;
-      c.drawImage(o, 0, 0, W, H); c.globalAlpha = 1;
-      for (const [x, y] of [s1, s2]) { c.fillStyle = col.gold; c.beginPath(); c.arc(x / GW * W, y / GH * H, 3.5, 0, TAU); c.fill(); c.strokeStyle = col.gold; c.globalAlpha = .5; c.beginPath(); c.arc(x / GW * W, y / GH * H, 9, 0, TAU); c.stroke(); c.globalAlpha = 1; }
-      hud(cv.closest('.inst'), 'd', (Math.hypot(s2[0] - s1[0], s2[1] - s1[1]) / 7.5).toFixed(2).replace('.', ',') + ' λ');
+      // фронти хвиль, що розходяться від обох джерел (тонке золото, згасає з відстанню)
+      c.lineWidth = 1; c.strokeStyle = col.gold;
+      const ph0 = (t * lam * .55) % lam, R = Math.hypot(W, H);
+      for (const [x0, y0] of [s1, s2]) for (let r = ph0; r < R; r += lam) {
+        c.globalAlpha = Math.max(0, .38 - r / (R * 1.3)); c.beginPath(); c.arc(x0, y0, r, 0, TAU); c.stroke();
+      }
+      c.globalAlpha = 1;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 5; }
+      c.imageSmoothingEnabled = true; c.drawImage(o, 0, 0, W, H); c.shadowBlur = 0;
+      for (const [x, y] of [s1, s2]) { c.fillStyle = col.gold; c.beginPath(); c.arc(x, y, 3.2, 0, TAU); c.fill(); c.strokeStyle = col.gold; c.globalAlpha = .45; c.beginPath(); c.arc(x, y, 8, 0, TAU); c.stroke(); c.globalAlpha = 1; }
+      hud(box, 'd', (Math.hypot(s2[0] - s1[0], s2[1] - s1[1]) / lam).toFixed(2).replace('.', ',') + ' λ');
     },
   };
 }
@@ -415,7 +427,150 @@ function mobius(c, st, cv) {
   };
 }
 
-/* ── Роботодавцям: тесеракт ───────────────────────────────── */
+/* ── Дослідження: нейронна мережа — прямий прохід сигналу шарами ── */
+// Ваги — товщина й яскравість зв'язків; імпульси біжать від входів до виходів, нейрони спалахують за активацією.
+// Курсор біля нейрона підсвічує його зв'язки.
+function nnet(c, st, cv) {
+  const box = cv.closest('.inst');
+  const LAYERS = [4, 7, 7, 5, 2];
+  let nodes = [], edges = [], pulses = [], act = [], shown = [], hl = [], hover = -1, waveT = .4, pass = 0;
+  const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;   // плавний розгін і гальмування імпульсу
+  function build() {
+    const { W, H } = st, padX = W * .1, top = 36, bot = H - 36;
+    nodes = []; edges = [];
+    LAYERS.forEach((n, l) => { for (let i = 0; i < n; i++) nodes.push({ l, x: padX + (W - 2 * padX) * l / (LAYERS.length - 1), y: top + (bot - top) * (n === 1 ? .5 : i / (n - 1)) }); });
+    let base = 0;
+    for (let l = 0; l < LAYERS.length - 1; l++) {
+      const nb = base + LAYERS[l];
+      for (let i = 0; i < LAYERS[l]; i++) for (let j = 0; j < LAYERS[l + 1]; j++) edges.push({ a: base + i, b: nb + j, w: rnd() * 2 - 1 });
+      base = nb;
+    }
+    act = nodes.map(() => 0); shown = nodes.map(() => 0); hl = edges.map(() => 0);
+  }
+  const spawn = e => pulses.push({ e, p: -Math.random() * .6, v: .42 + Math.random() * .22 });
+  function fire() {                                   // новий приклад на вході — повільна хвиля шар за шаром
+    pass++;
+    nodes.forEach((n, i) => { if (n.l === 0) act[i] = .35 + rnd() * .65; });
+    edges.forEach(e => { if (nodes[e.a].l === 0 && Math.abs(e.w) > .3 && Math.random() < .7) spawn(e); });
+  }
+  cv.addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    let best = -1, bd = 30; nodes.forEach((n, i) => { const d = Math.hypot(n.x - x, n.y - y); if (d < bd) { bd = d; best = i; } }); hover = best;
+  });
+  cv.addEventListener('pointerleave', () => { hover = -1; });
+  return {
+    still: 2.6,
+    resize() { build(); },
+    step(dt) {
+      if (!nodes.length) build();
+      waveT -= dt; if (waveT <= 0) { fire(); waveT = 3.2; }
+      const next = [];
+      for (const p of pulses) {
+        p.p += dt * p.v;
+        if (p.p >= 1) {
+          const b = p.e.b; act[b] = Math.min(1, act[b] + Math.abs(p.e.w) * .5);
+          if (nodes[b].l < LAYERS.length - 1) edges.forEach(e => { if (e.a === b && Math.abs(e.w) > .4 && Math.random() < .3) spawn(e); });
+        } else next.push(p);
+      }
+      pulses = next.length > 140 ? next.slice(-140) : next;
+      const k = 1 - Math.pow(.02, dt);                // м'яке «доганяння»: світіння розгорається й гасне плавно
+      for (let i = 0; i < act.length; i++) { act[i] *= Math.pow(.55, dt); shown[i] += (act[i] - shown[i]) * k; }
+      const kh = 1 - Math.pow(.001, dt);
+      edges.forEach((e, i) => { hl[i] += ((hover === e.a || hover === e.b ? 1 : 0) - hl[i]) * kh; });
+      hud(box, 'pass', String(pass));
+    },
+    draw() {
+      if (!nodes.length) build();
+      const { col } = st;
+      edges.forEach((e, i) => {
+        const A = nodes[e.a], B = nodes[e.b], h = hl[i];
+        c.strokeStyle = e.w > 0 ? col.gold : col.line;
+        c.globalAlpha = .08 + Math.abs(e.w) * .2 + h * .6; c.lineWidth = .6 + Math.abs(e.w) * .7 + h * .6;
+        c.beginPath(); c.moveTo(A.x, A.y); c.lineTo(B.x, B.y); c.stroke();
+      });
+      c.lineCap = 'round';
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 8; }
+      for (const p of pulses) {
+        if (p.p <= 0) continue;
+        const A = nodes[p.e.a], B = nodes[p.e.b], hd = ease(p.p), tl = ease(Math.max(0, p.p - .22));   // комета: голова й довгий м'який хвіст
+        const x0 = A.x + (B.x - A.x) * tl, y0 = A.y + (B.y - A.y) * tl, x1 = A.x + (B.x - A.x) * hd, y1 = A.y + (B.y - A.y) * hd;
+        const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, col.ph);
+        c.globalAlpha = Math.min(1, Math.sin(Math.PI * Math.min(1, p.p)) * 1.6); c.strokeStyle = g; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+      }
+      c.shadowBlur = 0;
+      nodes.forEach((n, i) => {
+        const v = shown[i], r = 5.5 + v * 2;
+        c.globalAlpha = 1; c.fillStyle = col.dark ? '#141211' : '#F1EBE0'; c.beginPath(); c.arc(n.x, n.y, r, 0, TAU); c.fill();
+        c.strokeStyle = col.gold; c.lineWidth = 1.2; c.stroke();
+        if (v > .02) { c.globalAlpha = Math.min(1, v * 1.2); c.fillStyle = col.ph; if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 10 * v; } c.beginPath(); c.arc(n.x, n.y, r - 1.6, 0, TAU); c.fill(); c.shadowBlur = 0; }
+      });
+      c.globalAlpha = 1;
+    },
+  };
+}
+
+/* ── Роботодавцям: «Життя» Конвея — клітинний автомат B3/S23 (повний за Тюрінгом) ── */
+// Планерна рушниця Госпера й рідкий «суп»; живі клітини світяться, відмерлі лишають слід.
+// Курсором можна «підсіяти» клітини; коли колонія завмирає — народжується нова.
+function life(c, st, cv) {
+  const box = cv.closest('.inst');
+  const GUN = ['........................O', '......................O.O', '............OO......OO............OO', '...........O...O....OO............OO', 'OO........O.....O...OO', 'OO........O...O.OO....O.O', '..........O.....O.......O', '...........O...O', '............OO'];
+  let C = 0, R = 0, cell = 6, a = null, b = null, glow = null, gen = 0, acc = 0, calm = 0, lastPop = 0;
+  const idx = (x, y) => ((y + R) % R) * C + ((x + C) % C);
+  function seed() {
+    a.fill(0); gen = 0; calm = 0;
+    for (let q = 0; q < a.length; q++) if (Math.random() < .07) a[q] = 1;
+    for (let y = 0; y < Math.min(R, GUN.length + 4); y++) for (let x = 0; x < Math.min(C, 40); x++) a[idx(x, y)] = 0;
+    GUN.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === 'O' && x + 2 < C && y + 2 < R) a[idx(x + 2, y + 2)] = 1; }));
+  }
+  function step() {
+    let pop = 0;
+    for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
+      let n = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (dx || dy) n += a[idx(x + dx, y + dy)];
+      const q = y * C + x; b[q] = (a[q] ? (n === 2 || n === 3) : n === 3) ? 1 : 0; pop += b[q];
+    }
+    [a, b] = [b, a]; gen++;
+    for (let q = 0; q < a.length; q++) glow[q] = a[q] ? 1 : glow[q] * .82;
+    calm = Math.abs(pop - lastPop) < 3 ? calm + 1 : 0; lastPop = pop;
+    if (calm > 60 || pop < 8) seed();
+    hud(box, 'gen', String(gen)); hud(box, 'pop', String(pop));
+  }
+  cv.addEventListener('pointermove', e => {
+    if (!a) return;
+    const r = cv.getBoundingClientRect(), ox = (st.W - C * cell) / 2, oy = (st.H - R * cell) / 2;
+    const x = Math.floor((e.clientX - r.left - ox) / cell), y = Math.floor((e.clientY - r.top - oy) / cell);
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (Math.random() < .5) a[idx(x + dx, y + dy)] = 1;
+  });
+  return {
+    still: 4,
+    resize() {
+      cell = Math.max(6, Math.round(Math.min(st.W, st.H) / 38));
+      C = Math.max(20, Math.floor((st.W - 24) / cell)); R = Math.max(12, Math.floor((st.H - 64) / cell));   // поле не заходить під підписи
+      a = new Uint8Array(C * R); b = new Uint8Array(C * R); glow = new Float32Array(C * R); seed();
+      if (REDUCED) for (let i = 0; i < 60; i++) step();
+    },
+    step(dt) { if (!a) return; acc += dt; while (acc > .11) { step(); acc -= .11; } },
+    draw() {
+      if (!a) this.resize();
+      const { W, H, col } = st, ox = (W - C * cell) / 2, oy = (H - R * cell) / 2, sz = cell - 1.5;
+      c.fillStyle = col.line; c.globalAlpha = .35;
+      for (let y = 0; y <= R; y++) for (let x = 0; x <= C; x++) c.fillRect(ox + x * cell - .75, oy + y * cell - .75, 1, 1);
+      c.globalAlpha = 1; c.fillStyle = col.ph;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 4; }
+      for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
+        const g = glow[y * C + x]; if (g < .06) continue;
+        c.globalAlpha = a[y * C + x] ? 1 : g * .32;
+        c.beginPath(); c.roundRect(ox + x * cell + .75, oy + y * cell + .75, sz, sz, Math.max(1, sz * .28)); c.fill();
+      }
+      c.globalAlpha = 1; c.shadowBlur = 0;
+    },
+  };
+}
+
+/* ── (запасний) тесеракт ──────────────────────────────────── */
 function tess(c, st, cv) {
   const V = []; for (let i = 0; i < 16; i++) V.push([i & 1 ? 1 : -1, i & 2 ? 1 : -1, i & 4 ? 1 : -1, i & 8 ? 1 : -1]);
   const E = []; for (let i = 0; i < 16; i++) for (let k = 0; k < 4; k++) { const j = i ^ (1 << k); if (j > i) E.push([i, j, k]); }
@@ -455,10 +610,10 @@ function tess(c, st, cv) {
   };
 }
 
-const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius };
+const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius, nnet, life };
 export function mountInstruments() {
   document.querySelectorAll('.inst[data-inst] canvas[data-draw]').forEach(cv => {
     const kind = KINDS[cv.closest('.inst').dataset.inst];
-    if (kind) mount(cv, kind);
+    try { if (kind) mount(cv, kind); } catch (e) { console.error(e); }
   });
 }

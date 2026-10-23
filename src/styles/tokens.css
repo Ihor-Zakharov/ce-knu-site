@@ -1,0 +1,137 @@
+/* «Сигнал» — UI-кіт кафедри комп'ютерної інженерії КНУ.
+   Токени: єдине джерело кольорів, шрифтів, відступів і руху.
+   Тема: <html data-theme="light|dark">; без атрибута — системна. */
+
+@font-face {
+  font-family: "Fixel";
+  src: url("../assets/fonts/FixelVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 87.5% 100%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Signal Mono";
+  src: url("../assets/fonts/SignalMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Signal Mono";
+  src: url("../assets/fonts/SignalMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  /* бренд: однаковий в обох темах */
+  --brand-wine: #5E1424;
+  --brand-gold: #E6D3A3;
+
+  /* ── Світла тема «Папір» ─────────────────────────────── */
+  --bg:          #F6F2EA;   /* слонова кістка */
+  --surface:     #FFFDF8;
+  --surface-2:   #EFE8DC;
+  --ink:         #17130F;   /* 16.5:1 */
+  --ink-2:       #4A423A;   /* 8.8:1 */
+  --ink-3:       #6A6155;   /* 5.4:1 */
+  --action:      #5E1424;   /* головна дія: заливка */
+  --action-hover:#741A2D;
+  --on-action:   #FFFFFF;
+  --link:        #5E1424;   /* підкреслені посилання, 11.7:1 */
+  --link-line:   #B08A3E;
+  --gold:        #B08A3E;   /* лише графіка */
+  --gold-ink:    #80601F;   /* золото як текст, 5.2:1 */
+  --phosphor:    #5E1424;   /* промінь приладу */
+  --phosphor-glow: none;
+  --signal:      #A4202A;   /* помилки, «наживо» */
+  --ok:          #3F6B2A;
+  --line:        #E3DBCD;   /* декоративні волосяні лінії */
+  --line-strong: #8C8478;   /* межі полів, 3.3:1 */
+  --focus:       #80601F;
+  --grat:        rgb(23 19 15 / .07);
+  --edge:        inset 0 1px 0 rgb(255 255 255 / .9);
+  --bezel:       linear-gradient(180deg, #FFFDF8, #F2EDE3);
+  --bezel-shadow: inset 0 1px 0 #fff, 0 1px 2px rgb(23 19 15 / .06), 0 28px 56px -28px rgb(60 20 25 / .28);
+  --screen:      #F1EBE0;
+  --hero-light:  transparent;
+  --footer-bg:   #2A0A12;
+  color-scheme: light;
+
+  /* ── Типографіка ─────────────────────────────────────── */
+  --font-sans: "Fixel", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Signal Mono", ui-monospace, "Cascadia Mono", monospace;
+  --fs-mono:  .75rem;                                    /* 12 */
+  --fs-meta:  .8125rem;                                  /* 13 */
+  --fs-base:  1rem;                                      /* 16 */
+  --fs-lead:  clamp(1.0625rem, 1rem + .35vw, 1.25rem);   /* 17–20 */
+  --fs-h3:    clamp(1.25rem, 1.15rem + .4vw, 1.5rem);     /* 20–24 */
+  --fs-h2:    clamp(1.875rem, 1.35rem + 2.1vw, 3.25rem);  /* 30–52 */
+  --fs-h1:    clamp(2.625rem, 1.5rem + 3.2vw, 4.5rem);    /* 42–72 */
+  --track-mono: .06em;
+
+  /* ── Простір і сітка ─────────────────────────────────── */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px; --s5: 24px;
+  --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 144px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --maxw: 1320px;
+  --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-pill: 999px;
+
+  /* ── Рух: «вимірювання» — точно, без пружин ─────────── */
+  --ease:      cubic-bezier(.2, .7, .2, 1);
+  --ease-in:   cubic-bezier(.5, 0, .75, 0);
+  --ease-lux:  cubic-bezier(.16, 1, .3, 1);
+  --t-press: 80ms; --t-fast: 160ms; --t-mid: 220ms; --t-slow: 700ms; --t-theme: 640ms;
+}
+
+/* ── Темна тема «Прилад уночі» ──────────────────────────── */
+:root[data-theme="dark"] {
+  --bg:          #141211;
+  --surface:     #1B1816;
+  --surface-2:   #241F1C;
+  --ink:         #F3EDE3;   /* 16:1 */
+  --ink-2:       #C9BFB1;   /* 10.3:1 */
+  --ink-3:       #9A9084;   /* 6:1 */
+  --action:      #D8B56E;
+  --action-hover:#E6C886;
+  --on-action:   #141211;
+  --link:        #F3EDE3;
+  --link-line:   #D8B56E;
+  --gold:        #D8B56E;
+  --gold-ink:    #D8B56E;
+  --phosphor:    #E2C27F;
+  --phosphor-glow: drop-shadow(0 0 3px rgb(226 194 127 / .35));
+  --signal:      #FF6F61;
+  --ok:          #9BD487;
+  --line:        #2E2824;
+  --line-strong: #7A7166;   /* 3.9:1 */
+  --focus:       #D8B56E;
+  --grat:        rgb(216 181 110 / .08);
+  --edge:        inset 0 1px 0 rgb(255 240 210 / .05);
+  --bezel:       linear-gradient(180deg, #1F1B18, #151311);
+  --bezel-shadow: inset 0 1px 0 rgb(255 240 210 / .07), 0 30px 60px -30px rgb(0 0 0 / .9);
+  --screen:      radial-gradient(120% 90% at 50% 40%, #1A1613, #0C0A09);
+  --hero-light:  radial-gradient(60% 70% at 74% 42%, rgb(226 194 127 / .07), transparent 62%);
+  --footer-bg:   #0B0908;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #141211; --surface: #1B1816; --surface-2: #241F1C;
+    --ink: #F3EDE3; --ink-2: #C9BFB1; --ink-3: #9A9084;
+    --action: #D8B56E; --action-hover: #E6C886; --on-action: #141211;
+    --link: #F3EDE3; --link-line: #D8B56E; --gold: #D8B56E; --gold-ink: #D8B56E;
+    --phosphor: #E2C27F; --phosphor-glow: drop-shadow(0 0 3px rgb(226 194 127 / .35));
+    --signal: #FF6F61; --ok: #9BD487; --line: #2E2824; --line-strong: #7A7166; --focus: #D8B56E;
+    --grat: rgb(216 181 110 / .08); --edge: inset 0 1px 0 rgb(255 240 210 / .05);
+    --bezel: linear-gradient(180deg, #1F1B18, #151311);
+    --bezel-shadow: inset 0 1px 0 rgb(255 240 210 / .07), 0 30px 60px -30px rgb(0 0 0 / .9);
+    --screen: radial-gradient(120% 90% at 50% 40%, #1A1613, #0C0A09);
+    --hero-light: radial-gradient(60% 70% at 74% 42%, rgb(226 194 127 / .07), transparent 62%);
+    --footer-bg: #0B0908;
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-press: 0ms; --t-fast: 0ms; --t-mid: 0ms; --t-slow: 0ms; --t-theme: 0ms; }
+}

@@ -27,7 +27,8 @@ main { flex: 1; }
 .nav ul { display: flex; list-style: none; margin: 0; padding: 0; gap: 2px; }
 .nav a { position: relative; z-index: 1; display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14.5px; letter-spacing: -.005em; text-decoration: none; color: var(--ink-2); transition: color var(--hover) var(--ease-out); }
 .nav a:hover, .nav a:focus-visible, .nav a[aria-current] { color: var(--ink); }
-.nav .led { position: absolute; top: 50%; left: 3px; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--gold); opacity: 0; scale: .4; transition: opacity 300ms var(--ease-out), scale 520ms var(--spring); }
+.nav a[aria-current] { padding-left: 24px; }
+.nav .led { position: absolute; top: 50%; left: 12px; width: 5px; height: 5px; margin-top: -3px; border-radius: 50%; background: var(--gold); opacity: 0; scale: .4; transition: opacity 300ms var(--ease-out), scale 520ms var(--spring); }
 .nav a[aria-current] .led { opacity: 1; scale: 1; box-shadow: 0 0 6px 1px color-mix(in oklab, var(--gold) 65%, transparent); }   /* «світлодіод» ліворуч від активного каналу, по центру рядка */
 .nav__wave { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 6px; width: calc(100% - 24px); overflow: visible; pointer-events: none; }
 .nav__wave { clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 620ms var(--ease-out), opacity 200ms var(--ease-out); }
@@ -386,7 +387,8 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 @media (min-width: 1240px) and (max-width: 1439px) {
   .hd__in { gap: 10px; }
   .nav a { padding: 0 8px; font-size: 14px; }
-  .nav .led { left: 1px; }
+  .nav a[aria-current] { padding-left: 20px; }
+  .nav .led { left: 8px; }
   .nav__wave { left: 8px; right: 8px; width: calc(100% - 16px); }
   .brand__t small { display: none; }
   .brand__t b { font-size: 15px; }

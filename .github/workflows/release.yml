@@ -1,0 +1,58 @@
+# Готова збірка для сервера КНУ. Сервер сам забирає її (deploy/update-site.sh) з
+#   https://github.com/<власник>/<репозиторій>/releases/latest/download/ce-knu-site.tar.gz
+# Якщо адміністратор дасть SSH/SFTP-доступ до каталогу сайту — додайте секрети
+# DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_KEY, і збірка ще й копіюватиметься на сервер одразу.
+name: Release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      site_url: { description: 'Адреса сайту', default: 'https://ce.knu.ua' }
+      base_path: { description: 'Підкаталог на сервері', default: '/' }
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          SITE_URL: ${{ inputs.site_url || vars.SITE_URL || 'https://ce.knu.ua' }}
+          BASE_PATH: ${{ inputs.base_path || vars.BASE_PATH || '/' }}
+      - run: npm run check:content
+      - name: Архів і контрольна сума
+        run: |
+          tar -C dist -czf ce-knu-site.tar.gz .
+          (cd dist && zip -qr ../ce-knu-site.zip .)
+          sha256sum ce-knu-site.tar.gz > ce-knu-site.sha256
+      - name: Випуск на GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="site-$(date -u +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          gh release create "$tag" ce-knu-site.tar.gz ce-knu-site.zip ce-knu-site.sha256 \
+            --title "Сайт $(date -u +%F) · ${GITHUB_SHA::7}" --latest \
+            --notes "Збірка з main ${GITHUB_SHA}. Розпакувати в каталог сайту або встановити deploy/update-site.sh."
+          # лишаємо 10 останніх випусків
+          gh release list --limit 100 --json tagName --jq '.[10:][].tagName' | xargs -r -n1 gh release delete --yes --cleanup-tag
+      - name: Копіювання на сервер (якщо задано секрети)
+        if: env.DEPLOY_HOST != ''
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          DEST: ${{ secrets.DEPLOY_PATH }}
+          KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          install -m 600 /dev/null ~/.ssh_key && printf '%s\n' "$KEY" > ~/.ssh_key
+          rsync -az --delete -e "ssh -i ~/.ssh_key -o StrictHostKeyChecking=accept-new" dist/ "$USER@$HOST:$DEST/"
+          rm -f ~/.ssh_key

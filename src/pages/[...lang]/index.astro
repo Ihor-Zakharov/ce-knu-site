@@ -1,0 +1,107 @@
+---
+import Base from '../../layouts/Base.astro';
+import { render } from 'astro:content';
+import { T, url, langOf, langParams } from '../../lib/i18n';
+import { page } from '../../lib/content';
+import { HISTORY, PARTNERS } from '../../lib/home';
+import AlumniStrip from '../../components/AlumniStrip.astro';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const t = T[lang];
+const home = (await page(lang, 'index'))!;
+const { Content } = await render(home);
+const uk = lang === 'uk';
+const scopeKeys = [
+  { mode: 'sine', label: 'SIN', on: true },
+  { mode: 'square', label: '⊓⊔', sr: uk ? 'Меандр' : 'Square wave' },
+  { mode: 'am', label: 'AM', title: uk ? 'Амплітудна модуляція' : 'Amplitude modulation' },
+  { mode: 'chirp', label: 'CHIRP', title: uk ? 'Лінійна частотна модуляція' : 'Linear frequency sweep' },
+];
+---
+<Base lang={lang} title={t.dept} description={(uk ? 'Кафедра комп’ютерної інженерії КНУ імені Тараса Шевченка: ' : 'Department of Computer Engineering, Taras Shevchenko National University of Kyiv: ') + (uk ? 'бакалаврат, магістратура й аспірантура F7 «Комп’ютерна інженерія», лабораторії Huawei, IBM, Cisco.' : 'Bachelor’s, Master’s and PhD programmes in F7 Computer Engineering, Huawei, IBM and Cisco labs.')} og="home">
+  <section class="ph hero-home">
+    <div class="wrap ph__grid">
+      <div class="ph__text">
+        <p class="ph__eyebrow"><b>{uk ? 'КНУ' : 'KNU'}</b><span class="long">{uk ? 'Факультет радіофізики, електроніки та комп’ютерних систем' : 'Faculty of Radiophysics, Electronics and Computer Systems'}</span><span>{uk ? '· ФРЕКС' : '· FRECS'}</span></p>
+        <h1>{(uk ? ['Кафедра', 'комп’ютерної', 'інженерії'] : ['Department', 'of Computer', 'Engineering']).map((w, i) => <><span class="w"><span style={`--i:${i}`}>{i === 1 ? <em>{w}</em> : w}</span></span> </>)}</h1>
+        <p class="lead">{uk ? 'Поєднання електроніки та комп’ютерних наук.' : 'Combining electronics and computer science.'}</p>
+        <div class="cta">
+          <a class="btn" href={url(lang, '/entrant/')}>{uk ? 'Вступникам' : 'Admission'} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--line" href={url(lang, '/news/')}>{t.news}</a>
+        </div>
+      </div>
+      <div class="inst-wrap" data-dockable>
+      <figure class="scope scope-home" aria-label={uk ? 'Демонстраційний сигнал на осцилографі; по променю біжить КІ-Рекс' : 'Demo signal on an oscilloscope; KI-Rex runs along the trace'}>
+        <div class="scope__screen">
+          <svg viewBox="0 0 1000 667" preserveAspectRatio="none" aria-hidden="true">
+            <g class="grat">
+              <path d="M100 0V667M200 0V667M300 0V667M400 0V667M600 0V667M700 0V667M800 0V667M900 0V667M0 83H1000M0 167H1000M0 250H1000M0 417H1000M0 500H1000M0 583H1000"/>
+              <path class="axis" d="M500 0V667M0 333.5H1000"/>
+            </g>
+            <path class="trace trace--ghost"/>
+            <path class="trace trace--main"/>
+          </svg>
+          <div class="scope__hud scope__hud--top"><span>CH1 · <b data-scope-mode>SIN</b></span><span>2,0 V/DIV · 250 µs/DIV</span></div>
+          <div class="scope__hud scope__hud--bot"><span>f = <b data-scope-f>{uk ? '0,80 кГц' : '0.80 kHz'}</b></span><span>KI-REX · {uk ? 'ДЕМО-СИГНАЛ' : 'DEMO SIGNAL'}</span></div>
+        </div>
+        <div class="scope__keys" role="group" aria-label={uk ? 'Форма сигналу' : 'Waveform'}>
+          {scopeKeys.map(k => <button type="button" class="key" data-mode={k.mode} aria-pressed={k.on ? 'true' : 'false'} title={k.title}>{k.sr ? <><span aria-hidden="true">{k.label}</span><span class="sr-only">{k.sr}</span></> : k.label}</button>)}
+          <span class="sp"></span><span class="scope__auto cap" data-scope-next aria-live="off"></span>
+          <button type="button" class="key" data-scope-play aria-pressed="false" aria-label={uk ? 'Пауза' : 'Pause'} title={uk ? 'Пауза' : 'Pause'}><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+        </div>
+      </figure>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="figures-wrap mt-l" data-rex-scope>
+      <div class="perch perch--line" data-acc="" data-start="460" data-lines={JSON.stringify(uk ? ['КІ-Рекс на зв’язку', 'Гуляю по шині даних', 'Ловлю хвилю'] : ['KI-Rex on the line', 'Walking along the data bus', 'Catching a wave'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
+      <div class="figures rv">
+        <div data-rex-say={uk ? 'Перший курс, перший біт' : 'First year, first bit'}><b>100</b><span>{uk ? 'ліміт набору: бакалаврат' : 'Bachelor’s intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Ще два роки відкриттів' : 'Two more years of discovery'}><b>50</b><span>{uk ? 'ліміт набору: магістратура' : 'Master’s intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Гіпотеза кличе' : 'A hypothesis is calling'}><b>10</b><span>{uk ? 'ліміт набору: аспірантура' : 'PhD intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Початок відліку' : 'The starting point'}><b>1991</b><span>{uk ? 'рік створення спеціалізації' : 'specialisation established'}</span></div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <AlumniStrip lang={lang} />
+
+  <div class="wrap inst-dock inst-dock--home" data-inst-dock hidden></div>
+
+  <section class="section" aria-labelledby="h-about">
+    <div class="wrap">
+      <div class="sec-head rv"><div><p class="eyebrow">{uk ? 'Про кафедру' : 'About'}</p><h2 class="mt-s" id="h-about">{home.data.title}</h2></div></div>
+      <div class="page">
+        <article class="prose"><Content /></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="h-history">
+    <div class="wrap history">
+      <div class="rv">
+        <p class="eyebrow">{uk ? 'Хронологія' : 'Timeline'}</p>
+        <h2 class="mt-s sec-h2" id="h-history">{uk ? 'Історія кафедри' : 'Department history'}</h2>
+        <p class="lead mt-m">{uk ? 'У 1991 році створено спеціалізацію «Автоматизація наукових досліджень».' : 'The Automation of Scientific Research specialisation was established in 1991.'}</p>
+        <div class="mt-l"><p class="cap"><b>{uk ? 'Академії й партнери' : 'Academies and partners'}</b></p><div class="logos mt-m">{PARTNERS.map(p => <span>{p}</span>)}</div></div>
+      </div>
+      <ol class="timeline rv" style="--prog:100%">
+        {HISTORY[lang].map(h => <li class="done"><time>{h.y}</time><b>{h.t}</b>{h.d && <span>{h.d}</span>}</li>)}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="band rv">
+        <div>
+          <p class="eyebrow">F7 · {uk ? 'Комп’ютерна інженерія' : 'Computer Engineering'}</p>
+          <h3>{uk ? 'Вивчайте комп’ютерну інженерію' : 'Study Computer Engineering'}</h3>
+        </div>
+        <a class="btn" href={url(lang, '/entrant/')}>{uk ? 'Про вступ' : 'Admissions'} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+</Base>

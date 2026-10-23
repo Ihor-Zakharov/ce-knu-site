@@ -1,0 +1,25 @@
+---
+// Прилад розділу з КІ-Рексом на верхньому краї (вид — scripts/instruments.js, Рекс — scripts/rex.js)
+import { HEROES } from '../lib/heroes';
+import type { Lang } from '../lib/i18n';
+interface Props { lang: Lang; kind: string; text?: string; data?: Record<string, string> }
+const { lang, kind, text = '', data = {} } = Astro.props;
+const h = HEROES[kind];
+const dataAttrs = Object.fromEntries(Object.entries(data).map(([k, v]) => [`data-${k}`, v]));
+---
+<div class="ph__inst" data-dockable>
+    <div class="inst-wrap" aria-hidden="true">
+    <div class="perch" data-acc={h.acc} data-lines={JSON.stringify(h.lines[lang])}>
+      <span class="perch__say"></span>
+      <canvas width="90" height="72"></canvas>
+    </div>
+    <figure class="inst" data-inst={h.inst} data-text={text} {...dataAttrs}>
+      <div class="inst__screen">
+        <canvas data-draw></canvas>
+        <div class="inst__hud inst__hud--top"><span set:html={h.hud.top[0]} /><span set:html={h.hud.top[1]} /></div>
+        <div class="inst__hud inst__hud--bot"><span set:html={h.hud.bot[0]} /><span set:html={h.hud.bot[1]} /></div>
+      </div>
+      <div class="inst__bar"><i class="inst__led"></i><span>KI-REX · {h.ch}</span><span class="sp"></span><span>{lang === 'uk' ? 'клацніть Рекса' : 'click Rex'}</span></div>
+    </figure>
+    </div>
+</div>

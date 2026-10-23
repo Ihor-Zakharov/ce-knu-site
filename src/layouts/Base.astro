@@ -1,0 +1,123 @@
+---
+import '../styles/tokens.css';
+import '../styles/kit.css';
+import '../styles/site.css';
+import fixel from '../assets/fonts/FixelVariable.woff2?url';
+import Icons from '../components/Icons.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { T, url, stripLang, type Lang } from '../lib/i18n';
+import { orgLd, breadcrumbLd } from '../lib/seo';
+
+interface Props {
+  lang: Lang; title: string; description?: string;
+  image?: ImageMetadata;           // власна картка (обкладинка новини, фото людини)
+  og?: string;                     // інакше — картка розділу з public/og/<og>-<мова>.jpg
+  type?: 'website' | 'article' | 'profile'; noindex?: boolean;
+  crumbs?: { name: string; path: string }[];   // для BreadcrumbList; поточна сторінка додається сама
+  jsonld?: Record<string, unknown>[];
+  published?: Date;
+}
+const { lang, title, description = '', image, og = 'home', type = 'website', noindex = false, crumbs, jsonld = [], published } = Astro.props;
+const t = T[lang];
+const path = stripLang(Astro.url.pathname);
+const other: Lang = lang === 'uk' ? 'en' : 'uk';
+// 404: українська — /404.html (так її шукає сервер), англійська — /en/404/
+const alt = path.startsWith('/404') ? (other === 'uk' ? url('uk', '/404.html') : url('en', '/404/')) : url(other, path);
+const canonical = new URL(url(lang, path), Astro.site).href;
+const full = title === t.dept ? `${t.dept} · ${t.uniShort}` : `${title} · ${t.dept}`;
+const base = import.meta.env.BASE_URL;
+const desc = (description || t.footNote).replace(/\s+/g, ' ').trim();
+const metaDesc = desc.length > 160 ? desc.slice(0, desc.lastIndexOf(' ', 157)) + '…' : desc;
+const ogSrc = image
+  ? (await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 })).src
+  : `${base}og/${og}-${lang}.jpg`;
+const ogImage = new URL(ogSrc, Astro.site).href;
+const ld: Record<string, unknown>[] = [...jsonld];
+if (crumbs) ld.push(breadcrumbLd(lang, [...crumbs, { name: title, path }], Astro.site!));
+if (path === '/') ld.push(...orgLd(lang, Astro.site!));
+---
+<!doctype html>
+<html lang={lang} data-base={base}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{full}</title>
+  <meta name="description" content={metaDesc} />
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" hreflang={lang === 'uk' ? 'uk' : 'en'} href={canonical} />
+  <link rel="alternate" hreflang={other === 'uk' ? 'uk' : 'en'} href={new URL(alt, Astro.site).href} />
+  <link rel="alternate" hreflang="x-default" href={new URL(url('uk', path), Astro.site).href} />
+  <link rel="alternate" type="application/rss+xml" title={`${t.news} · ${t.dept}`} href={url(lang, '/rss.xml')} />
+  {noindex && <meta name="robots" content="noindex" />}
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={metaDesc} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:locale" content={lang === 'uk' ? 'uk_UA' : 'en_US'} />
+  <meta property="og:locale:alternate" content={lang === 'uk' ? 'en_US' : 'uk_UA'} />
+  <meta property="og:site_name" content={t.dept} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={title} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={metaDesc} />
+  <meta name="twitter:image" content={ogImage} />
+  {published && <meta property="article:published_time" content={published.toISOString()} />}
+  {ld.map(o => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+  <meta name="theme-color" content="#F6F2EA" />
+  <link rel="icon" href={`${base}favicon.png`} type="image/png" />
+  <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+  <link rel="preload" href={fixel} as="font" type="font/woff2" crossorigin />
+  <script is:inline>
+    // тема до першого кадру — без спалаху; ?theme=dark|light для перевірок
+    (function () {
+      var q = new URLSearchParams(location.search).get('theme'), s = null;
+      try { s = localStorage.getItem('ki-theme'); } catch (e) {}
+      var v = q === 'dark' || q === 'light' ? q : s;
+      if (v === 'dark' || v === 'light') document.documentElement.dataset.theme = v;
+      var dark = v ? v === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.querySelector('meta[name="theme-color"]').content = dark ? '#141211' : '#F6F2EA';
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">{t.skip}</a>
+  <Icons />
+  <Header lang={lang} path={path} alt={alt} />
+  <main id="main" tabindex="-1">
+    <slot />
+    <div class="wrap inst-dock" data-inst-dock hidden></div>
+  </main>
+  <Footer lang={lang} />
+
+  <dialog class="dlg search-dlg" id="search" aria-label={t.search}>
+    <div class="dlg__card">
+      <div class="dlg__in">
+        <svg width="20" height="20" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="text" role="combobox" aria-expanded="false" enterkeyhint="search" aria-controls="search-list" aria-autocomplete="list" aria-label={t.search} placeholder={t.searchPh} autocomplete="off" />
+        <button type="button" class="btn btn--ghost btn--icon btn--sm" onclick="this.closest('dialog').close()" aria-label={t.close} title={t.close}><svg width="18" height="18" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+      <ul id="search-list" role="listbox" aria-label={t.search}></ul>
+      <p class="dlg__empty">{t.searchHint}</p>
+      <div class="dlg__foot"><span><span class="kbd">↑↓</span> {lang === 'uk' ? 'вибір' : 'select'}</span><span><span class="kbd">Enter</span> {lang === 'uk' ? 'відкрити' : 'open'}</span><span><span class="kbd">Esc</span> {t.close.toLowerCase()}</span><span><span class="kbd">/</span> {lang === 'uk' ? 'пошук з будь-якої сторінки' : 'search from any page'}</span></div>
+    </div>
+  </dialog>
+
+  <dialog class="lightbox" id="lightbox" aria-label={t.photo}>
+    <div class="lightbox__in">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="" />
+      <p class="lightbox__cap cap" data-lb-cap></p>
+      <!-- кнопки зафіксовані по краях екрана: підпис будь-якої довжини їх не зсуває -->
+      <button type="button" class="btn btn--line btn--icon lightbox__nav lightbox__nav--prev" data-lb-prev aria-label={t.lightboxPrev} title={t.lightboxPrev}><svg width="22" height="22" aria-hidden="true"><use href="#i-left"/></svg></button>
+      <button type="button" class="btn btn--line btn--icon lightbox__nav lightbox__nav--next" data-lb-next aria-label={t.lightboxNext} title={t.lightboxNext}><svg width="22" height="22" aria-hidden="true"><use href="#i-right"/></svg></button>
+      <button type="button" class="btn btn--line btn--icon lightbox__close" data-lb-close aria-label={t.lightboxClose} title={t.lightboxClose}><svg width="22" height="22" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+  </dialog>
+  <script>import '../scripts/site.js';</script>
+</body>
+</html>

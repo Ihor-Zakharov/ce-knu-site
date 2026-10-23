@@ -1,7 +1,0 @@
-# Checks staged files with ESLint, Stylelint and Prettier. CI runs the full checks anyway,
-# so the hook is skipped when Node.js is not installed (Docker-only setup).
-if ! command -v npx >/dev/null 2>&1; then
-  echo "husky: Node.js not found, skipping pre-commit checks"
-  exit 0
-fi
-npx lint-staged

@@ -1,0 +1,26 @@
+---
+// Вкладені сторінки розділів (напр. /research/llm-memory-group/ — дослідницька група)
+import Base from '../../../../layouts/Base.astro';
+import PageHero from '../../../../components/PageHero.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+import { langOf, url, type Lang } from '../../../../lib/i18n';
+import { slugOf } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await getCollection('pages', p => slugOf(p.id).includes('/'));
+  return all.map(p => {
+    const lang = p.id.split('/')[0] as Lang, [page, sub] = slugOf(p.id).split('/');
+    return { params: { lang: lang === 'en' ? 'en' : undefined, page, sub }, props: { entry: p } };
+  });
+}
+const { entry } = Astro.props;
+const lang = langOf(Astro.params.lang);
+const parent = await getEntry('pages', `${lang}/${Astro.params.page}`);
+const { Content } = await render(entry);
+---
+<Base lang={lang} title={entry.data.title} description={entry.data.description} og={Astro.params.page} crumbs={parent ? [{ name: parent.data.title, path: `/${Astro.params.page}/` }] : []}>
+  <PageHero lang={lang} title={entry.data.title} kind={Astro.params.page!} crumbs={parent ? [{ href: url(lang, `/${Astro.params.page}/`), label: parent.data.title }] : []} />
+  <section class="section">
+    <div class="wrap page"><article class="prose"><Content /></article></div>
+  </section>
+</Base>

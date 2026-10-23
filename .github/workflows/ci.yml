@@ -1,58 +1,47 @@
+# Перевірки на кожен запит на злиття й на кожну зміну main (критерій «Автоматичні перевірки»).
 name: CI
-
 on:
   pull_request:
   push:
     branches: [main]
-  workflow_dispatch:
-
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
+  cancel-in-progress: true
 permissions:
   contents: read
 
-env:
-  ASTRO_TELEMETRY_DISABLED: 1
-  HUSKY: 0
-
 jobs:
+  # назви задач «build» і «pr-title» — обов'язкові перевірки в правилах гілки main
   build:
     name: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    env:
+      ASTRO_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v7
-
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
-
-      - run: npm ci --no-audit
-
-      - name: Lint (ESLint, Stylelint, Prettier)
-        run: npm run lint
-
-      - name: Type check (astro check, TypeScript 7)
-        run: npm run check
-
-      - name: Build for GitHub Pages
-        run: |
-          export ASTRO_SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
-          export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/"
-          npm run build
-
-      - name: Validate HTML
-        run: npm run validate:html
-
-      - uses: actions/upload-artifact@v7
+      - run: npm ci
+      - name: Збирання (лише статичні файли)
+        run: npm run build
+      - name: Повнота вмісту й внутрішні посилання
+        run: npm run check:content
+      - name: Браузер для тестів
+        run: npx playwright install --with-deps chromium
+      - name: Автотести (навігація, мови, мобільний вигляд, клавіатура, axe)
+        run: npm test
+      - name: Lighthouse CI — мобільний і настільний профілі, медіана трьох запусків
+        run: npm run lhci
+      - if: always()
+        uses: actions/upload-artifact@v7
         with:
-          name: site
-          path: dist
-          include-hidden-files: true
-          retention-days: 7
+          name: reports
+          path: |
+            playwright-report/
+            .lighthouseci/
+          retention-days: 14
 
   pr-title:
     name: pr-title
@@ -61,6 +50,7 @@ jobs:
     permissions:
       pull-requests: read
     steps:
+      # назва запиту на злиття: «тип: опис з малої літери», напр. «content: новина про день відкритих дверей»
       - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,30 +69,5 @@ jobs:
             build
             chore
             revert
-          subjectPattern: ^[^A-Z].+$
-          subjectPatternError: 'Start the summary with a lower-case letter, e.g. "feat(news): add news list page".'
-
-  deploy:
-    name: deploy
-    needs: build
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    concurrency:
-      group: pages-deploy
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: site
-          path: dist
-
-      # Publishes to the gh-pages branch; pr-preview/ is kept for future PR previews.
-      - uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
-          branch: gh-pages
-          clean-exclude: pr-preview/
+          subjectPattern: ^[^A-ZА-ЯІЇЄҐ].+$
+          subjectPatternError: 'Опис — з малої літери, напр. «content: новина про день відкритих дверей».'

@@ -1,0 +1,35 @@
+---
+// Де працюють випускники: три словесні знаки в шрифті сайту під ключовими цифрами; кожен веде до історії випускника.
+import { Image } from 'astro:assets';
+import { ALUMNI } from '../lib/home';
+import { url, type Lang } from '../lib/i18n';
+import kalyta from '../assets/images/abiturient/d_kalita.jpg';
+import kramov from '../assets/images/abiturient/a_kramov.jpg';
+import slynko from '../assets/images/abiturient/m_slynko.png';
+const PHOTOS = { d_kalita: kalyta, a_kramov: kramov, m_slynko: slynko } as const;
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const uk = lang === 'uk';
+const split = (c: string) => c.match(/^(.+?)\s+(Inc\.|LLC|Ltd\.?)$/);   // «One AI Inc.» → знак + дрібний суфікс, як одиниці в .figures
+---
+<section class="alum" aria-labelledby="h-alum">
+  <div class="wrap">
+    <div class="alum__head rv">
+      <h2 class="eyebrow" id="h-alum">{uk ? 'Де працюють наші випускники' : 'Where our alumni work'}</h2>
+      <a class="arrow-link" href={url(lang, '/graduates/')}>{uk ? 'Історії випускників' : 'Alumni stories'} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+    <ul class="alum__row" role="list">
+      {ALUMNI[lang].map((a, i) => { const m = split(a.company); return (
+        <li class="rv" style={`--i:${i + 1}`}>
+          <a class="alum__item" href={url(lang, '/graduates/') + '#' + a.anchor}>
+            <span class="alum__mark">{m ? <>{m[1]} <small>{m[2]}</small></> : a.company}</span>
+            <span class="alum__who">
+              <span class="alum__ph"><Image src={PHOTOS[a.photo as keyof typeof PHOTOS]} width={96} alt="" loading="lazy" /></span>
+              <span><b>{a.who}</b><span class="alum__role">{a.role}</span></span>
+            </span>
+          </a>
+        </li>
+      ); })}
+    </ul>
+  </div>
+</section>

@@ -20,9 +20,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Байт свіжих подій', 'Тримаю в полі зору', 'Є сигнал для новини'], en: ['A byte of news', 'Keeping news in focus', 'Picking up a news signal'] },
   },
   research: {
-    ch: 'CH 02 · RSRC', inst: 'field', acc: 'tube',
+    ch: 'CH 02 · RSRC', inst: 'lorenz', acc: 'tube',
     lead: { uk: 'Високопродуктивні обчислення, цифровий зв’язок і штучний інтелект.', en: 'High-performance computing, digital communications and artificial intelligence.' },
-    hud: { top: ['Δ = <b data-hud="d">0 λ</b>', 'λ = 7,5 CELLS'], bot: ['2 SOURCES · COHERENT', 'MOVE CURSOR'] },
+    hud: { top: ['σ 10 · ρ 28 · β 8/3', 'z = <b data-hud="z">0</b>'], bot: ['LORENZ ATTRACTOR', 'MOVE CURSOR'] },
     lines: { uk: ['Дві хвилі — одна картина', 'Додаю трохи інтерференції', 'Звіряю з експериментом'], en: ['Two waves, one pattern', 'A little interference', 'Checking the experiment'] },
   },
   'medu-guide': {
@@ -44,9 +44,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Читаю дрібний шрифт', 'Читаю по біту', 'Усе за протоколом'], en: ['Reading the fine print', 'Reading bit by bit', 'Following the protocol'] },
   },
   graduates: {
-    ch: 'CH 06 · ALUM', inst: 'array', acc: 'cap',
+    ch: 'CH 06 · ALUM', inst: 'chladni', acc: 'cap',
     lead: { uk: 'Досвід і поради випускників кафедри.', en: 'Experience and advice from department alumni.' },
-    hud: { top: ['θ = <b data-hud="theta">0°</b>', 'N = 8 · d = λ/2'], bot: ['PHASED ARRAY', 'BEAM STEERING'] },
+    hud: { top: ['MODE (n, m) = <b data-hud="mode">(2, 3)</b>', 'f = 0'], bot: ['CHLADNI FIGURES', 'STANDING WAVES'] },
     lines: { uk: ['Диплом є. Пошук триває.', 'Тримаю курс на знання', 'Шапка вгору, сигнал теж'], en: ['Degree earned. Still curious', 'Steering towards knowledge', 'Caps up, signal up'] },
   },
   personas: {
@@ -56,9 +56,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Готуюся до лекції', 'У кожного своя частота', 'Сьогодні в режимі X–Y'], en: ['Getting ready to lecture', 'A frequency for everyone', 'In X–Y mode today'] },
   },
   stateholders: {
-    ch: 'CH 08 · EMPL', inst: 'tess', acc: 'tie',
+    ch: 'CH 08 · EMPL', inst: 'nnet', acc: 'tie',
     lead: { uk: 'Знання випускників і пропозиції щодо змісту освіти.', en: 'Graduate skills and suggestions for educational content.' },
-    hud: { top: ['4D · ROT XW · YZ', 'W-PERSPECTIVE'], bot: ['TESSERACT', 'MOVE CURSOR'] },
+    hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['NEURAL NETWORK · FORWARD PASS', 'MOVE CURSOR'] },
     lines: { uk: ['Звіряємо протоколи', 'Знайдемо спільну частоту', 'Краватка в чотирьох вимірах'], en: ['Comparing protocols', 'Finding a shared frequency', 'A tie in four dimensions'] },
   },
   studying: {

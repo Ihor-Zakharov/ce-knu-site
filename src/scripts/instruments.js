@@ -1,13 +1,17 @@
 // Прилади в героях розділів. Кожен розділ — своє радіофізичне явище:
 //   ticker   — новини: світлодіодна матриця, що біжить заголовками
-//   field    — дослідження: інтерференція двох джерел (друге йде за курсором)
+//   lorenz   — дослідження: атрактор Лоренца, детермінований хаос
+//   field    — (запасний) інтерференція двох джерел
 //   fourier  — НМЗ: меандр, що складається з гармонік ряду Фур'є
 //   mobius   — вступникам: стрічка Мебіуса, хвиля після обходу інвертує фазу
 //   spectrum — навчання: аналізатор спектра з утриманням піків
 //   tape     — документи: перфострічка, що кодує назви документів ASCII
-//   array    — випускники: фазована антенна решітка, промінь сканує світ
+//   chladni  — випускники: фігури Хладні, вузлові лінії стоячих хвиль
+//   array    — (запасний) фазована антенна решітка
 //   liss     — персоналії: фігури Ліссажу, що перетікають між відношеннями частот
-//   tess     — роботодавцям: тесеракт у 4D-обертанні
+//   nnet     — роботодавцям: нейронна мережа, синхронна хвиля прямого проходу
+//   life     — (запасний) «Життя» Конвея
+//   tess     — (запасний) тесеракт у 4D-обертанні
 //   smith    — (запасний) діаграма Сміта, імпеданс сходиться до узгодження
 // Без руху (prefers-reduced-motion) малюється один статичний кадр. Поза екраном — пауза.
 import { REDUCED, Spring } from './spring.js';
@@ -90,32 +94,42 @@ function ticker(c, st, cv) {
 
 /* ── Дослідження: інтерференція ───────────────────────────── */
 function field(c, st, cv) {
-  const sx = new Spring({ value: .68, response: 1.1, damping: .9 }), sy = new Spring({ value: .62, response: 1.1, damping: .9 });
+  const box = cv.closest('.inst');
+  const sx = new Spring({ value: .66, response: 1.1, damping: .9 }), sy = new Spring({ value: .56, response: 1.1, damping: .9 });
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); sx.set(Math.min(.9, Math.max(.1, (e.clientX - r.left) / r.width))); sy.set(Math.min(.85, Math.max(.15, (e.clientY - r.top) / r.height))); });
+  cv.addEventListener('pointerleave', () => { sx.set(.66); sy.set(.56); });
   const o = document.createElement('canvas'), oc = o.getContext('2d');
   let img = null, GW = 0, GH = 0;
-  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); sx.set((e.clientX - r.left) / r.width); sy.set((e.clientY - r.top) / r.height); });
-  cv.addEventListener('pointerleave', () => { sx.set(.68); sy.set(.62); });
-  const rgb = h => { const n = parseInt(h.replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const rgb = h => { const n = parseInt((h || '#E2C27F').replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   return {
-    resize() { GW = Math.max(40, Math.round(st.W / 5)); GH = Math.max(28, Math.round(st.H / 5)); o.width = GW; o.height = GH; img = oc.createImageData(GW, GH); },
+    resize() { GW = Math.max(60, Math.round(st.W)); GH = Math.max(40, Math.round(st.H)); o.width = GW; o.height = GH; img = oc.createImageData(GW, GH); },
     draw(t) {
       if (!img) this.resize();
       const { W, H, col } = st, ph = rgb(col.ph.startsWith('#') ? col.ph : '#E2C27F');
-      const bgc = col.dark ? [12, 10, 9] : [241, 235, 224];
-      const s1 = [.3 * GW, .5 * GH], s2 = [sx.value * GW, sy.value * GH], k = TAU / 7.5, w = t * 3.2;
+      const lam = Math.min(W, H) / 9, s1 = [W * .34, H * .46], s2 = [sx.value * W, sy.value * H], k = W / GW;
+      // яскраві лінії максимумів: різниця ходу кратна довжині хвилі — сімейство гіпербол з фокусами в джерелах
       const d = img.data;
-      for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
-        const r1 = Math.hypot(x - s1[0], y - s1[1]), r2 = Math.hypot(x - s2[0], y - s2[1]);
-        let v = (Math.cos(k * r1 - w) / Math.sqrt(1 + r1 * .08) + Math.cos(k * r2 - w) / Math.sqrt(1 + r2 * .08));
-        v = Math.max(0, v) / 2; v = v * v * 1.6;
-        const i = (y * GW + x) * 4;
-        d[i] = bgc[0] + (ph[0] - bgc[0]) * v; d[i + 1] = bgc[1] + (ph[1] - bgc[1]) * v; d[i + 2] = bgc[2] + (ph[2] - bgc[2]) * v; d[i + 3] = 255;
+      for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+        const x = i * k, y = j * k, r1 = Math.hypot(x - s1[0], y - s1[1]), r2 = Math.hypot(x - s2[0], y - s2[1]);
+        const u = (r1 - r2) / lam, fr = Math.abs(u - Math.round(u));
+        const g1x = (x - s1[0]) / (r1 || 1) - (x - s2[0]) / (r2 || 1), g1y = (y - s1[1]) / (r1 || 1) - (y - s2[1]) / (r2 || 1);
+        const dist = fr * lam / (Math.hypot(g1x, g1y) + 1e-3);       // відстань у пікселях до найближчої гіперболи
+        const edge = Math.min(1, Math.max(0, (Math.min(y, H - y) - 22) / 26));   // під підписами вгорі й унизу лінії згасають
+        const a = Math.exp(-((dist / .85) ** 2)) * Math.min(1, (r1 + r2) / lam / 3) * edge;
+        const q = (j * GW + i) * 4; d[q] = ph[0]; d[q + 1] = ph[1]; d[q + 2] = ph[2]; d[q + 3] = Math.round(220 * a);
       }
       oc.putImageData(img, 0, 0);
-      c.imageSmoothingEnabled = true; c.globalAlpha = col.dark ? .95 : .7;
-      c.drawImage(o, 0, 0, W, H); c.globalAlpha = 1;
-      for (const [x, y] of [s1, s2]) { c.fillStyle = col.gold; c.beginPath(); c.arc(x / GW * W, y / GH * H, 3.5, 0, TAU); c.fill(); c.strokeStyle = col.gold; c.globalAlpha = .5; c.beginPath(); c.arc(x / GW * W, y / GH * H, 9, 0, TAU); c.stroke(); c.globalAlpha = 1; }
-      hud(cv.closest('.inst'), 'd', (Math.hypot(s2[0] - s1[0], s2[1] - s1[1]) / 7.5).toFixed(2).replace('.', ',') + ' λ');
+      // фронти хвиль, що розходяться від обох джерел (тонке золото, згасає з відстанню)
+      c.lineWidth = 1; c.strokeStyle = col.gold;
+      const ph0 = (t * lam * .55) % lam, R = Math.hypot(W, H);
+      for (const [x0, y0] of [s1, s2]) for (let r = ph0; r < R; r += lam) {
+        c.globalAlpha = Math.max(0, .38 - r / (R * 1.3)); c.beginPath(); c.arc(x0, y0, r, 0, TAU); c.stroke();
+      }
+      c.globalAlpha = 1;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 5; }
+      c.imageSmoothingEnabled = true; c.drawImage(o, 0, 0, W, H); c.shadowBlur = 0;
+      for (const [x, y] of [s1, s2]) { c.fillStyle = col.gold; c.beginPath(); c.arc(x, y, 3.2, 0, TAU); c.fill(); c.strokeStyle = col.gold; c.globalAlpha = .45; c.beginPath(); c.arc(x, y, 8, 0, TAU); c.stroke(); c.globalAlpha = 1; }
+      hud(box, 'd', (Math.hypot(s2[0] - s1[0], s2[1] - s1[1]) / lam).toFixed(2).replace('.', ',') + ' λ');
     },
   };
 }
@@ -256,6 +270,60 @@ function array(c, st, cv) {
   };
 }
 
+/* ── Випускники: фігури Хладні — вузлові лінії стоячих хвиль на пластині ── */
+// f(x, y) = cos(nπx)·cos(mπy) − cos(mπx)·cos(nπy); пісок збирається там, де f = 0.
+// Моди (n, m) плавно перетікають одна в одну; лінії світяться, як промінь приладу.
+function chladni(c, st, cv) {
+  const box = cv.closest('.inst');
+  const MODES = [[2, 3], [1, 4], [3, 5], [2, 5], [1, 6], [4, 7], [3, 7], [2, 7], [5, 8]];
+  const o = document.createElement('canvas'), oc = o.getContext('2d');
+  let img = null, GW = 0, GH = 0, grain = null;
+  const rgb = h => { const n = parseInt((h || '#E2C27F').replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const P = Math.PI;
+  // значення й градієнт f для моди (n, m)
+  const fg = (n, m, x, y, out) => {
+    const cnx = Math.cos(n * P * x), cmy = Math.cos(m * P * y), cmx = Math.cos(m * P * x), cny = Math.cos(n * P * y);
+    const snx = Math.sin(n * P * x), smy = Math.sin(m * P * y), smx = Math.sin(m * P * x), sny = Math.sin(n * P * y);
+    out[0] = cnx * cmy - cmx * cny;
+    out[1] = -n * P * snx * cmy + m * P * smx * cny;
+    out[2] = -m * P * cnx * smy + n * P * cmx * sny;
+  };
+  const A = [0, 0, 0], B = [0, 0, 0];
+  return {
+    still: 1.2,
+    resize() {
+      const s = Math.min(st.W, st.H) * .8; GW = GH = Math.max(96, Math.round(s / 1.15));
+      o.width = GW; o.height = GH; img = oc.createImageData(GW, GH);
+      grain = new Float32Array(GW * GH); for (let q = 0; q < grain.length; q++) grain[q] = Math.random();   // «піщинки» — сталий шум
+    },
+    draw(t) {
+      if (!img) this.resize();
+      const { W, H, col } = st, ph = rgb(col.ph.startsWith('#') ? col.ph : '#E2C27F');
+      const HOLD = 4.4, k = Math.floor(t / HOLD), u = (t % HOLD) / HOLD;
+      const e = u < .6 ? 0 : (u - .6) / .4, w = e * e * (3 - 2 * e);
+      const [n1, m1] = MODES[k % MODES.length], [n2, m2] = MODES[(k + 1) % MODES.length];
+      const d = img.data, width = 1.6 / GW;                       // півширина лінії ≈ 1,6 комірки
+      for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+        const x = i / (GW - 1), y = j / (GH - 1);
+        fg(n1, m1, x, y, A); fg(n2, m2, x, y, B);
+        const v = A[0] * (1 - w) + B[0] * w, gx = A[1] * (1 - w) + B[1] * w, gy = A[2] * (1 - w) + B[2] * w;
+        const dist = Math.abs(v) / (Math.hypot(gx, gy) + 1e-3);    // відстань до вузлової лінії — лінії рівної товщини
+        const g = Math.exp(-((dist / width) ** 2)), q = j * GW + i;
+        const a = g > grain[q] * .9 ? Math.min(1, .55 + g * .6) : g * .25;   // пісок: щільно на лінії, зрідка поруч
+        d[q * 4] = ph[0]; d[q * 4 + 1] = ph[1]; d[q * 4 + 2] = ph[2]; d[q * 4 + 3] = Math.round(255 * a);
+      }
+      oc.putImageData(img, 0, 0);
+      const s = Math.min(W, H) * .8, x0 = (W - s) / 2, y0 = (H - s) / 2 + 2;
+      c.strokeStyle = col.gold; c.globalAlpha = .5; c.lineWidth = 1; c.strokeRect(x0 - .5, y0 - .5, s + 1, s + 1); c.globalAlpha = 1;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 5; }
+      c.imageSmoothingEnabled = true; c.drawImage(o, x0, y0, s, s); c.shadowBlur = 0;
+      c.fillStyle = col.gold; c.beginPath(); c.arc(W / 2, y0 + s / 2, 2.2, 0, TAU); c.fill();
+      const [n, m] = w < .5 ? [n1, m1] : [n2, m2];
+      hud(box, 'mode', `(${n}, ${m})`);
+    },
+  };
+}
+
 /* ── Персоналії: Ліссажу ──────────────────────────────────── */
 function liss(c, st, cv) {
   const box = cv.closest('.inst');
@@ -360,7 +428,189 @@ function mobius(c, st, cv) {
   };
 }
 
-/* ── Роботодавцям: тесеракт ───────────────────────────────── */
+/* ── Роботодавцям: нейронна мережа — синхронна хвиля прямого проходу ── */
+// Ваги — товщина й яскравість зв'язків; імпульси біжать від входів до виходів, нейрони спалахують за активацією.
+// Курсор біля нейрона підсвічує його зв'язки.
+function nnet(c, st, cv) {
+  const box = cv.closest('.inst');
+  const LAYERS = [4, 7, 7, 5, 2], SEG = 1.7, REST = 1.1;           // секунд на шар і пауза між прикладами
+  let nodes = [], edges = [], act = [], shown = [], hl = [], hover = -1, clock = 0, pass = 0, live = [];
+  const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const sine = x => .5 - .5 * Math.cos(Math.PI * x);               // м'яка синусоїдальна крива: повільний старт і фініш
+  function build() {
+    const { W, H } = st, padX = W * .1, top = 36, bot = H - 36;
+    nodes = []; edges = [];
+    LAYERS.forEach((n, l) => { for (let i = 0; i < n; i++) nodes.push({ l, x: padX + (W - 2 * padX) * l / (LAYERS.length - 1), y: top + (bot - top) * (n === 1 ? .5 : i / (n - 1)) }); });
+    let base = 0;
+    for (let l = 0; l < LAYERS.length - 1; l++) {
+      const nb = base + LAYERS[l];
+      for (let i = 0; i < LAYERS[l]; i++) for (let j = 0; j < LAYERS[l + 1]; j++) edges.push({ a: base + i, b: nb + j, w: rnd() * 2 - 1, l });
+      base = nb;
+    }
+    act = nodes.map(() => 0); shown = nodes.map(() => 0); hl = edges.map(() => 0); newPass();
+  }
+  function newPass() {                               // новий приклад: які зв'язки «проведуть» сигнал цього разу
+    pass++; clock = 0;
+    live = edges.map(e => Math.abs(e.w) > .35 && Math.random() < .55);
+    nodes.forEach((n, i) => { if (n.l === 0) act[i] = .45 + rnd() * .55; });
+  }
+  cv.addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    let best = -1, bd = 30; nodes.forEach((n, i) => { const d = Math.hypot(n.x - x, n.y - y); if (d < bd) { bd = d; best = i; } }); hover = best;
+  });
+  cv.addEventListener('pointerleave', () => { hover = -1; });
+  return {
+    still: SEG * 1.5,
+    resize() { build(); },
+    step(dt) {
+      if (!nodes.length) build();
+      const before = Math.floor(clock / SEG); clock += dt;
+      const seg = Math.floor(clock / SEG);
+      if (seg > before && before < LAYERS.length - 1) {               // хвиля дійшла до наступного шару — він спалахує
+        edges.forEach((e, i) => { if (live[i] && e.l === before) act[e.b] = Math.min(1, act[e.b] + Math.abs(e.w) * .45); });
+      }
+      if (clock > SEG * (LAYERS.length - 1) + REST) newPass();
+      const k = 1 - Math.pow(.03, dt);
+      for (let i = 0; i < act.length; i++) { act[i] *= Math.pow(.6, dt); shown[i] += (act[i] - shown[i]) * k; }
+      const kh = 1 - Math.pow(.001, dt);
+      edges.forEach((e, i) => { hl[i] += ((hover === e.a || hover === e.b ? 1 : 0) - hl[i]) * kh; });
+      hud(box, 'pass', String(pass));
+    },
+    draw() {
+      if (!nodes.length) build();
+      const { col } = st;
+      edges.forEach((e, i) => {
+        const A = nodes[e.a], B = nodes[e.b], h = hl[i];
+        c.strokeStyle = e.w > 0 ? col.gold : col.line;
+        c.globalAlpha = .08 + Math.abs(e.w) * .2 + h * .6; c.lineWidth = .6 + Math.abs(e.w) * .7 + h * .6;
+        c.beginPath(); c.moveTo(A.x, A.y); c.lineTo(B.x, B.y); c.stroke();
+      });
+      // синхронна хвиля: усі імпульси шару рухаються разом
+      const seg = Math.floor(clock / SEG), u = (clock % SEG) / SEG;
+      if (seg < LAYERS.length - 1) {
+        const hd = sine(u), tl = sine(Math.max(0, u - .26)), fade = Math.sin(Math.PI * u);
+        c.lineCap = 'round'; if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 8; }
+        edges.forEach((e, i) => {
+          if (!live[i] || e.l !== seg) return;
+          const A = nodes[e.a], B = nodes[e.b];
+          const x0 = A.x + (B.x - A.x) * tl, y0 = A.y + (B.y - A.y) * tl, x1 = A.x + (B.x - A.x) * hd, y1 = A.y + (B.y - A.y) * hd;
+          const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, col.ph);
+          c.globalAlpha = Math.min(1, .25 + fade) * (.5 + Math.abs(e.w) * .5); c.strokeStyle = g; c.lineWidth = 2;
+          c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+        });
+        c.shadowBlur = 0;
+      }
+      nodes.forEach((n, i) => {
+        const v = shown[i], r = 5.5 + v * 2;
+        c.globalAlpha = 1; c.fillStyle = col.dark ? '#141211' : '#F1EBE0'; c.beginPath(); c.arc(n.x, n.y, r, 0, TAU); c.fill();
+        c.strokeStyle = col.gold; c.lineWidth = 1.2; c.stroke();
+        if (v > .02) { c.globalAlpha = Math.min(1, v * 1.2); c.fillStyle = col.ph; if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 10 * v; } c.beginPath(); c.arc(n.x, n.y, r - 1.6, 0, TAU); c.fill(); c.shadowBlur = 0; }
+      });
+      c.globalAlpha = 1;
+    },
+  };
+}
+
+/* ── Дослідження: атрактор Лоренца — детермінований хаос ── */
+// dx/dt = σ(y − x), dy/dt = x(ρ − z) − y, dz/dt = xy − βz; σ = 10, ρ = 28, β = 8/3.
+// Траєкторія будується наживо (Рунге — Кутта 4), повільно обертається; старі ділянки згасають; курсор нахиляє вигляд.
+function lorenz(c, st, cv) {
+  const box = cv.closest('.inst');
+  const S = 10, Rr = 28, B = 8 / 3, N = 2600, DT = .006;
+  const pts = []; let p = [0.1, 0, 20], tt = 0;
+  const yaw = new Spring({ value: 0, response: 1.2, damping: .9 }), tilt = new Spring({ value: 0, response: 1.2, damping: .9 });
+  const f = ([x, y, z]) => [S * (y - x), x * (Rr - z) - y, x * y - B * z];
+  const rk = q => { const k1 = f(q), k2 = f(q.map((v, i) => v + k1[i] * DT / 2)), k3 = f(q.map((v, i) => v + k2[i] * DT / 2)), k4 = f(q.map((v, i) => v + k3[i] * DT)); return q.map((v, i) => v + DT / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i])); };
+  for (let i = 0; i < 400; i++) p = rk(p);                          // вихід на атрактор
+  for (let i = 0; i < N; i++) { p = rk(p); pts.push(p); }
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); yaw.set(((e.clientX - r.left) / r.width - .5) * 1.4); tilt.set(((e.clientY - r.top) / r.height - .5) * .8); });
+  cv.addEventListener('pointerleave', () => { yaw.set(0); tilt.set(0); });
+  return {
+    still: 0,
+    step(dt) { for (let i = 0; i < 5; i++) { p = rk(p); pts.push(p); pts.shift(); } tt += dt; },
+    draw() {
+      // вигляд «метелика» спереди, ледь погойдується; курсор нахиляє
+      const { W, H, col } = st, a = .45 * Math.sin(tt * .09) + yaw.value, b = .12 + tilt.value, s = Math.min(W / 42, (H - 64) / 44), cx = W / 2, cy = H / 2 + 6;
+      const pr = ([x, y, z]) => { const X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a), Z = z - 25; return [cx + X * s, cy - (Z * Math.cos(b) - Y * Math.sin(b)) * s]; };
+      c.lineJoin = 'round'; c.lineCap = 'round';
+      const CH = 26, step = Math.ceil(pts.length / CH);
+      for (let k = 0; k < CH; k++) {                                  // відрізками: що старіше — то блідіше
+        const i0 = k * step, i1 = Math.min(pts.length - 1, i0 + step);
+        c.globalAlpha = .06 + .94 * (k / (CH - 1)) ** 2; c.strokeStyle = col.ph; c.lineWidth = .9 + .7 * (k / CH);
+        if (col.dark && k > CH - 6) { c.shadowColor = col.ph; c.shadowBlur = 6; } else c.shadowBlur = 0;
+        c.beginPath(); let q = pr(pts[i0]); c.moveTo(q[0], q[1]);
+        for (let i = i0 + 1; i <= i1; i++) { q = pr(pts[i]); c.lineTo(q[0], q[1]); }
+        c.stroke();
+      }
+      c.shadowBlur = 0; c.globalAlpha = 1;
+      const hdp = pr(pts[pts.length - 1]), g = c.createRadialGradient(hdp[0], hdp[1], 0, hdp[0], hdp[1], 10);
+      g.addColorStop(0, col.ph); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.fillRect(hdp[0] - 10, hdp[1] - 10, 20, 20);
+      c.fillStyle = col.gold; c.beginPath(); c.arc(hdp[0], hdp[1], 2.2, 0, TAU); c.fill();
+      hud(box, 'z', p[2].toFixed(1).replace('.', ','));
+    },
+  };
+}
+
+/* ── Роботодавцям: «Життя» Конвея — клітинний автомат B3/S23 (повний за Тюрінгом) ── */
+// Планерна рушниця Госпера й рідкий «суп»; живі клітини світяться, відмерлі лишають слід.
+// Курсором можна «підсіяти» клітини; коли колонія завмирає — народжується нова.
+function life(c, st, cv) {
+  const box = cv.closest('.inst');
+  const GUN = ['........................O', '......................O.O', '............OO......OO............OO', '...........O...O....OO............OO', 'OO........O.....O...OO', 'OO........O...O.OO....O.O', '..........O.....O.......O', '...........O...O', '............OO'];
+  let C = 0, R = 0, cell = 6, a = null, b = null, glow = null, gen = 0, acc = 0, calm = 0, lastPop = 0;
+  const idx = (x, y) => ((y + R) % R) * C + ((x + C) % C);
+  function seed() {
+    a.fill(0); gen = 0; calm = 0;
+    for (let q = 0; q < a.length; q++) if (Math.random() < .07) a[q] = 1;
+    for (let y = 0; y < Math.min(R, GUN.length + 4); y++) for (let x = 0; x < Math.min(C, 40); x++) a[idx(x, y)] = 0;
+    GUN.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === 'O' && x + 2 < C && y + 2 < R) a[idx(x + 2, y + 2)] = 1; }));
+  }
+  function step() {
+    let pop = 0;
+    for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
+      let n = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (dx || dy) n += a[idx(x + dx, y + dy)];
+      const q = y * C + x; b[q] = (a[q] ? (n === 2 || n === 3) : n === 3) ? 1 : 0; pop += b[q];
+    }
+    [a, b] = [b, a]; gen++;
+    for (let q = 0; q < a.length; q++) glow[q] = a[q] ? 1 : glow[q] * .82;
+    calm = Math.abs(pop - lastPop) < 3 ? calm + 1 : 0; lastPop = pop;
+    if (calm > 60 || pop < 8) seed();
+    hud(box, 'gen', String(gen)); hud(box, 'pop', String(pop));
+  }
+  cv.addEventListener('pointermove', e => {
+    if (!a) return;
+    const r = cv.getBoundingClientRect(), ox = (st.W - C * cell) / 2, oy = (st.H - R * cell) / 2;
+    const x = Math.floor((e.clientX - r.left - ox) / cell), y = Math.floor((e.clientY - r.top - oy) / cell);
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (Math.random() < .5) a[idx(x + dx, y + dy)] = 1;
+  });
+  return {
+    still: 4,
+    resize() {
+      cell = Math.max(6, Math.round(Math.min(st.W, st.H) / 38));
+      C = Math.max(20, Math.floor((st.W - 24) / cell)); R = Math.max(12, Math.floor((st.H - 64) / cell));   // поле не заходить під підписи
+      a = new Uint8Array(C * R); b = new Uint8Array(C * R); glow = new Float32Array(C * R); seed();
+      if (REDUCED) for (let i = 0; i < 60; i++) step();
+    },
+    step(dt) { if (!a) return; acc += dt; while (acc > .11) { step(); acc -= .11; } },
+    draw() {
+      if (!a) this.resize();
+      const { W, H, col } = st, ox = (W - C * cell) / 2, oy = (H - R * cell) / 2, sz = cell - 1.5;
+      c.fillStyle = col.line; c.globalAlpha = .35;
+      for (let y = 0; y <= R; y++) for (let x = 0; x <= C; x++) c.fillRect(ox + x * cell - .75, oy + y * cell - .75, 1, 1);
+      c.globalAlpha = 1; c.fillStyle = col.ph;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 4; }
+      for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
+        const g = glow[y * C + x]; if (g < .06) continue;
+        c.globalAlpha = a[y * C + x] ? 1 : g * .32;
+        c.beginPath(); c.roundRect(ox + x * cell + .75, oy + y * cell + .75, sz, sz, Math.max(1, sz * .28)); c.fill();
+      }
+      c.globalAlpha = 1; c.shadowBlur = 0;
+    },
+  };
+}
+
+/* ── (запасний) тесеракт ──────────────────────────────────── */
 function tess(c, st, cv) {
   const V = []; for (let i = 0; i < 16; i++) V.push([i & 1 ? 1 : -1, i & 2 ? 1 : -1, i & 4 ? 1 : -1, i & 8 ? 1 : -1]);
   const E = []; for (let i = 0; i < 16; i++) for (let k = 0; k < 4; k++) { const j = i ^ (1 << k); if (j > i) E.push([i, j, k]); }
@@ -400,10 +650,10 @@ function tess(c, st, cv) {
   };
 }
 
-const KINDS = { ticker, field, fourier, spectrum, tape, array, liss, smith, tess, mobius };
+const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius, nnet, life, lorenz };
 export function mountInstruments() {
   document.querySelectorAll('.inst[data-inst] canvas[data-draw]').forEach(cv => {
     const kind = KINDS[cv.closest('.inst').dataset.inst];
-    if (kind) mount(cv, kind);
+    try { if (kind) mount(cv, kind); } catch (e) { console.error(e); }
   });
 }

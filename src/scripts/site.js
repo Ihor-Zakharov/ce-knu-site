@@ -209,7 +209,7 @@ if (az) {
 /* ── КІ-Рекс: статичні спрайти, «Рекси на приладах» ─────────── */
 $$('canvas[data-rex]').forEach(paintStatic);
 $$('.perch').forEach(perch);
-mountInstruments();
+try { mountInstruments(); } catch (e) { console.error(e); }   // збій одного приладу не зупиняє решту сторінки
 // підказка «рухайте курсором» — лише там, де є курсор
 if (!FINE.matches) $$('.inst__hud span').forEach(s => { if (/MOVE CURSOR/.test(s.textContent)) s.textContent = ''; });
 

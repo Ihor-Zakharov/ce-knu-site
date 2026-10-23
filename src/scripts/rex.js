@@ -97,7 +97,10 @@ export function perch(box) {
     zz.style.left = px + (dir > 0 ? 62 : 6) + 'px';
     if (say.classList.contains('on')) {
       say.style.left = Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
-      say.style.transform = `translateY(${Math.round(jump)}px)`;      // репліка завжди над головою — і в стрибку
+      // репліка над головою й у стрибку, але не вище за 8 px від верху вікна — щоб її завжди було видно
+      const top = say.getBoundingClientRect().top - (parseFloat(say.dataset.dy) || 0);
+      const dy = Math.max(Math.round(jump), 8 - top);
+      say.dataset.dy = dy; say.style.transform = `translateY(${dy}px)`;
       say.style.setProperty('--tail', Math.min(Math.max(10, px - parseFloat(say.style.left) + (dir > 0 ? 50 : 26)), say.offsetWidth - 16) + 'px');
     }
   }
@@ -147,7 +150,7 @@ export function perch(box) {
 
   cv.addEventListener('click', () => {
     const was = asleep; wake();
-    if (!REDUCED && jump === 0) { vy = -480; jump = -.01; }   // ≈105 px угору — у стрибку перекриває шапку
+    if (!REDUCED && jump === 0) { vy = -420; jump = -.01; }   // ≈80 px угору — у стрибку перекриває шапку, але не тікає за край екрана
     if (was) speak(uk ? 'Виходжу з режиму сну' : 'Leaving sleep mode');
     else if (lines.length) speak(lines[li++ % lines.length]);
     render();
@@ -168,7 +171,7 @@ export function perch(box) {
   }));
   document.addEventListener('themechange', () => {
     const dark = document.documentElement.dataset.theme === 'dark';
-    if (seen) { wake(); speak(dark ? (uk ? 'Темна тема, ясна думка' : 'Dark theme, clear thinking') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }
+    if (seen) { wake(); speak(dark ? (uk ? 'Темно — пора кодити' : 'It’s dark — time to code') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }
   });
   new ResizeObserver(() => { x = clamp(x); target = clamp(target); render(); }).observe(box);
   render();

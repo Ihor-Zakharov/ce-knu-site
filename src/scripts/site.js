@@ -67,31 +67,6 @@ const hd = $('.hd');
 const onScroll = () => hd?.classList.toggle('is-scrolled', scrollY > 8);
 addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
-/* ── Промінь у шапці: швидкість прокручування — амплітуда, позиція — фаза ── */
-const trace = $('.hd__trace');
-if (trace) {
-  const bg = $('.hd__trace-bg', trace);
-  let amp = 0, raf = 0, lastY = scrollY, lastT = performance.now();
-  const draw = () => {
-    const ph = scrollY / 90;
-    let d = 'M0 7';
-    for (let x = 0; x <= 1000; x += 5) {
-      const env = Math.sin(Math.PI * x / 1000);                                 // до країв промінь затухає
-      d += ` L${x} ${(7 - amp * env * Math.sin(x / 1000 * Math.PI * 18 - ph) * (.7 + .3 * Math.sin(x / 1000 * Math.PI * 3 + ph * .3))).toFixed(2)}`;
-    }
-    bg.setAttribute('d', d);
-  };
-  const tick = now => {
-    const dt = Math.max(1, now - lastT), v = Math.abs(scrollY - lastY) / dt; lastY = scrollY; lastT = now;
-    amp += (Math.min(6, v * 4) - amp) * .18;                                    // м'яко за швидкістю, без ривків
-    draw();
-    raf = amp > .02 ? requestAnimationFrame(tick) : 0;
-    if (!raf) { amp = 0; draw(); }
-  };
-  addEventListener('scroll', () => { if (REDUCED) { draw(); return; } if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(tick); } }, { passive: true });
-  addEventListener('resize', draw); draw();
-}
-
 /* ── Меню на телефоні й планшеті ─────────────────────────────── */
 const menu = $('#menu'), menuBtn = $('.menu-btn');
 if (menu && menuBtn) {

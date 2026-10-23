@@ -13,10 +13,6 @@ const MENU = [...NAV, { path: '/studying/', uk: 'Навчання', en: 'Studies
 const wave = 'M0 3 C1.5 0 3.5 0 5 3 S8.5 6 10 3 S13.5 0 15 3 S18.5 6 20 3';
 ---
 <header class="hd">
-  <!-- нижня кромка шапки — промінь: у спокої рівний, під час прокручування хвилюється -->
-  <svg class="hd__trace" viewBox="0 0 1000 14" preserveAspectRatio="none" aria-hidden="true">
-    <path class="hd__trace-bg" d="M0 7 H1000" />
-  </svg>
   <div class="wrap hd__in">
     <a class="brand" href={url(lang, '/')}>
       <Image src={emblem} width={84} height={84} alt="" loading="eager" />

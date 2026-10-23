@@ -9,9 +9,7 @@ main { flex: 1; }
 /* ── Шапка ─────────────────────────────────────────────────── */
 .hd { position: sticky; top: 0; z-index: 60; background: var(--surface); box-shadow: inset 0 1px 0 rgb(255 255 255 / .6); transition: box-shadow var(--hover) var(--ease-out); }
 :root[data-theme="dark"] .hd { box-shadow: inset 0 1px 0 rgb(255 240 210 / .04); }
-.hd__trace { position: absolute; left: 0; right: 0; bottom: -7px; width: 100%; height: 14px; overflow: visible; pointer-events: none; z-index: 1; }
-.hd__trace path { fill: none; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-.hd__trace-bg { stroke: var(--line-strong); stroke-width: 1; opacity: .7; }
+.hd { border-bottom: 1px solid var(--line); }
 .hd__in { position: relative; }
 .hd.is-scrolled { box-shadow: 0 10px 30px -24px rgb(0 0 0 / .35); }
 @keyframes hairline { from { transform: scaleX(0); } }
@@ -430,20 +428,32 @@ a:hover .news-art { animation: none; }
 .post-cover--art .plate__f { --ar: 21 / 6; }
 @media (max-width: 760px) { .post-cover--art .plate__f { --ar: 21 / 9; } }
 
-/* стрічка компаній випускників */
-.ribbon { padding-block: clamp(28px, 3.5vw, 48px); border-top: 1px solid var(--line); overflow: hidden; }
-.ribbon__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
-.ribbon__head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
-.ribbon__vp { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6% 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6% 94%, transparent); }
-.ribbon__track { display: flex; width: max-content; list-style: none; margin: 0; padding: 0; animation: ribbon 48s linear infinite; }
-.ribbon__vp:hover .ribbon__track, .ribbon__vp:focus-within .ribbon__track { animation-play-state: paused; }
-.ribbon__track li { flex: none; }
-.ribbon__track a { display: grid; gap: 4px; padding: 14px 44px 14px 0; margin-right: 44px; border-right: 1px solid var(--line); text-decoration: none; }
-.ribbon__track b { font: 300 clamp(28px, 3vw, 44px)/1 var(--font-sans); letter-spacing: -.03em; color: var(--ink); transition: color var(--hover) var(--ease-out); white-space: nowrap; }
-.ribbon__track span { font: 400 12.5px/1.4 var(--font-mono); letter-spacing: .03em; color: var(--ink-3); white-space: nowrap; }
-.ribbon__track a:hover b { color: var(--action); }
-@keyframes ribbon { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .ribbon__track { animation: none; flex-wrap: wrap; width: auto; } .ribbon__track li[aria-hidden] { display: none; } }
+/* ── Де працюють випускники: ряд словесних знаків під ключовими цифрами (рішення арт-директора) ── */
+.alum { padding-block: clamp(44px, 4.6vw, 72px) clamp(28px, 3vw, 44px); }
+.alum__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.alum__head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
+.alum__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); border-top: 1px solid var(--line-strong); }
+.alum__item { display: grid; gap: 12px; align-content: start; padding: 22px 0 8px; text-decoration: none; color: inherit; }
+.alum__mark { position: relative; display: inline-block; width: max-content; max-width: 100%; font: 500 clamp(2.25rem, 4.2vw, 5rem)/1 var(--font-sans); letter-spacing: -.035em; white-space: nowrap; color: var(--action); filter: var(--phosphor-glow); transition: color var(--hover) var(--ease-out); }
+.alum__mark small { font-size: .42em; letter-spacing: -.01em; color: var(--ink-3); margin-left: 2px; }
+.alum__mark::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.08em; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform var(--hover-move) var(--ease-out); }
+.alum__who { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; max-width: 36ch; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
+.alum__who b { font-weight: 500; color: var(--ink-2); }
+.alum__ph { position: relative; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--surface-2); }
+.alum__ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 10%, transparent); }
+.alum__ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; scale: 1.1; filter: var(--duo); transition: filter var(--hover) var(--ease-out), scale var(--hover-move) var(--spring); }
+.alum__item:hover .alum__mark, .alum__item:focus-visible .alum__mark { color: var(--action-hover); }
+.alum__item:hover .alum__mark::after, .alum__item:focus-visible .alum__mark::after { transform: scaleX(1); }
+.alum__item:hover .alum__ph img, .alum__item:focus-visible .alum__ph img { filter: var(--grade); scale: 1.18; }
+@media (max-width: 860px) {
+  .alum { padding-block: 36px 20px; }
+  .alum__row { grid-template-columns: 1fr; }
+  .alum__item { padding: 14px 0; gap: 10px; }
+  .alum__row li + li .alum__item { border-top: 1px solid var(--line); }
+  .alum__mark { font-size: clamp(2.5rem, 11vw, 3rem); }
+  .alum__who { max-width: none; grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
+  .alum__ph { width: 36px; height: 36px; }
+}
 
 /* перегляд фото: стрілки й хрестик на сталих місцях, підпис — окремим рядком під фото */
 .lightbox__in { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; place-items: center; gap: 16px; padding: 64px clamp(72px, 8vw, 120px) 28px; }
@@ -479,7 +489,7 @@ a:hover .news-art { animation: none; }
 /* прилад у компактному герої: праворуч від назви, невеликий; КІ-Рекс у спокої — під шапкою */
 .ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: end; gap: clamp(24px, 4vw, 72px); }
 @media (min-width: 1700px) { .ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); } }
-.ph__inst .inst-wrap { margin-top: 60px; }
+.ph__inst .inst-wrap { margin-top: 76px; }
 .ph__inst .inst { padding: 7px; border-radius: 12px; }
 .ph__inst .inst__screen { border-radius: 7px; }
 .ph__inst .inst__hud { font-size: 9.5px; left: 9px; right: 9px; }

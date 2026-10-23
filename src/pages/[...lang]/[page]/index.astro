@@ -7,7 +7,7 @@ import { getCollection, render } from 'astro:content';
 import { langOf, type Lang } from '../../../lib/i18n';
 import { slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
-import AlumniRibbon from '../../../components/AlumniRibbon.astro';
+import AlumniStrip from '../../../components/AlumniStrip.astro';
 
 export async function getStaticPaths() {
   const SKIP = ['index', 'personas'];          // мають власні шаблони
@@ -37,5 +37,5 @@ const docText = entry.data.title + ' · ' + toc.map(h => h.text).join(' · ');
       <aside class="page__aside"><Mascot src={entry.data.mascot} alt={entry.data.mascotAlt} /></aside>
     </div>
   </section>
-  {Astro.params.page === 'graduates' && <AlumniRibbon lang={lang} />}
+  {Astro.params.page === 'graduates' && <AlumniStrip lang={lang} />}
 </Base>

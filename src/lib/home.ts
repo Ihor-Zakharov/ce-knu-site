@@ -41,15 +41,15 @@ export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
 export const PARTNERS = ['Huawei ICT Academy', 'Cisco Networking Academy', 'Microsoft', 'IBM Ukraine', 'Fortinet Academy', 'Intel', 'MIPS Technologies'];
 
 // Компанії випускників — лише ті, що названо на сторінці «Наші випускники» (src/content/pages/*/graduates.md)
-export const ALUMNI: Record<Lang, { company: string; who: string; role: string; anchor: string }[]> = {
+export const ALUMNI: Record<Lang, { company: string; who: string; role: string; anchor: string; photo: string }[]> = {
   uk: [
-    { company: 'Intel', who: 'Дмитро Калита', role: 'директор представництва в Україні', anchor: 'дмитро-калита' },
-    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'інженер-дослідник NLP, Тель-Авів', anchor: 'крамов-артем-андрійович' },
-    { company: 'Lyft', who: 'Максим Слинько', role: 'менеджер програмних проєктів', anchor: 'максим-слинько' },
+    { company: 'Intel', who: 'Дмитро Калита', role: 'директор представництва в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita' },
+    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'інженер-дослідник NLP, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov' },
+    { company: 'Lyft', who: 'Максим Слинько', role: 'менеджер програмних проєктів', anchor: 'максим-слинько', photo: 'm_slynko' },
   ],
   en: [
-    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of the office in Ukraine', anchor: 'dmytro-kalyta' },
-    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, Tel Aviv', anchor: 'artem-andriiovych-kramov' },
-    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager', anchor: 'maksym-slynko' },
+    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of the office in Ukraine, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita' },
+    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov' },
+    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager', anchor: 'maksym-slynko', photo: 'm_slynko' },
   ],
 };

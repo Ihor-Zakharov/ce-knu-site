@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import { T, url, langOf, langParams } from '../../lib/i18n';
 import { page } from '../../lib/content';
 import { HISTORY, PARTNERS } from '../../lib/home';
-import AlumniRibbon from '../../components/AlumniRibbon.astro';
+import AlumniStrip from '../../components/AlumniStrip.astro';
 import Mascot from '../../components/Mascot.astro';
 
 export const getStaticPaths = langParams;
@@ -67,6 +67,8 @@ const scopeKeys = [
     </div>
   </section>
 
+  <AlumniStrip lang={lang} />
+
   <div class="wrap inst-dock inst-dock--home" data-inst-dock hidden></div>
 
   <section class="section" aria-labelledby="h-about">
@@ -78,8 +80,6 @@ const scopeKeys = [
       </div>
     </div>
   </section>
-
-  <AlumniRibbon lang={lang} />
 
   <section class="section" aria-labelledby="h-history">
     <div class="wrap history">

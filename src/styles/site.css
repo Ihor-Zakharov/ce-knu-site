@@ -517,3 +517,5 @@ a:hover .news-art { animation: none; }
 
 /* зміна теми — миттєво під колом, без «доганяння» кольорів */
 .theme-switching :not(.theme-toggle, .theme-toggle *), .theme-switching :not(.theme-toggle *)::before, .theme-switching :not(.theme-toggle *)::after { transition: none !important; }   /* іконка сонця/місяця — з морфінгом */
+/* на телефоні ілюстрацію КІ-Рекса з чинного сайту не показуємо — зміст важливіший */
+@media (max-width: 760px) { .rex-sign { display: none !important; } }

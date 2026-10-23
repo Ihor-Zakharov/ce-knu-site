@@ -247,21 +247,21 @@ export default function (env) {
         c.globalAlpha = 1;
       }
       // дуги переходів: волосяна траса завжди, золота прокреслюється від команди до мітки
-      for (const [A, T0, dur] of [[g.jnc, jncT, .26], [g.jmp, jmpT, .36]]) {
+      for (const [A, T0, dur, lw] of [[g.jnc, jncT, .26, 1.5], [g.jmp, jmpT, .36, 1.8]]) {
         c.lineCap = 'round'; c.lineJoin = 'round';
         trace(c, A, A.len); c.lineWidth = 1; c.strokeStyle = al(col.lineStrong, dark ? .55 : .6); c.stroke();
         c.fillStyle = al(col.lineStrong, dark ? .6 : .65); arrowHead(c, A);
         const since = t - T0;
         if (since < 0 || since > 2.2) continue;
         const gr = smooth(0, 1, (since - .02) / dur), hold = 1 - smooth(.8, 1.9, since);
-        glow(c, col, col.gold, 7); c.strokeStyle = al(col.gold, hold); c.lineWidth = 1.8; trace(c, A, A.len * gr); c.stroke();
+        glow(c, col, col.gold, 7); c.strokeStyle = al(col.gold, hold); c.lineWidth = lw; trace(c, A, A.len * gr); c.stroke();
         if (gr >= .999) { c.fillStyle = al(col.gold, hold); arrowHead(c, A); }
         else if (gr > 0) { const [px, py] = pointAt(A, A.len * gr); c.fillStyle = col.gold; c.beginPath(); c.arc(px, py, 2.3, 0, 6.2832); c.fill(); }
         noGlow(c);
       }
       // каретка в кінці поточної команди: ковзає разом зі смугою, між рухами м'яко блимає
       const endOf = r => g.instrX + PROGRAM[r - 1].txt.length * cw + cw * .35, cxr = lerp(endOf(B.fr), endOf(B.tr), eB);
-      const blink = clamp(.5 + .95 * Math.sin(t * 5.4), .12, 1), ca = moving ? 1 : blink;
+      const blink = clamp(.5 + .95 * Math.sin(t * 5.4), .12, 1), ca = moving || frozen ? 1 : blink;
       c.fillStyle = al(ph, ca); glow(c, col, ph, 6); c.fillRect(Math.round(cxr * 2) / 2, bc - lh * .34, 1.6, lh * .68); noGlow(c);
       c.restore();
 

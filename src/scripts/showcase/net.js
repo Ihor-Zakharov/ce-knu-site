@@ -144,7 +144,7 @@ export default function (env) {
     if (pending && T >= pending.at) startWave();
     if (wave) {
       const tau = T - wave.t0;
-      for (let v = 0; v < N; v++) if (!wave.ringed[v] && spf.dist[v] < Infinity && spf.dist[v] * K <= tau) { wave.ringed[v] = 1; ring(v, 'ph', v === R1 ? -1 : 6, v === R1 ? .75 : .5); }
+      for (let v = 0; v < N; v++) if (!wave.ringed[v] && spf.dist[v] < Infinity && spf.dist[v] * K <= tau) { wave.ringed[v] = 1; if (v !== PC && v !== SW) ring(v, 'ph', v === R1 ? -1 : 6, v === R1 ? .75 : .5); }
       if (tau > wave.span) wave = null;
     }
     for (let i = 0; i < N; i++) { const g = rt.V.has(i) && !converging() ? 1 : 0; hot[i] += clamp(g - hot[i], -5 * dt, 5 * dt); }
@@ -228,14 +228,14 @@ export default function (env) {
       c.beginPath();
       for (let v = 0; v < N; v++) {
         const par = s.pn[v];
-        if (par < 0 || down[s.pl[v]] && s === spf) continue;
+        if (par < 0 || down[s.pl[v]]) continue;
         const tp = s.dist[par] * K, tv = s.dist[v] * K, q = p === null ? 1 : clamp((tau - tp) / (tv - tp));
         if (q <= 0) continue;
         c.moveTo(P[par].x, P[par].y); c.lineTo(lerp(P[par].x, P[v].x, q), lerp(P[par].y, P[v].y, q));
       }
       c.strokeStyle = col.gold; c.globalAlpha = a; c.lineWidth = 1.5; c.stroke(); c.globalAlpha = 1;
     };
-    const boldPath = r => { c.beginPath(); for (const l of r.L) { const [a, b] = LINKS[l]; c.moveTo(P[a].x, P[a].y); c.lineTo(P[b].x, P[b].y); } };
+    const boldPath = r => { c.beginPath(); for (const l of r.L) { if (down[l]) continue; const [a, b] = LINKS[l]; c.moveTo(P[a].x, P[a].y); c.lineTo(P[b].x, P[b].y); } };
     const bold = (r, a) => {
       if (a < .02 || !r.L.size) return;
       boldPath(r); c.strokeStyle = col.gold; c.lineWidth = 2.5; c.globalAlpha = a * .9; glow(c, col, col.gold, 3.5); c.stroke(); noGlow(c); c.globalAlpha = 1;
@@ -355,7 +355,9 @@ export default function (env) {
       c.beginPath();
       if (g.k < 0) c.arc(n.x, n.y, lerp(G.r + 3, G.u * 1.3, e), 0, TAU);   // початок хвилі: коло від R1 на всю схему
       else shape(c, g.n, 2.5 + g.k * e);
-      c.stroke(); noGlow(c); c.globalAlpha = 1;
+      c.stroke(); noGlow(c);
+      if (g.c === 'ph' && g.k >= 0) { c.fillStyle = colr; c.globalAlpha = Math.pow(1 - u, 1.6) * .2; c.beginPath(); shape(c, g.n, 0); c.fill(); }   // вузол «спалахує» всередині
+      c.globalAlpha = 1;
     }
   }
   function drawTop(c, col) {

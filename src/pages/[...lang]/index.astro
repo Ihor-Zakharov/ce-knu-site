@@ -33,7 +33,7 @@ const uk = lang === 'uk';
           <div class="scope__hud scope__hud--bot"><span data-sc-bl></span><span data-sc-br></span></div>
         </div>
         <div class="scope__keys" role="group" aria-label={uk ? 'Що показати' : 'What to show'}>
-          {(uk ? [['ПРОЦЕСОР'], ['ПАМ’ЯТЬ'], ['ЛОГІКА'], ['КОД'], ['МЕРЕЖІ'], ['ML', 'МАШИННЕ НАВЧАННЯ']] : [['CPU'], ['MEMORY'], ['LOGIC'], ['CODE'], ['NETWORKS'], ['ML', 'MACHINE LEARNING']]).map(([k, name], i) => <button type="button" class="key" data-view={i} data-name={name ?? k} aria-label={name} title={name} aria-pressed={i === 0 ? 'true' : 'false'}>{k}</button>)}
+          {(uk ? [['ПРОЦЕСОР'], ['ПАМ’ЯТЬ'], ['ЛОГІКА'], ['КОД'], ['МЕРЕЖІ'], ['ML', 'МАШИННЕ НАВЧАННЯ']] : [['CPU'], ['MEMORY'], ['LOGIC'], ['CODE'], ['NETWORKS'], ['ML', 'MACHINE LEARNING']]).map(([k, name], i) => <button type="button" class="key" data-view={i} data-name={name ?? k} aria-label={name && `${k}, ${name}`} title={name} aria-pressed={i === 0 ? 'true' : 'false'}>{k}</button>)}
           <span class="sp"></span>
           <button type="button" class="key key--auto" data-sc-auto hidden aria-label={uk ? 'Автоперемикання' : 'Auto cycle'} title={uk ? 'Автоперемикання' : 'Auto cycle'}><svg aria-hidden="true"><use href="#i-loop"/></svg><span class="t">{uk ? 'АВТО' : 'AUTO'}</span></button>
           <button type="button" class="key" data-sc-play aria-pressed="false" aria-label={uk ? 'Пауза' : 'Pause'} title={uk ? 'Пауза' : 'Pause'}><svg aria-hidden="true"><use href="#i-pause"/></svg></button>

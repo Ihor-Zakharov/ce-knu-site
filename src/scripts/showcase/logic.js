@@ -10,8 +10,8 @@ const FIRST = .75, GAP = 1.65, SLOW = 3.6, POKE_GAP = 2.2;   // перша зм�
 const GW = 48, GH = 40, PIN = 10;                // вентиль: ширина, висота, півкрок виводів
 const BC = 12;                                   // вигин задньої дуги OR/XOR (глибина ≈ 9)
 const RAD = 5, HOP = 4;                          // заокруглення поворотів, радіус «містка» над перетином
-const BB = { x0: 2, y0: 22, x1: 464, y1: 246 };  // габарит креслення
-const IX = 46, LEDX = 424, LEDR = 6.5;           // кінець площадки входу, вісь і радіус світлодіодів
+const BB = { x0: 4, y0: 20, x1: 476, y1: 240 };  // габарит креслення (сітка 10 одиниць, провідники — на лініях x, y ≡ 10 mod 20)
+const IX = 45, LEDX = 430, LEDR = 6.5;           // кінець площадки входу, вісь і радіус світлодіодів
 
 /* ── логіка ──────────────────────────────────────────────────────────── */
 const FN = { xor: (a, b) => a ^ b, and: (a, b) => a & b, or: (a, b) => a | b };
@@ -29,16 +29,16 @@ const backX = dy => {
 const XB = backX(PIN);
 
 const GATES = {
-  u1: { t: 'xor', x: 118, y: 56, in: ['A', 'B'], out: 'X1', cap: 'XOR' },
-  u2: { t: 'and', x: 118, y: 196, in: ['A', 'B'], out: 'G1', cap: 'AND' },
-  u3: { t: 'xor', x: 244, y: 56, in: ['X1', 'C'], out: 'S', cap: 'XOR' },
-  u4: { t: 'and', x: 244, y: 128, in: ['X1', 'C'], out: 'G2', cap: 'AND' },
-  u5: { t: 'or', x: 336, y: 162, in: ['G2', 'G1'], out: 'CO', cap: 'OR' },
+  u1: { t: 'xor', x: 120, y: 60, in: ['A', 'B'], out: 'X1', cap: 'XOR' },
+  u2: { t: 'and', x: 120, y: 190, in: ['A', 'B'], out: 'G1', cap: 'AND' },
+  u3: { t: 'xor', x: 240, y: 60, in: ['X1', 'C'], out: 'S', cap: 'XOR' },
+  u4: { t: 'and', x: 240, y: 130, in: ['X1', 'C'], out: 'G2', cap: 'AND' },
+  u5: { t: 'or', x: 340, y: 160, in: ['G2', 'G1'], out: 'CO', cap: 'OR' },
 };
 for (const g of Object.values(GATES)) {
   const px = g.t === 'and' ? g.x : g.x + XB - (g.t === 'xor' ? 6 : 0);
   g.pin = [[px, g.y - PIN], [px, g.y + PIN]]; g.tip = [g.x + GW, g.y];
-  g.path = gatePath(g.t, g.x, g.y); g.arc = g.t === 'xor' ? backArc(g.x - 6, g.y) : null; g.lit = 0; g.pv = [0, 0]; g.cur = 0;
+  g.path = gatePath(g.t, g.x, g.y); g.arc = g.t === 'xor' ? backArc(g.x - 6, g.y) : null; g.pv = [0, 0]; g.cur = 0; g.hit = -1e9;
 }
 function backArc(x, y) { const p = new Path2D(); p.moveTo(x, y - GH / 2); p.bezierCurveTo(x + BC, y - 9, x + BC, y + 9, x, y + GH / 2); return p; }
 function gatePath(type, x, y) {
@@ -62,25 +62,25 @@ function gatePath(type, x, y) {
 // точка [x, y] або [x, y, 1] — різкий кут (вузол розгалуження, там стоїть крапка)
 const P = (g, k) => GATES[g].pin[k];
 const NETS = {
-  A: { src: 'in', y: 30, paths: [
-    { pts: [[IX, 30], [92, 30], [92, P('u2', 0)[1]], P('u2', 0)], sink: 'u2.0' },
-    { at: [92, P('u1', 0)[1]], pts: [[92, P('u1', 0)[1]], P('u1', 0)], sink: 'u1.0', dot: 1 }] },
-  B: { src: 'in', y: 82, paths: [
-    { pts: [[IX, 82], [70, 82, 1], [70, P('u2', 1)[1]], P('u2', 1)], sink: 'u2.1' },
-    { at: [70, 82], pts: [[70, 82], [70, P('u1', 1)[1]], P('u1', 1)], sink: 'u1.1', dot: 1 }] },
-  C: { src: 'in', y: 236, paths: [
-    { pts: [[IX, 236], [214, 236], [214, P('u3', 1)[1]], P('u3', 1)], sink: 'u3.1' },
-    { at: [214, P('u4', 1)[1]], pts: [[214, P('u4', 1)[1]], P('u4', 1)], sink: 'u4.1', dot: 1 }] },
+  A: { paths: [
+    { pts: [[IX, 30], [90, 30], [90, P('u2', 0)[1]], P('u2', 0)], sink: 'u2.0' },
+    { at: [90, P('u1', 0)[1]], pts: [[90, P('u1', 0)[1]], P('u1', 0)], sink: 'u1.0' }] },
+  B: { paths: [
+    { pts: [[IX, 90], [70, 90, 1], [70, P('u2', 1)[1]], P('u2', 1)], sink: 'u2.1' },
+    { at: [70, 90], pts: [[70, 90], [70, P('u1', 1)[1]], P('u1', 1)], sink: 'u1.1' }] },
+  C: { paths: [
+    { pts: [[IX, 230], [210, 230], [210, P('u3', 1)[1]], P('u3', 1)], sink: 'u3.1' },
+    { at: [210, P('u4', 1)[1]], pts: [[210, P('u4', 1)[1]], P('u4', 1)], sink: 'u4.1' }] },
   X1: { paths: [
-    { pts: [GATES.u1.tip, [188, 56, 1], [188, P('u3', 0)[1]], P('u3', 0)], sink: 'u3.0' },
-    { at: [188, 56], pts: [[188, 56], [188, P('u4', 0)[1]], P('u4', 0)], sink: 'u4.0', dot: 1 }] },
-  S: { paths: [{ pts: [GATES.u3.tip, [LEDX - LEDR, 56]], sink: 'led.S' }] },
-  G2: { paths: [{ pts: [GATES.u4.tip, [314, 128], [314, P('u5', 0)[1]], P('u5', 0)], sink: 'u5.0' }] },
-  G1: { paths: [{ pts: [GATES.u2.tip, [314, 196], [314, P('u5', 1)[1]], P('u5', 1)], sink: 'u5.1' }] },
-  CO: { paths: [{ pts: [GATES.u5.tip, [LEDX - LEDR, 162]], sink: 'led.C' }] },
+    { pts: [GATES.u1.tip, [190, 60, 1], [190, P('u3', 0)[1]], P('u3', 0)], sink: 'u3.0' },
+    { at: [190, 60], pts: [[190, 60], [190, P('u4', 0)[1]], P('u4', 0)], sink: 'u4.0' }] },
+  S: { paths: [{ pts: [GATES.u3.tip, [LEDX - LEDR, 60]], sink: 'led.S' }] },
+  G2: { paths: [{ pts: [GATES.u4.tip, [310, 130], [310, P('u5', 0)[1]], P('u5', 0)], sink: 'u5.0' }] },
+  G1: { paths: [{ pts: [GATES.u2.tip, [310, 190], [310, P('u5', 1)[1]], P('u5', 1)], sink: 'u5.1' }] },
+  CO: { paths: [{ pts: [GATES.u5.tip, [LEDX - LEDR, 160]], sink: 'led.C' }] },
 };
-const INPUT_PAD = { A: [37, 30], B: [37, 82], C: [37, 236] };
-const LEDS = { S: [LEDX, 56], C: [LEDX, 162] };
+const INPUT_PAD = { A: [36, 30], B: [36, 90], C: [36, 230] };
+const LEDS = { S: [LEDX, 60], C: [LEDX, 160] };
 
 // щільна ламана зі «місточками» (hops: x-координати над вертикалями інших мереж) і кумулятивною довжиною
 function dense(cs, hops) {
@@ -163,7 +163,7 @@ export default function (env) {
     const x1 = a ^ b, g1 = a & b, s = x1 ^ cin, g2 = x1 & cin;
     const val = { A: a, B: b, C: cin, X1: x1, G1: g1, S: s, G2: g2, CO: g1 | g2 };
     state = Object.fromEntries(NET_ORDER.map(id => [id, { base: val[id], ev: [] }]));
-    for (const g of Object.values(gates)) { g.pv = g.in.map(id => val[id]); g.cur = val[g.out]; }
+    for (const g of Object.values(gates)) { g.pv = g.in.map(id => val[id]); g.cur = val[g.out]; g.hit = -1e9; }
     queue = [];
   }
   const code = () => inp.A * 4 + inp.B * 2 + inp.C;
@@ -177,7 +177,7 @@ export default function (env) {
   function run(t) {                               // обробити події до моменту t
     while (queue.length && queue[0].time <= t) {
       const q = queue.shift(), g = gates[q.g];
-      g.pv[q.pin] = q.val;
+      g.pv[q.pin] = q.val; g.hit = q.time;
       const nv = FN[g.t](g.pv[0], g.pv[1]);
       if (nv !== g.cur) { g.cur = nv; emit(g.out, q.time + DLY[g.t], nv); }
     }
@@ -205,7 +205,7 @@ export default function (env) {
     const bw = BB.x1 - BB.x0, bh = BB.y1 - BB.y0, s = Math.min((fw - 2 * mx) / bw, (fh - 2 * my) / bh);
     const ox = fx0 + (fw - bw * s) / 2 - BB.x0 * s, oy = fy0 + (fh - bh * s) / 2 - BB.y0 * s;
     // штамп: не заходить на провідники (вертикаль AND1 → OR) і світлодіод Cout
-    const clear = ox + 314 * s + 14, kBase = clamp(W / 560, .8, 1.5), ks = clamp(Math.min(kBase, (fx1 - clear) / 118), .56, 1.5);
+    const clear = ox + 310 * s + 14, kBase = clamp(W / 560, .8, 1.5), ks = clamp(Math.min(kBase, (fx1 - clear) / 118), .56, 1.5);
     return (lay = { W, H, s, ox, oy, fx0, fx1, fy0, fy1, ks });
   }
 
@@ -227,6 +227,11 @@ export default function (env) {
       c.moveTo(fx0 + 1, y); c.lineTo(fx0 + 4, y); c.moveTo(fx1 - 1, y); c.lineTo(fx1 - 4, y);
     }
     c.stroke(); c.restore();
+    if (lay.s > .5) {                             // координатна сітка креслення: ледь помітні точки через 20 одиниць
+      const { s, ox, oy } = lay, st = 20 * s; c.save(); c.fillStyle = col.lineStrong; c.globalAlpha = col.dark ? .22 : .3; c.beginPath();
+      for (let gx = ox + 10 * s + Math.ceil((fx0 + 6 - ox - 10 * s) / st) * st; gx < fx1 - 4; gx += st) for (let gy = oy + 10 * s + Math.ceil((fy0 + 6 - oy - 10 * s) / st) * st; gy < fy1 - 4; gy += st) c.rect(Math.round(gx) - .5, Math.round(gy) - .5, 1, 1);
+      c.fill(); c.restore();
+    }
     // штамп (title block): КІ-Рекс — підпис розробника, шифр, назва
     const w = 118 * ks, h = 36 * ks, x0 = fx1 - w, y0 = fy1 - h, cl = 34 * ks, r1 = 19 * ks, cm = 42 * ks;
     c.save(); c.strokeStyle = col.lineStrong; c.lineWidth = 1; c.globalAlpha = .8;
@@ -297,7 +302,7 @@ export default function (env) {
           const p = pa.p; let i = 0; while (i < p.length - 2 && p[i + 1].d < f) i++;
           const u = p[i + 1].d > p[i].d ? (f - p[i].d) / (p[i + 1].d - p[i].d) : 0, hx = lerp(p[i].x, p[i + 1].x, u), hy = lerp(p[i].y, p[i + 1].y, u);
           glow(c, col, col.gold, 8); c.fillStyle = col.dark ? col.ink : col.gold; c.beginPath(); c.arc(hx, hy, 2.1 / s, 0, 6.2832); c.fill(); noGlow(c);
-          if (!col.dark) { c.strokeStyle = col.ph; c.lineWidth = .7 / s; c.stroke(); }
+          if (!col.dark) { c.strokeStyle = col.bg; c.lineWidth = 1.1 / s; c.stroke(); }   // у світлій темі — «намистинка» з ободком кольору паперу
         }
       }
       /* вузли розгалужень */
@@ -309,6 +314,8 @@ export default function (env) {
         const lv = level(g.out, 0, t, .26);
         c.globalAlpha = lv * (col.dark ? .17 : .075); c.fillStyle = cOn; c.fill(g.path); c.globalAlpha = 1;
         c.strokeStyle = col.ink2; c.stroke(g.path); if (g.arc) c.stroke(g.arc);
+        const h = clamp(1 - (t - g.hit) / .8);       // фронт щойно прийшов на вхід — контур коротко теплішає
+        if (h > 0) { c.globalAlpha = h * h; c.strokeStyle = col.dark ? col.gold : col.ph; c.stroke(g.path); if (g.arc) c.stroke(g.arc); c.globalAlpha = 1; }
       }
       c.restore();
 
@@ -341,8 +348,8 @@ export default function (env) {
       }
 
       const a = inp, so = valueAt('S', sinkD('S'), t), co = valueAt('CO', sinkD('CO'), t);
-      return { tl: 'FULL ADDER', tr: `A B Cin = ${a.A} ${a.B} ${a.C}`, bl: `S = ${so} · Cout = ${co}`, br: 't_pd 3 gates' };
+      const nar = W < 300;                          // вузький екран: підписи коротші, щоб не переносились
+      return { tl: nar ? 'ADDER' : 'FULL ADDER', tr: nar ? `ABC = ${a.A} ${a.B} ${a.C}` : `A B Cin = ${a.A} ${a.B} ${a.C}`, bl: `S = ${so} · Cout = ${co}`, br: nar ? '3 gates' : 't_pd 3 gates' };
     },
   };
 }
-export const __dbg = () => ({ NETS, GATES });

@@ -2,7 +2,7 @@
 // у ній кристал на майданчику, золоті ламелі рамки виводів і тонкі дроти розварки. На кристалі — план блоків,
 // що «гріються» від команд машини, тактове H-дерево з імпульсом на кожному такті й чіп-арт КІ-Рекса.
 // Важкий статичний шар кешується в offscreen-канвасі; динаміка (тепло блоків, імпульс, виводи) — поверх нього.
-import { TAU, clamp, lerp, easeOut, hex, mono, rex } from './kit.js';
+import { TAU, clamp, lerp, smooth, easeOut, hex, mono, rex } from './kit.js';
 
 const rgbOf = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(x => x + x).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
 const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${+a.toFixed(3)})`;
@@ -13,7 +13,7 @@ const KEYS = ['L1I', 'L1D', 'REG', 'ALU', 'CU', 'PLL', 'IO'];
 const SIDES = ['t', 'b', 'l', 'r'];
 const STILL = { L1I: .38, L1D: .16, REG: .95, ALU: .55, CU: .62, PLL: .5, IO: .1 };   // показовий статичний кадр
 const STILL_OUT = 0xA5, STILL_ADDR = 0b0101;
-const TP = .3, PW = .22;                    // час проходу імпульсу від кореня до листків; ширина імпульсу (частка шляху)
+const CYC = 2.3, LEAD = .7, FRONT0 = .15, TP = 1.15, PW = .3;   // цикл команди, затримка першого циклу, старт і тривалість проходу фронту (с), ширина імпульсу (частка шляху)
 
 /** Геометрія: усе виводиться з W, H. Корпус разом із виводами — у смузі між HUD, по центру. */
 function layout(W, H) {
@@ -34,7 +34,6 @@ function layout(W, H) {
   for (const side of SIDES) {
     const vert = side === 't' || side === 'b', s = side === 't' || side === 'l' ? -1 : 1, n = vert ? nx : ny;
     const eB = { t: by, b: by + bh, l: bx, r: bx + bw }[side], eW = { t: wy, b: wy + wh, l: wx, r: wx + ww }[side], eD = { t: dy, b: dy + dh, l: dx, r: dx + dw }[side];
-    const lo = (a, b2, f0, f1) => (vert ? [a + b2 * f0, b2 * (f1 - f0)] : null);
     const spanB = vert ? [bx + bw * .1, bw * .8] : [by + bh * .1, bh * .8], spanW = vert ? [wx + ww * .13, ww * .74] : [wy + wh * .13, wh * .74], spanD = vert ? [dx + dw * .07, dw * .86] : [dy + dh * .07, dh * .86];
     const lw = spanB[1] / n * .46, fw = spanW[1] / n * .38;
     pins[side] = Array.from({ length: n }, (_, i) => {
@@ -77,7 +76,7 @@ function layout(W, H) {
   grow(pcx, pcy, 0, 0);
   const dTot = .375 * (core.w + core.h);
   edges.forEach(e => { const full = Math.hypot(e.x1 - e.x0, e.y1 - e.y0), orig = e.d1 - e.d0; e.d0 /= dTot; e.d1 = (e.d0 * dTot + (e.rex ? Math.min(full, orig) : orig)) / dTot; });
-  return { top, bot, bx, by, bw, bh, ll, ring, wx, wy, ww, wh, fl, dx, dy, dw, dh, dm, pr, core, big, p, nx, ny, pins, plaque, blk, pll, edges, sinks, cx, cy };
+  return { W, top, bot, x0: bx - ll, x1: bx + bw + ll, bx, by, bw, bh, ll, ring, wx, wy, ww, wh, fl, dx, dy, dw, dh, dm, pr, core, big, p, nx, ny, pins, plaque, blk, pll, edges, sinks, cx, cy };
 }
 
 /** Кольори «фізичних» речей і гравіювання кристала; усе — похідне від env.col */
@@ -128,26 +127,26 @@ const TEX = {
 
 export default function (env) {
   const m = env.m;
-  // «тепло» блока: швидке наростання, повільне згасання, перераховується від часу t (тому пауза не ламає)
-  const ATT = .1, DEC = .44;
-  const rec = () => ({ a: 0, t: -9, p: 0 });
-  const lvl = (r, t) => { const age = t - r.t; return age < 0 ? r.a : age < ATT ? lerp(r.a, r.p, easeOut(age / ATT)) : r.p * Math.exp(-(age - ATT) / DEC); };
-  const bump = (r, t, s) => { const cur = lvl(r, t); r.a = cur; r.p = Math.max(cur, s); r.t = t; };
-  const heat = Object.fromEntries(KEYS.map(k => [k, rec()]));
-  const pinD = Array.from({ length: 8 }, rec), pinA = Array.from({ length: 4 }, rec), pinClk = rec();
-  let pulses = [], last = null, t0 = 0, frozen = false, S = null;
-
-  function fire(ev, t) {
-    frozen = false; last = ev; pulses.push(t); if (pulses.length > 4) pulses.shift();
-    bump(heat.CU, t, .7); bump(heat.L1I, t, .4); bump(heat.PLL, t, .55); bump(pinClk, t, .55);
-    const op = ev.op;
-    if (op === 'LDI') bump(heat.REG, t, .8);
-    if (op === 'SHL' || op === 'XOR') { bump(heat.ALU, t, 1); bump(heat.REG, t, .8); }
-    if (op === 'INC') { bump(heat.ALU, t, .8); bump(heat.REG, t, .7); }
-    if (op === 'JMP' || op === 'JNC') { bump(heat.CU, t, 1); bump(heat.L1I, t, .75); }
-    if (op === 'ST') { bump(heat.REG, t, .5); bump(heat.L1D, t, 1); pinA.forEach((r, i) => ev.addr >> (3 - i) & 1 && bump(r, t, .9)); }
-    if (op === 'OUT') { bump(heat.REG, t, .5); bump(heat.IO, t, 1); pinD.forEach((r, i) => ev.out >> (7 - i) & 1 && bump(r, t, .95)); }
+  // власний повільний ритм: один цикл команди — 2,3 с, перший починається ~0,7 с після появи; такт машини (0,4 с) візуально не відстежується
+  let lastEv = null, cyc = null, prevCyc = null, lastK = -1, t0 = 0, frozen = false, S = null;
+  const bell = (a, s, att, hold, rel) => {                                   // м'який «дзвін»: плавний підйом, пауза, косинусний спад
+    a -= s; if (a < 0) return 0; if (a < att) return smooth(0, att, a); if (a < att + hold) return 1;
+    const b = (a - att - hold) / rel; return b < 1 ? .5 * (1 + Math.cos(Math.PI * b)) : 0;
+  };
+  /** Стадії команди: [ключ, початок, наростання, пауза, спад, амплітуда] — вибірка, декодування, регістри, АЛП, запис; блоки гріються по черзі */
+  function plan(ev) {
+    const op = ev.op, a = [['CLK', 0, .55, .1, .9, .8], ['PLL', .05, .45, .1, .9, .8], ['L1I', .2, .55, .1, 1.1, .7], ['CU', .7, .5, .15, 1.1, .85]];
+    const rd = ['REG', 1.0, .45, 0, .6, .5], wr = ['REG', 1.85, .45, .1, 1.1, .9];
+    if (op === 'LDI') a.push(['REG', 1.2, .5, .2, 1.1, .85]);
+    if (op === 'SHL' || op === 'XOR' || op === 'INC') a.push(rd, ['ALU', 1.3, .5, .2, 1.1, 1], wr);
+    if (op === 'ST') a.push(rd, ['L1D', 1.5, .5, .25, 1.1, 1], ['A', 1.55, .5, .25, 1.0, .9]);
+    if (op === 'OUT') a.push(rd, ['IO', 1.5, .5, .25, 1.1, 1], ['D', 1.55, .5, .25, 1.0, .9]);
+    if (op === 'JMP' || op === 'JNC') a.push(['CU', 1.2, .45, .1, 1.0, 1], ['L1I', 1.6, .5, .1, 1.1, .8]);
+    return a;
   }
+  const snap = (t, ev) => ({ t, ev, A: m.A, X: m.X, plan: plan(ev) });
+  const nowEv = () => lastEv ?? m.last ?? { pc: m.pc, op: 'LDI' };
+  const lv = Object.fromEntries(KEYS.map(k => [k, 0])), pD = new Float32Array(8), pA = new Float32Array(4);
 
   /* ── статичний шар: корпус, порожнина, кристал, дроти ── */
   function build(L, P, W, H, D) {
@@ -264,41 +263,82 @@ export default function (env) {
     for (const side of SIDES) for (const q of L.pins[side]) {
       const w = q.wire;
       c.strokeStyle = 'rgba(0,0,0,.5)'; c.lineWidth = .9; c.beginPath(); c.moveTo(w.x0 + 1, w.y0 + 1.6); c.quadraticCurveTo(w.cx + 1, w.cy + 1.6, w.x1 + 1, w.y1 + 1.6); c.stroke();
-      c.strokeStyle = rgba(mix(gold, P.goldHi, .35), 1); c.lineWidth = .8; c.beginPath(); c.moveTo(w.x0, w.y0); c.quadraticCurveTo(w.cx, w.cy, w.x1, w.y1); c.stroke();
+      c.strokeStyle = rgba(mix(gold, P.goldHi, .5), 1); c.lineWidth = .95; c.beginPath(); c.moveTo(w.x0, w.y0); c.quadraticCurveTo(w.cx, w.cy, w.x1, w.y1); c.stroke();
       c.fillStyle = rgba(P.goldHi, 1); c.beginPath(); c.arc(w.x0, w.y0, Math.max(.9, L.pr * .17), 0, TAU); c.fill();
       c.beginPath(); c.arc(w.x1, w.y1, .75, 0, TAU); c.fill();
     }
+    annotate(c, L);
     return { k, key: `${W}|${H}|${D}|${env.gen}`, L, P };
   }
 
+  /* креслярські позначки на полях, як на кресленні з паспорта мікросхеми: габарит, крок виводів, тип корпуса */
+  function annotate(c, L) {
+    const col = env.col, room = L.x0, ink = rgbOf(col.ink3), uk = env.L === 'uk', num = v => String(v).replace('.', uk ? ',' : '.');
+    if (room < 44) return;
+    const fs = room < 70 ? 7 : 8;
+    const arrow = (x, y, dx, dy) => { const a = 3.2, b = 1.3; c.beginPath(); c.moveTo(x, y); c.lineTo(x - dx * a - dy * b, y - dy * a + dx * b); c.lineTo(x - dx * a + dy * b, y - dy * a - dx * b); c.closePath(); c.fill(); };
+    c.save(); c.strokeStyle = rgba(ink, .55); c.fillStyle = rgba(ink, .7); c.lineWidth = .6; c.lineCap = 'butt';
+    mono(c, fs, 500); if ('letterSpacing' in c) c.letterSpacing = '.4px'; c.textBaseline = 'middle';
+    // габарит корпуса по висоті (праворуч)
+    const xr = L.x1 + Math.min(18, room * .22), ymm = 10 * L.bh / L.bw, lab = num(+ymm.toFixed(1)) + ' mm';
+    c.beginPath(); c.moveTo(L.bx + L.bw + 3, L.by); c.lineTo(xr + 4, L.by); c.moveTo(L.bx + L.bw + 3, L.by + L.bh); c.lineTo(xr + 4, L.by + L.bh); c.moveTo(xr, L.by + 4); c.lineTo(xr, L.by + L.bh - 4); c.stroke();
+    arrow(xr, L.by, 0, 1); arrow(xr, L.by + L.bh, 0, -1);
+    c.save(); c.translate(xr + fs * .9 + 2, L.by + L.bh / 2); c.rotate(-Math.PI / 2); c.textAlign = 'center'; c.fillStyle = rgba(ink, .85); c.fillText(lab, 0, 0); c.restore();
+    // крок виводів (ліворуч): дві сусідні ніжки посередині
+    const ls = L.pins.l, j = (ls.length >> 1) - 1, y0 = ls[j].lead.y + ls[j].lead.h / 2, y1 = ls[j + 1].lead.y + ls[j + 1].lead.h / 2, xl = L.x0 - Math.min(14, room * .18);
+    c.beginPath(); c.moveTo(L.x0 - 2, y0); c.lineTo(xl - 4, y0); c.moveTo(L.x0 - 2, y1); c.lineTo(xl - 4, y1); c.moveTo(xl, y0 - 8); c.lineTo(xl, y1 + 8); c.stroke();
+    arrow(xl, y0, 0, 1); arrow(xl, y1, 0, -1);
+    c.textAlign = 'right'; c.fillStyle = rgba(ink, .85); c.fillText(num((Math.round(8 / L.nx / .05) * .05).toFixed(2).replace(/0$/, '')) + ' mm', xl - 5, (y0 + y1) / 2);
+    // тип корпуса
+    c.fillText('QFP-' + (2 * (L.nx + L.ny)), L.x0 - 6, L.by + 6);
+    c.restore();
+  }
+
   /* ── динаміка ── */
-  const inten = (d, f) => { const x = (f - d) / PW; return x < 0 ? Math.exp(-((x * 2.4) ** 2)) : Math.exp(-x * 1.5); };
+  const inten = (d, f) => { const x = (f - d) / PW; return x < 0 ? Math.exp(-((x * 2.2) ** 2)) : Math.exp(-x * 1.25); };
 
   function draw(c, W, H, t, dt) {
     const D = c.getTransform().a || 1, key = `${W}|${H}|${D}|${env.gen}`;
     if (!S || S.key !== key) { const L = layout(W, H), P = palette(env.col); S = build(L, P, W, H, D); }
-    const { L, P } = S, { core, blk, pll } = L;
+    const { L, P } = S, { blk, pll } = L, hot = rgba(P.hot, 1), ph = P.ph;
     c.drawImage(S.k, 0, 0, W, H);
-    const hot = rgba(P.hot, 1), ph = P.ph;
-    const fronts = frozen ? [.6] : pulses.map(p => (t - p) / TP).filter(f => f > -.05 && f < 3);
-    const H_ = (r, k) => (frozen ? STILL[k] : lvl(r, t));
+    // новий цикл: знімок поточної команди машини (далі машина йде своїм швидким ходом, а погляд — своїм)
+    if (!frozen) { const k = Math.floor((t - t0 - LEAD) / CYC); if (k >= 0 && k > lastK) { lastK = k; prevCyc = cyc; cyc = snap(t0 + LEAD + k * CYC, nowEv()); } }
+    // стадії -> рівні тепла блоків, виводів і положення фронту тактового імпульсу
+    const fronts = [], cycles = frozen ? [] : [prevCyc, cyc].filter(Boolean);
+    let clkH = 0, clkU = 0, uD = 0, uA = 0, ripple = [];
+    for (const k of KEYS) lv[k] = frozen ? STILL[k] : 0;
+    pD.fill(0); pA.fill(0);
+    for (const cy of cycles) {
+      const age = t - cy.t; if (age < 0 || age > 5) continue;
+      const f = (age - FRONT0) / TP; if (f > -.1 && f < 3) fronts.push(f);
+      if (age > .1 && age < 1.3) ripple.push((age - .1) / 1.2);
+      for (const st of cy.plan) {
+        const v = st[5] * bell(age, st[1], st[2], st[3], st[4]); if (v <= 0) continue;
+        const k = st[0], u = smooth(0, .55, age - st[1]);
+        if (k === 'CLK') { clkH = Math.max(clkH, v); clkU = u; }
+        else if (k === 'D') { uD = u; for (let i = 0; i < 8; i++) if (cy.ev.out >> (7 - i) & 1) pD[i] = Math.max(pD[i], v); }
+        else if (k === 'A') { uA = u; for (let i = 0; i < 4; i++) if (cy.ev.addr >> (3 - i) & 1) pA[i] = Math.max(pA[i], v); }
+        else lv[k] = Math.max(lv[k], v);
+      }
+    }
+    if (frozen) { fronts.push(.6); clkH = .35; clkU = 1; uD = uA = 1; for (let i = 0; i < 8; i++) pD[i] = STILL_OUT >> (7 - i) & 1 ? .7 : 0; for (let i = 0; i < 4; i++) pA[i] = STILL_ADDR >> (3 - i) & 1 ? .7 : 0; }
 
     // тепло блоків: радіальне світіння зсередини + рамка
     for (const k of KEYS) {
       const b = blk[k]; if (!b) continue;
-      const h = Math.pow(H_(heat[k], k), .8); if (h < .02) continue;
+      const h = Math.pow(lv[k], .8); if (h < .02) continue;
       const gx = b.x + b.w / 2, gy = b.y + b.h / 2, g = c.createRadialGradient(gx, gy, 0, gx, gy, Math.max(b.w, b.h) * .72);
       g.addColorStop(0, rgba(ph, (P.d ? .72 : .9) * h)); g.addColorStop(1, rgba(ph, (P.d ? .38 : .5) * h));
       c.globalCompositeOperation = P.d ? 'screen' : 'multiply'; c.fillStyle = g; c.fillRect(b.x + .7, b.y + .7, b.w - 1.4, b.h - 1.4); c.globalCompositeOperation = 'source-over';
       c.strokeStyle = rgba(ph, .25 + .7 * h); c.lineWidth = 1; c.strokeRect(b.x + .5, b.y + .5, b.w - 1, b.h - 1);
     }
-    // PLL: серце такту — вузол і хвиля від нього
-    const hp = H_(heat.PLL, 'PLL');
+    // PLL: серце такту — вузол і кільце-хвиля від нього
+    const hp = lv.PLL;
     if (hp > .02) { c.fillStyle = rgba(ph, .35 * hp); c.beginPath(); c.arc(pll.x, pll.y, pll.r, 0, TAU); c.fill(); c.strokeStyle = rgba(ph, .35 + .6 * hp); c.lineWidth = .9; c.beginPath(); c.arc(pll.x, pll.y, pll.r, 0, TAU); c.stroke(); }
-    const lead = fronts.length ? Math.max(...fronts) : 0;
-    if (!frozen && fronts.length) { const f = fronts[fronts.length - 1]; if (f >= 0 && f < .9) { c.strokeStyle = rgba(ph, (1 - f / .9) * .5); c.lineWidth = .8; c.beginPath(); c.arc(pll.x, pll.y, pll.r + f / .9 * pll.r * 1.6, 0, TAU); c.stroke(); } }
+    for (const r of ripple) { c.strokeStyle = rgba(ph, (1 - r) ** 1.6 * .5); c.lineWidth = .8; c.beginPath(); c.arc(pll.x, pll.y, pll.r + easeOut(r) * pll.r * 1.9, 0, TAU); c.stroke(); }
 
-    // H-дерево: імпульс біжить від PLL до листків; чотири рівні яскравості — п'ять штрихів
+    // H-дерево: імпульс плавно біжить від PLL до листків; чотири рівні яскравості — чотири штрихи
     if (fronts.length) {
       const buckets = [[], [], [], []];
       for (const e of L.edges) {
@@ -332,34 +372,33 @@ export default function (env) {
       const { lead: r, fin: f, wire: w } = q;   // струм біжить від кристала назовні (вихід) або досередини (вхід)
       let gx = r.x, gy = r.y, gw = r.w, gh = r.h;
       if (q.vert) { gh = r.h * u; gy = (q.s < 0) !== inward ? r.y + r.h - gh : r.y; } else { gw = r.w * u; gx = (q.s < 0) !== inward ? r.x + r.w - gw : r.x; }
-      c.fillStyle = rgba(P.lead, Math.min(.95, h * 1.05)); if (P.d) { c.shadowColor = rgba(ph, .85); c.shadowBlur = 7 * h; } c.fillRect(gx, gy, gw, gh); c.shadowBlur = 0; c.shadowColor = 'transparent';
+      c.fillStyle = rgba(P.lead, Math.min(.95, h * 1.05)); if (P.d) { c.shadowColor = rgba(ph, .8); c.shadowBlur = 5 * h; } c.fillRect(gx, gy, gw, gh); c.shadowBlur = 0; c.shadowColor = 'transparent';
       c.fillStyle = rgba(P.hot, Math.min(.95, h)); c.fillRect(f.x, f.y, f.w, f.h);
       c.strokeStyle = rgba(P.hot, Math.min(1, h * 1.1)); c.lineWidth = 1; c.beginPath(); c.moveTo(w.x0, w.y0); c.quadraticCurveTo(w.cx, w.cy, w.x1, w.y1); c.stroke();
       c.fillStyle = rgba(P.hot, h); c.beginPath(); c.arc(w.x0, w.y0, 1.5, 0, TAU); c.fill();
     };
-    const nB = L.pins.b.length, offD = (nB - 8) >> 1, nL = L.pins.l.length, offA = (nL - 4) >> 1, nT = L.pins.t.length;
-    const run = r => (frozen ? 1 : easeOut(clamp((t - r.t) / .32)));
-    pinD.forEach((r, i) => lit(L.pins.b[offD + i], frozen ? (STILL_OUT >> (7 - i) & 1 ? .7 : 0) : lvl(r, t), run(r)));
-    pinA.forEach((r, i) => lit(L.pins.l[offA + i], frozen ? (STILL_ADDR >> (3 - i) & 1 ? .7 : 0) : lvl(r, t), run(r)));
-    lit(L.pins.t[(nT >> 1) - 1], frozen ? .35 : lvl(pinClk, t) * .8, run(pinClk), true);
+    const offD = (L.pins.b.length - 8) >> 1, offA = (L.pins.l.length - 4) >> 1;
+    for (let i = 0; i < 8; i++) lit(L.pins.b[offD + i], pD[i], uD);
+    for (let i = 0; i < 4; i++) lit(L.pins.l[offA + i], pA[i], uA);
+    lit(L.pins.t[(L.pins.t.length >> 1) - 1], clkH, clkU, true);
 
     // ковзний відблиск по корпусу — раз на появу, спокійно (у статичному кадрі — застиглий)
-    const u = frozen ? .3 : (t - t0 - .8) / 1.9;
+    const u = frozen ? .3 : (t - t0 - 1) / 2.4;
     if (u > -.3 && u < 1.3) {
       const q = frozen ? .5 : Math.sin(clamp(u) * Math.PI) * .9 + .1, cxs = L.bx + L.bw * u, cys = L.by + L.bh * u, hw = L.bw * .2;
-      const g = c.createLinearGradient(cxs - hw, cys - hw * .6, cxs + hw, cys + hw * .6); g.addColorStop(0, 'rgba(255,246,222,0)'); g.addColorStop(.5, `rgba(255,246,222,${(P.d ? .14 : .2) * q})`); g.addColorStop(1, 'rgba(255,246,222,0)');
+      const g = c.createLinearGradient(cxs - hw, cys - hw * .6, cxs + hw, cys + hw * .6); g.addColorStop(0, 'rgba(255,246,222,0)'); g.addColorStop(.5, `rgba(255,246,222,${(P.d ? .22 : .3) * q})`); g.addColorStop(1, 'rgba(255,246,222,0)');
       c.save(); c.beginPath(); c.rect(L.bx, L.by, L.bw, L.bh); c.clip(); c.fillStyle = g; c.fillRect(L.bx, L.by, L.bw, L.bh); c.restore();
     }
 
-    const e = last ?? m.last ?? { pc: 0, op: 'LDI' };
-    const hz = env.L === 'uk' ? '2,5' : '2.5', short = W < 300;      // на вузькому екрані (360 px) підписи коротші, щоб не переносилися
-    return { tl: `${short ? '' : 'PC '}${hex(e.pc)} · ${e.op}`, tr: short ? `${hz} Hz` : `CLK ${hz} Hz`, bl: `A = ${hex(m.A)}`, br: `X = ${hex(m.X, 1)}` };
+    const cy = cyc, e = cy ? cy.ev : nowEv(), A = cy ? cy.A : m.A, X = cy ? cy.X : m.X;   // HUD: команда й регістри зафіксовані на початку циклу
+    const hz = env.L === 'uk' ? '0,4' : '0.4', short = W < 286;                           // на найвужчому екрані (360 px) «PC» опущено, щоб рядок не переносився
+    return { tl: `${short ? '' : 'PC '}${hex(e.pc)} · ${e.op}`, tr: `CLK ${hz} Hz`, bl: `A = ${hex(A)}`, br: `X = ${hex(X, 1)}` };
   }
 
   return {
-    enter(t) { t0 = t; },
-    tick: fire,
+    enter(t) { t0 = t; lastK = -1; cyc = prevCyc = null; },
+    tick(ev) { lastEv = ev; frozen = false; },          // лише запам'ятовуємо: візуально за кожним тактом машини (0,4 с) ми не йдемо
     draw,
-    still() { frozen = true; last = m.last ?? { pc: m.pc, op: 'LDI' }; },
+    still() { frozen = true; cyc = snap(-9, nowEv()); },
   };
 }

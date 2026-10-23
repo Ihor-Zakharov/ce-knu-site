@@ -1,7 +1,7 @@
 // Експонат «МАШИННЕ НАВЧАННЯ»: нейромережа вчиться малювати КІ-Рекса. Дані — піксельний Рекс як хмара точок двох класів
-// (піксель Рекса / фон), модель — справжня: RBF-ознаки (сітка гаусіан) + логістична регресія, навчена Adam у реальному часі.
+// (піксель Рекса / фон), модель — справжня: RBF-ознаки (грубі й дрібні гаусіани) + логістична регресія, навчена Adam у реальному часі.
 // Теплова карта — ймовірність класу, золотий контур — межа рішення p = 0,5; праворуч — крива втрат і схема «ознаки → σ → p».
-import { TAU, clamp, lerp, smooth, mono, glow, noGlow, rex } from './kit.js';
+import { TAU, clamp, lerp, smooth, mono, glow, noGlow } from './kit.js';
 import { rexFrame } from '../rex.js';
 
 /* ── Дані: спрайт Рекса, обрізаний по краях, з полями; око — «дірка» (клас 0) ── */
@@ -11,6 +11,7 @@ const isEye = (col, y) => col === '#111111' || (col === '#FFFFFF' && y < 10);
 let [bx0, bx1, by0, by1] = [99, -1, 99, -1];
 SPR.forEach((row, y) => row.forEach((col, x) => { if (col) { bx0 = Math.min(bx0, x); bx1 = Math.max(bx1, x); by0 = Math.min(by0, y); by1 = Math.max(by1, y); } }));
 const NX = bx1 - bx0 + 1 + MARGIN * 2, NY = by1 - by0 + 1 + MARGIN * 2, N = NX * NY;
+const TW = NX - MARGIN * 2, TH = NY - MARGIN * 2;                // розмір самого спрайта
 const LAB = new Uint8Array(N);                                    // 1 — піксель Рекса, 0 — фон
 for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
   const sx = i - MARGIN + bx0, sy = j - MARGIN + by0, col = SPR[sy]?.[sx];
@@ -18,10 +19,12 @@ for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
 }
 const POS = LAB.reduce((s, v) => s + v, 0);
 
-/* ── Модель: KX×KY гаусових центрів, p = σ(b + Σ w·φ). Дані лежать на ґратці, тож φ розкладається на множники
-   по осях і навчання коштує кілька тисяч множень на епоху ── */
-const KX = 16, KY = 14, R = 3, HW = NX * R, HH = NY * R;         // R — відліків карти на піксель даних
-const BASE_SG = 1.25, VARIANTS = [1, .8, 1.4];                  // σ ≈ крок сітки; клік змінює σ
+/* ── Модель: дві сітки гаусових центрів (грубі дають пляму, дрібні — контур), p = σ(b + Σ w·φ). Дані лежать на ґратці,
+   тож φ розкладається на множники по осях і епоха коштує кілька десятків тисяч множень ── */
+const SETS = [{ kx: 6, ky: 6, sg: 2.4 }, { kx: 20, ky: 18, sg: .85 }];
+const RBF = SETS.reduce((s, q) => s + q.kx * q.ky, 0);
+const R = 4, HW = NX * R, HH = NY * R;                            // R — відліків карти на піксель даних
+const VARIANTS = [1, .8, 1.5];                                    // клік по екрану міняє ширину σ
 const LR = .012, B1 = .9, B2 = .99;
 const epochAt = te => Math.floor(9.3 * Math.pow(Math.max(0, te - .1), 2.3));   // повільний старт, потім швидше
 const EMAX = epochAt(5), YMAX = .72;
@@ -34,16 +37,15 @@ const table = (n, k, res, sg) => {                               // G[g][a] = ex
 
 export default function (env) {
   /* модель */
-  const Wt = new Float32Array(KX * KY), M1 = new Float32Array(KX * KY + 1), M2 = new Float32Array(KX * KY + 1), grad = new Float32Array(KX * KY + 1);
-  const U = new Float32Array(KY * NX), V = new Float32Array(KY * NX), U2 = new Float32Array(KY * HW), F = new Float32Array(HW * HH);
-  const hist = new Float32Array(EMAX + 2);
-  let GX, GY, HX, HY, bias = 0, ep = 0, loss = Math.LN2, acc = 1 - POS / N, t0 = 0, variant = 0, fixed = false;
+  const S = SETS.map(q => { const n = q.kx * q.ky; return { ...q, n, W: new Float32Array(n), m: new Float32Array(n), v: new Float32Array(n), g: new Float32Array(n), U: new Float32Array(q.ky * NX), V: new Float32Array(q.ky * NX), U2: new Float32Array(q.ky * HW) }; });
+  const Z = new Float32Array(N), Rs = new Float32Array(N), F = new Float32Array(HW * HH), hist = new Float32Array(EMAX + 2);
+  let bias = 0, mb = 0, vb = 0, ep = 0, loss = Math.LN2, acc = 1 - POS / N, t0 = 0, variant = 0, fixed = false;
   let dirty = true, builtGen = -1, builtEp = -1, paths = null;
 
   /* кеші малювання */
-  const mk = (w, h) => { const k = document.createElement('canvas'); k.width = w; k.height = h; return { k, c: k.getContext('2d', { willReadFrequently: true }) }; };
+  const mk = (w, h, read = false) => { const k = document.createElement('canvas'); k.width = w; k.height = h; return { k, c: k.getContext('2d', { willReadFrequently: read }) }; };
   const heat = mk(HW, HH), img = heat.c.createImageData(HW, HH);
-  const dots = mk(1, 1), probe = mk(1, 1);
+  const dots = mk(1, 1), probe = mk(1, 1, true);
   let dotsKey = '', lay = null, palGen = -1;
   const pal = {};
   const colors = () => {                                          // кольори теми в числах (для alpha й ImageData)
@@ -57,44 +59,51 @@ export default function (env) {
   const rgba = (k, a) => `rgba(${pal[k][0]},${pal[k][1]},${pal[k][2]},${a < 0 ? 0 : a > 1 ? 1 : +a.toFixed(3)})`;
 
   function reset(t, v) {
-    t0 = t; variant = v; ep = 0; bias = 0; loss = Math.LN2; acc = 1 - POS / N; hist[0] = loss;
-    Wt.fill(0); M1.fill(0); M2.fill(0);
-    const sg = BASE_SG * VARIANTS[v % VARIANTS.length];
-    GX = table(NX, KX, 1, sg); GY = table(NY, KY, 1, sg); HX = table(NX, KX, R, sg); HY = table(NY, KY, R, sg);
+    t0 = t; variant = v; ep = 0; bias = mb = vb = 0; loss = Math.LN2; acc = 1 - POS / N; hist[0] = loss;
+    const k = VARIANTS[v % VARIANTS.length];
+    for (const s of S) {
+      s.W.fill(0); s.m.fill(0); s.v.fill(0);
+      s.GX = table(NX, s.kx, 1, s.sg * k); s.GY = table(NY, s.ky, 1, s.sg * k); s.HX = table(NX, s.kx, R, s.sg * k); s.HY = table(NY, s.ky, R, s.sg * k);
+    }
     dirty = true; paths = null;
   }
 
   /* одна епоха: повний прохід по даних, градієнт, Adam */
   function step() {
-    for (let b = 0; b < KY; b++) for (let i = 0; i < NX; i++) { let s = 0; for (let a = 0; a < KX; a++) s += Wt[b * KX + a] * GX[i * KX + a]; U[b * NX + i] = s; }
-    V.fill(0);
+    Z.fill(bias);
+    for (const { kx, ky, GX, GY, W, U } of S) {
+      for (let b = 0; b < ky; b++) for (let i = 0; i < NX; i++) { let s = 0; for (let a = 0; a < kx; a++) s += W[b * kx + a] * GX[i * kx + a]; U[b * NX + i] = s; }
+      for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { let s = 0; for (let b = 0; b < ky; b++) s += GY[j * ky + b] * U[b * NX + i]; Z[j * NX + i] += s; }
+    }
     let L = 0, ok = 0, gb = 0;
-    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
-      let z = bias; for (let b = 0; b < KY; b++) z += GY[j * KY + b] * U[b * NX + i];
-      const y = LAB[j * NX + i], p = 1 / (1 + Math.exp(-z)), q = y ? z : -z;
-      L += q > -30 ? Math.log1p(Math.exp(-q)) : -q; ok += (p > .5) === !!y;
-      const r = (p - y) / N; gb += r;
-      for (let b = 0; b < KY; b++) V[b * NX + i] += GY[j * KY + b] * r;
+    for (let q = 0; q < N; q++) {
+      const z = Z[q], y = LAB[q], p = 1 / (1 + Math.exp(-z)), e = y ? z : -z;
+      L += e > -30 ? Math.log1p(Math.exp(-e)) : -e; ok += (p > .5) === !!y;
+      Rs[q] = (p - y) / N; gb += Rs[q];
     }
-    for (let b = 0; b < KY; b++) for (let a = 0; a < KX; a++) { let s = 0; for (let i = 0; i < NX; i++) s += V[b * NX + i] * GX[i * KX + a]; grad[b * KX + a] = s; }
-    grad[KX * KY] = gb;
     loss = L / N; acc = ok / N; ep++; hist[ep] = loss;
-    const c1 = 1 - Math.pow(B1, ep), c2 = 1 - Math.pow(B2, ep);
-    for (let q = 0; q <= KX * KY; q++) {
-      M1[q] = B1 * M1[q] + (1 - B1) * grad[q]; M2[q] = B2 * M2[q] + (1 - B2) * grad[q] * grad[q];
-      const d = LR * (M1[q] / c1) / (Math.sqrt(M2[q] / c2) + 1e-8);
-      if (q < KX * KY) Wt[q] -= d; else bias -= d;
+    const c1 = 1 - Math.pow(B1, ep), c2 = 1 - Math.pow(B2, ep), adam = (m, v, g) => LR * (m / c1) / (Math.sqrt(v / c2) + 1e-8);
+    for (const { kx, ky, GX, GY, W, m, v, g, V } of S) {
+      V.fill(0);
+      for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const r = Rs[j * NX + i]; for (let b = 0; b < ky; b++) V[b * NX + i] += GY[j * ky + b] * r; }
+      for (let b = 0; b < ky; b++) for (let a = 0; a < kx; a++) {
+        let s = 0; for (let i = 0; i < NX; i++) s += V[b * NX + i] * GX[i * kx + a];
+        const q = b * kx + a;
+        m[q] = B1 * m[q] + (1 - B1) * s; v[q] = B2 * v[q] + (1 - B2) * s * s; W[q] -= adam(m[q], v[q]);
+      }
     }
+    mb = B1 * mb + (1 - B1) * gb; vb = B2 * vb + (1 - B2) * gb * gb; bias -= adam(mb, vb);
   }
   const train = n => { for (let k = 0; k < n && ep < EMAX; k++) step(); dirty = true; };
 
   /* карта ймовірності p на ґратці HW×HH (R відліків на піксель даних) */
   function field() {
-    for (let b = 0; b < KY; b++) for (let g = 0; g < HW; g++) { let s = 0; for (let a = 0; a < KX; a++) s += Wt[b * KX + a] * HX[g * KX + a]; U2[b * HW + g] = s; }
-    for (let h = 0; h < HH; h++) for (let g = 0; g < HW; g++) {
-      let z = bias; for (let b = 0; b < KY; b++) z += HY[h * KY + b] * U2[b * HW + g];
-      F[h * HW + g] = 1 / (1 + Math.exp(-z));
+    F.fill(bias);
+    for (const { kx, ky, HX, HY, W, U2 } of S) {
+      for (let b = 0; b < ky; b++) for (let g = 0; g < HW; g++) { let s = 0; for (let a = 0; a < kx; a++) s += W[b * kx + a] * HX[g * kx + a]; U2[b * HW + g] = s; }
+      for (let h = 0; h < HH; h++) for (let g = 0; g < HW; g++) { let s = 0; for (let b = 0; b < ky; b++) s += HY[h * ky + b] * U2[b * HW + g]; F[h * HW + g] += s; }
     }
+    for (let q = 0; q < F.length; q++) F[q] = 1 / (1 + Math.exp(-F[q]));
   }
   function paintHeat() {                                          // p → прозорість фосфору
     const [r, g, b] = pal.ph, d = img.data, amax = env.col.dark ? .46 : .36;
@@ -133,7 +142,7 @@ export default function (env) {
     const P = Math.min((bot - top) / NY, (W - 2 * mx - gap - minPanel) / NX);
     const pw = clamp(W * .36, minPanel, 300), tw = NX * P + gap + pw, left = (W - tw) / 2;
     const fy = top + ((bot - top) - NY * P) / 2;
-    return { W, H, small, P, fx: left, fy, fw: NX * P, fh: NY * P, px: left + NX * P + gap, pw, fs: clamp(7 + P * .3, 8.2, 10.4) };
+    return { W, H, small, P, fx: left, fy, fw: NX * P, fh: NY * P, px: left + NX * P + gap, pw, fs: clamp(7 + P * .3, 8.2, 12.2) };
   }
 
   /* ── шар точок (кешується) ── */
@@ -157,54 +166,51 @@ export default function (env) {
   function schematic(c, x, y, w, h, Lt, te) {
     const s = clamp(Lt.P / 12, .75, 1.5), r = 3.2 * s, mid = y + h * .4, fs = Lt.fs - .6;
     const cx = [.07, .34, .6, .79, .95].map(u => x + u * w);
-    const ins = [mid - h * .17, mid + h * .17], hid = Array.from({ length: 5 }, (_, i) => y + h * .02 + i * h * .76 / 4 + 0);
-    const hy = hid.map(v => v - h * .02 + h * .02);
+    const ins = [mid - h * .17, mid + h * .17], hy = Array.from({ length: 5 }, (_, i) => y + h * .02 + i * h * .76 / 4);
     c.lineWidth = 1;
     // вхід -> RBF
     c.strokeStyle = rgba('lineStrong', .28); c.beginPath();
     for (const a of ins) for (const b of hy) { c.moveTo(cx[0] + r, a); c.lineTo(cx[1] - r, b); }
     c.stroke();
     // RBF -> Σ: товщина й тон — за справжніми вагами кількох центрів
-    const pick = [[3, 3], [5, 9], [7, 7], [9, 5], [11, 11]];
+    const fine = S[1], pick = [[4, 4], [7, 13], [9, 9], [12, 6], [14, 15]];
     hy.forEach((v, i) => {
-      const wv = Wt[pick[i][0] * KX + pick[i][1]], a = clamp(Math.abs(wv) / 1.6, 0, 1);
+      const wv = fine.W[pick[i][0] * fine.kx + pick[i][1]], a = clamp(Math.abs(wv) / 1.2, 0, 1);
       c.strokeStyle = wv >= 0 ? rgba('ph', .18 + a * .7) : rgba('ink3', .18 + a * .5); c.lineWidth = .8 + a * .9;
       c.beginPath(); c.moveTo(cx[1] + r, v); c.lineTo(cx[2] - r * 1.7, mid); c.stroke();
     });
     c.strokeStyle = rgba('lineStrong', .6); c.lineWidth = 1; c.beginPath();
     c.moveTo(cx[2] + r * 1.7, mid); c.lineTo(cx[3] - r * 1.7, mid); c.moveTo(cx[3] + r * 1.7, mid); c.lineTo(cx[4] - r, mid); c.stroke();
     // вузли
-    c.fillStyle = rgba('ink', .0);
     const node = (px, py, rr, fill) => { c.beginPath(); c.arc(px, py, rr, 0, TAU); if (fill) { c.fillStyle = fill; c.fill(); } c.strokeStyle = rgba('lineStrong', .9); c.lineWidth = 1; c.stroke(); };
     ins.forEach(v => node(cx[0], v, r)); hy.forEach(v => node(cx[1], v, r));
     node(cx[2], mid, r * 1.7);
     c.beginPath(); c.roundRect(cx[3] - r * 1.7, mid - r * 1.7, r * 3.4, r * 3.4, r * .8); c.stroke();
-    c.beginPath();                                                // сигмоїда в ромбі σ
+    c.beginPath();                                                // сигмоїда у квадраті σ
     for (let k = 0; k <= 12; k++) { const u = k / 12 * 2 - 1, px = cx[3] + u * r * 1.2, py = mid - Math.tanh(u * 2.6) * r * .95; k ? c.lineTo(px, py) : c.moveTo(px, py); }
     c.strokeStyle = rgba('ph', .95); c.lineWidth = 1.1; c.stroke();
     // вихід p — заповнюється, коли модель впевнена
-    const conf = clamp((POS ? Math.max(0, (acc - .6)) / .4 : 0), 0, 1);
-    node(cx[4], mid, r * 1.1, rgba('ph', .15 + .85 * conf));
+    node(cx[4], mid, r * 1.1, rgba('ph', .15 + .85 * clamp((acc - .6) / .4)));
     // підписи
     mono(c, fs); c.fillStyle = env.col.ink3; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
     const ly = y + h + fs * .2;
-    c.fillText('x', cx[0], ly); c.fillText('RBF', cx[1], ly); c.fillStyle = env.col.ink3; c.fillText('σ', cx[3], ly); c.fillText('p', cx[4], ly);
+    c.fillText('x', cx[0], ly); c.fillText('RBF', cx[1], ly); c.fillText('σ', cx[3], ly); c.fillText('p', cx[4], ly);
     mono(c, fs + 1.5, 600); c.fillStyle = env.col.ink2; c.fillText('Σ', cx[2], mid + (fs + 1.5) * .34);
     // імпульс прямого проходу
     const path = [[cx[0], ins[Math.floor(te / 1.4) % 2]], [cx[1], hy[Math.floor(te / 1.4 * 1.7) % 5]], [cx[2], mid], [cx[3], mid], [cx[4], mid]];
     const u = ((te / 1.4) % 1) * 1.25;
     if (u < 1 && !fixed) {
       const f = u * 4, i = Math.min(3, Math.floor(f)), k = f - i, px = lerp(path[i][0], path[i + 1][0], k), py = lerp(path[i][1], path[i + 1][1], k);
-      glow(c, env.col, env.col.gold, 6); c.fillStyle = env.col.gold; c.globalAlpha = Math.sin(Math.PI * clamp(u)) ; c.beginPath(); c.arc(px, py, 1.7 * s, 0, TAU); c.fill(); c.globalAlpha = 1; noGlow(c);
+      glow(c, env.col, env.col.gold, 6); c.fillStyle = env.col.gold; c.globalAlpha = Math.sin(Math.PI * u); c.beginPath(); c.arc(px, py, 1.7 * s, 0, TAU); c.fill(); c.globalAlpha = 1; noGlow(c);
     }
   }
 
-  function lossChart(c, x, y, w, h, Lt, te) {
+  function lossChart(c, x, y, w, h, Lt) {
     const fs = Lt.fs, cl = x + fs * 2.9, cr = x + w - 3, ct = y + fs + 9, cb = y + h - fs - 6;
     mono(c, fs); c.textBaseline = 'alphabetic';
     c.fillStyle = env.col.ink3; c.textAlign = 'left'; c.fillText('LOSS', x, y + fs - 1);
     c.textAlign = 'right'; c.fillText('EPOCH', cr, cb + fs + 5);
-    c.textAlign = 'right'; c.fillText('0.7', cl - 5, Math.round(cb - .7 / YMAX * (cb - ct)) + fs * .36); c.fillText('0', cl - 5, cb + fs * .36);
+    c.fillText('0.7', cl - 5, Math.round(cb - .7 / YMAX * (cb - ct)) + fs * .36); c.fillText('0', cl - 5, cb + fs * .36);
     // осі, ґратка
     c.strokeStyle = rgba('lineStrong', .6); c.lineWidth = 1; c.beginPath();
     c.moveTo(cl + .5, ct - 2); c.lineTo(cl + .5, cb + .5); c.lineTo(cr, cb + .5); c.stroke();
@@ -220,8 +226,7 @@ export default function (env) {
     c.beginPath(); c.moveTo(X(0), Y(hist[0]));
     for (let e = stride; e < ep; e += stride) c.lineTo(X(e), Y(hist[e]));
     c.lineTo(X(ep), Y(hist[ep]));
-    c.strokeStyle = env.col.ph; c.lineWidth = 1.5; c.lineJoin = 'round'; c.lineCap = 'round';
-    glow(c, env.col, env.col.ph, 4); c.stroke(); noGlow(c);
+    c.strokeStyle = env.col.ph; c.lineWidth = 1.5; c.lineJoin = 'round'; c.lineCap = 'round'; c.stroke();
     c.lineTo(X(ep), cb); c.lineTo(X(0), cb); c.closePath(); c.fillStyle = rgba('ph', .09); c.fill();
     // голівка
     const hx = X(ep), hy = Y(hist[ep]);
@@ -229,20 +234,21 @@ export default function (env) {
     c.fillStyle = env.col.ph; glow(c, env.col, env.col.ph, 6); c.beginPath(); c.arc(hx, hy, 2.2, 0, TAU); c.fill(); noGlow(c);
   }
 
-  function legend(c, x, y, w, Lt) {
-    const fs = Lt.fs, r = Math.max(2, fs * .3);
+  /* нижній блок панелі: назва даних, позначки класів і «ціль» — сам Рекс гравюрою (ті самі мітки, що й у даних) */
+  function legend(c, x, y, w, h, Lt, k) {
+    const fs = Lt.fs, r = Math.max(2, fs * .3), b2 = y + h - fs * .1, b1 = b2 - fs * 1.55;
     mono(c, fs); c.textBaseline = 'alphabetic'; c.textAlign = 'left';
-    const uk = env.L === 'uk', name = uk ? 'КІ-РЕКС' : 'KI-REX';
-    c.fillStyle = env.col.ink2; c.fillText(`${name} · N ${N}`, x, y + fs);
-    const ly = y + fs * 2.5;
-    c.fillStyle = env.col.ph; c.beginPath(); c.arc(x + r, ly - fs * .32, r, 0, TAU); c.fill();
-    c.fillStyle = env.col.ink3; c.fillText('y=1', x + r * 2 + 5, ly);
+    c.fillStyle = env.col.ink2; c.fillText(`${env.L === 'uk' ? 'КІ-РЕКС' : 'KI-REX'} · N ${N}`, x, b1);
+    c.fillStyle = env.col.ph; c.beginPath(); c.arc(x + r, b2 - fs * .32, r, 0, TAU); c.fill();
+    c.fillStyle = env.col.ink3; c.fillText('y=1', x + r * 2 + 5, b2);
     const x2 = x + r * 2 + 5 + fs * 3.6 + 10;
-    c.strokeStyle = env.col.lineStrong; c.lineWidth = 1; c.beginPath(); c.arc(x2 + r, ly - fs * .32, r - .3, 0, TAU); c.stroke();
-    c.fillText('y=0', x2 + r * 2 + 5, ly);
-    // «ціль»: сам Рекс гравюрою — підпис майстра в куті панелі
-    const D = c.getTransform().a || 1, k = Math.max(1, Math.round(Lt.P / 7.5 * D) / D);
-    if (w > fs * 17) rex(c, x + w - (bx1 + 1) * k, y + fs * 3.1 - (by1 + 1) * k, k, rgba('ink3', .8));
+    c.strokeStyle = env.col.lineStrong; c.lineWidth = 1; c.beginPath(); c.arc(x2 + r, b2 - fs * .32, r - .3, 0, TAU); c.stroke();
+    c.fillText('y=0', x2 + r * 2 + 5, b2);
+    if (!k) return;
+    const x0 = x + w - TW * k, y0 = y + h - TH * k;
+    c.fillStyle = rgba('ink3', .75); c.beginPath();
+    for (let j = 0; j < TH; j++) for (let i = 0; i < TW; i++) if (LAB[(j + MARGIN) * NX + i + MARGIN]) c.rect(x0 + i * k, y0 + j * k, k, k);
+    c.fill();
   }
 
   return {
@@ -256,7 +262,7 @@ export default function (env) {
       if (dirty || builtGen !== env.gen || builtEp !== ep) { field(); paintHeat(); paths = null; dirty = false; builtGen = env.gen; builtEp = ep; }
       if (!paths && ep > 0) paths = [.5, .7, .88].map(iso);
       if (!lay || lay.W !== W || lay.H !== H) lay = layout(W, H);
-      const Lt = lay, { P, fx, fy, fw, fh } = Lt, D = c.getTransform().a || 1, dark = env.col.dark;
+      const Lt = lay, { P, fx, fy, fw, fh } = Lt, D = c.getTransform().a || 1;
       const hold = fixed ? 0 : smooth(3.4, 4.4, te), br = hold * Math.sin(te * TAU / 2.6);
       c.textBaseline = 'alphabetic';
 
@@ -282,16 +288,17 @@ export default function (env) {
       for (let j = 0; j <= NY; j += tk) { const yy = Math.round(fy + j * P) + .5, l = j % 5 === 0 ? 4 : 2.2; c.moveTo(Math.round(fx) - .5, yy); c.lineTo(Math.round(fx) - .5 - l, yy); }
       c.strokeStyle = rgba('lineStrong', .5); c.stroke();
 
-      /* права панель */
-      const { px, pw, fs } = Lt, ph = fh, showSch = ph >= 190 && pw >= 170;
-      const sh = showSch ? ph * .27 : 0, lh = fs * 3.2;
+      /* права панель: схема, крива втрат, нижній блок із «ціллю» (низ — на рівні низу поля) */
+      const { px, pw, fs } = Lt, showSch = fh >= 190 && pw >= 170;
+      const k = pw > fs * 17 ? Math.max(1, Math.floor(Math.min(P / 7.5, fs * 2.7 / TH) * D) / D) : 0;
+      const bh = Math.max(fs * 2.7, k * TH), by = fy + fh - bh, sh = showSch ? fh * .27 : 0;
       if (showSch) schematic(c, px, fy + 2, pw, sh - fs * 1.6, Lt, te);
-      const cy0 = fy + (showSch ? sh + ph * .05 : 0);
-      lossChart(c, px, cy0, pw, fy + ph - lh - cy0 - 4, Lt, te);
-      legend(c, px, fy + ph - lh + 2, pw, Lt);
+      const cy0 = fy + (showSch ? sh + fh * .05 : 0);
+      lossChart(c, px, cy0, pw, by - fs * 1.7 - cy0, Lt);
+      legend(c, px, by, pw, bh, Lt, k);
 
       const pad = (v, n) => String(v).padStart(n, '0');
-      return { tl: `${W < 420 ? 'EP' : 'EPOCH'} ${pad(ep, 3)}`, tr: `${W < 290 ? 'L' : 'LOSS'} ${loss.toFixed(3)}`, bl: `RBF ${KX * KY} → σ`, br: `ACC ${Math.round(acc * 100)} %` };
+      return { tl: `${W < 420 ? 'EP' : 'EPOCH'} ${pad(ep, 3)}`, tr: `${W < 290 ? 'L' : 'LOSS'} ${loss.toFixed(3)}`, bl: `RBF ${RBF} → σ`, br: `ACC ${Math.round(acc * 100)} %` };
     },
   };
 }

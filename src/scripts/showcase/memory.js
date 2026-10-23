@@ -11,17 +11,18 @@ const SP = (() => {
   const m = rexMask(), fr = rexFrame();
   let x0 = 99, x1 = -1, y0 = 99, y1 = -1;
   m.forEach((r, y) => r.forEach((v, x) => { if (v) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); } }));
-  const w = x1 - x0 + 1, h = y1 - y0 + 1, bits = new Float32Array(w * h);
+  const w = x1 - x0 + 1, h = y1 - y0 + 1, bits = new Float32Array(w * h), eye = [];
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     const px = fr[y + y0][x + x0];
+    if (px === '#111111') eye.push(y * w + x);
     bits[y * w + x] = !m[y + y0][x + x0] || px === '#111111' ? 0 : y < 4 && px === '#FFFFFF' ? .4 : (LEVEL[px] ?? 1);
   }
-  return { w, h, bits };
+  return { w, h, bits, eye };
 })();
 
 const NR = 20;                               // рядків у полі: порожній рядок над Рексом і під ним
 const T0 = .9, ROW = .085, BF = .62;         // початок запису, період рядка, частка рядка на сам пакет
-const W0 = 3.15, WD = 1.05, WP = 4.4;        // перша хвиля читання, її тривалість, період наступних
+const W0 = 3.15, WD = 1.05, WP = 4.4, BL = 4.4;   // перша хвиля читання, її тривалість, період наступних; Рекс кліпає після хвилі
 const STILL = W0 + WD / 2, BASE = 0x1F00;    // кадр без руху: хвиля посередині; адреса першого рядка
 
 const prng = a => () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -39,18 +40,19 @@ export default function (env) {
   function build(W, H, D) {
     const col = env.col, dark = col.dark, gold = col.goldRGB;
     const availH = Math.max(80, H - 76), Mw = Math.min(W * .88, availH * 3.2);
-    const gm = Mw * .022, gap = Mw * .011, cw = (Mw - 2 * gm - 7 * gap) / 8, padX = Math.max(2, cw * .05);
+    const gm = Mw * .022, gap = Mw * .011, cw = (Mw - 2 * gm - 7 * gap) / 8, padX = Math.max(1.6, cw * .03);
     // стовпців на мікросхему: 13 — тулуб і голова Рекса (13 стовпців) вміщаються рівно в одну мікросхему, хвіст лягає в сусідню;
     // на малих екранах — менше стовпців, зате крупніші комірки
     const pH = Math.max(1.5, (availH / 1.7 - 2 * padX) / NR);
+    const fl = v => Math.floor(v * D + 1e-6) / D, minP = D >= 2 ? 2.4 : 3;      // крок комірки кратний фізичному пікселю
     let p = 3, nc = 13;
-    for (const n of [13, 10, 8, 6]) { nc = n; p = Math.min((cw - 2 * padX) / nc, pH); if (p >= 3.1) break; }
-    p = Math.max(1.4, snap(p, D));
+    for (const n of [13, 10, 8, 6]) { nc = n; p = fl(Math.min((cw - 2 * padX) / nc, pH)); if (p >= minP) break; }
+    p = Math.max(1.5, p);
     const NC = nc * 8, chH = NR * p + 2 * padX, tm = chH * .14, fh = clamp(chH * .17, 8, 24), Mh = tm + chH + chH * .42 + fh;
     const mx = snap((W - Mw) / 2, D), my = snap(H / 2 + 2 - Mh / 2, D), padY = padX;
     const chipX = Array.from({ length: 8 }, (_, k) => mx + gm + k * (cw + gap));
     const colX = new Float32Array(NC), rowY = new Float32Array(NR);
-    const cy = my + tm, s = Math.max(1.2, snap(p * .74, D));
+    const cy = my + tm, s = Math.max(1 / D, Math.min(snap(p * .74, D), p - 1 / D));
     for (let c = 0; c < NC; c++) colX[c] = snap(chipX[c / nc | 0] + (cw - nc * p) / 2 + (c % nc) * p + (p - s) / 2, D);
     for (let r = 0; r < NR; r++) rowY[r] = snap(cy + (chH - NR * p) / 2 + r * p + (p - s) / 2, D);
     const fyTop = my + Mh - fh;
@@ -100,13 +102,16 @@ export default function (env) {
 
     /* дрібні деталі в смузі між мікросхемами й контактами: SPD, PMIC, конденсатори */
     const sy = chB, sH = fyTop - chB, mid = sy + sH / 2, u = Math.max(1, Mh / 190);
+    const lh = clamp(sH * .62, 10, 24), fs = clamp(lh * .46, 5.5, 10), lx = snap(mx + Mw * .06, D), ly = snap(mid - lh / 2, D);
+    mono(x, 10, 700); const lw2 = Math.max(Mw * .2, lh * 1.15 + x.measureText('KI-RAM · DDR5').width * fs / 10), noTr = new Path2D();
+    noTr.rect(0, 0, W, H); noTr.rect(lx, ly, lw2, lh);
     const smd = (px, py, w, h, c, o = 1) => { x.globalAlpha = o; x.fillStyle = c; x.fillRect(snap(px, D), snap(py, D), w, h); x.globalAlpha = 1; };
     const ic = (px, py, w, h) => {                            // корпус з ніжками
       x.strokeStyle = 'rgba(214,190,130,.75)'; x.lineWidth = Math.max(.6, u * .7);
       x.beginPath(); for (let i = 1; i < 4; i++) { const q = px + w * i / 4; x.moveTo(q, py - u * 1.4); x.lineTo(q, py + h + u * 1.4); } x.stroke();
       smd(px, py, w, h, '#101213'); smd(px + 1, py + 1, w - 2, 1, 'rgba(255,255,255,.12)');
     };
-    const spdX = mx + Mw * .335, pmX = mx + Mw * .5;
+    const spdX = Math.min(Math.max(mx + Mw * .335, lx + lw2 + u * 6), nx - u * 20), pmX = mx + Mw * .5;
     ic(spdX, mid - u * 4, u * 14, u * 8);                        // SPD
     ic(pmX, mid - u * 6, u * 22, u * 12);                        // PMIC
     smd(pmX + u * 3, mid - u * 3.4, u * 1.8, u * 1.8, 'rgba(255,255,255,.35)');
@@ -114,12 +119,10 @@ export default function (env) {
     for (let i = 0; i < 4; i++) smd(mx + Mw * (.905 + i * .017), mid - u * 1.6, u * 2.2, u * 3.2, '#101213', .9);
 
     /* етикетка модуля — відсилка до КІ */
-    const lw2 = Mw * .235, lh = clamp(sH * .62, 10, 24), lx = snap(mx + Mw * .065, D), ly = snap(mid - lh / 2, D), noTr = new Path2D();
-    noTr.rect(0, 0, W, H); noTr.rect(lx, ly, lw2, lh);
     x.save(); x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2; x.shadowOffsetY = 1;
     x.fillStyle = dark ? '#CDC4AF' : '#EDE6D4'; rr(x, lx, ly, lw2, lh, 1.6); x.fill(); x.restore();
     x.fillStyle = css(gold); x.fillRect(lx + lh * .28, ly + lh * .2, Math.max(1.2, lh * .07), lh * .6);
-    const fs = clamp(lh * .46, 5.8, 10); mono(x, fs, 700); x.fillStyle = dark ? '#2A2012' : col.ph; x.textBaseline = 'middle'; x.textAlign = 'left';
+    mono(x, fs, 700); x.fillStyle = dark ? '#2A2012' : col.ph; x.textBaseline = 'middle'; x.textAlign = 'left';
     x.fillText('KI-RAM · DDR5', lx + lh * .6, ly + lh / 2 + .5); x.textBaseline = 'alphabetic';
 
     /* мікросхеми й вимкнені комірки */
@@ -152,20 +155,21 @@ export default function (env) {
     x.globalCompositeOperation = 'source-over';
 
     return { key: `${env.gen}|${W}|${H}|${D}`, W, H, D, L, mx, my, Mw, Mh, cw, cy, chH, chipX, nc, NC, p, s, colX, rowY, fingers, nf, fyTop, fh, fw, traces, lw, noTr,
-      ox: nc === 13 ? 4 * nc - 6 : Math.floor((NC - SP.w) / 2), oy: Math.floor((NR - SP.h) / 2),
+      ox: (nc >= 7 ? 5 : 6) * nc - SP.w, oy: Math.floor((NR - SP.h) / 2),
       led: dark ? env.col.ph : css(mix(gold, [255, 214, 128], .62)), hot: css(mix(gold, [255, 255, 255], dark ? .6 : .74)), gold: css(gold), goldRGB: gold };
   }
 
   /* ── дані: випадковий вміст, фінальний Рекс і розклад запису ── */
   function fill() {
     const { NC, ox, oy, nf, fingers } = g, n = NR * NC, R = prng(0xC0FFEE + epoch * 977);
-    const o = { NC, fin: new Float32Array(n), nb: new Uint8Array(n), nl: new Float32Array(n), tf: new Float32Array(n), tw: new Float32Array(n), fb: new Uint8Array(NR * nf), fcol: new Uint8Array(nf) };
+    const o = { NC, fin: new Float32Array(n), nb: new Uint8Array(n), nl: new Float32Array(n), tf: new Float32Array(n), tw: new Float32Array(n), fb: new Uint8Array(NR * nf), fcol: new Uint8Array(nf), eye: new Uint8Array(n) };
     for (let r = 0; r < NR; r++) for (let c = 0; c < NC; c++) {
       const i = r * NC + c, sr = r - oy, sc = c - ox;
       o.fin[i] = sr >= 0 && sr < SP.h && sc >= 0 && sc < SP.w ? SP.bits[sr * SP.w + sc] : 0;
       o.nb[i] = R() < .46 ? 1 : 0; o.nl[i] = .36 + R() * .3; o.tf[i] = R() < .24 ? R() * T0 * .9 : -1;
       o.tw[i] = T0 + r * ROW + c / NC * ROW * BF;
     }
+    for (const e of SP.eye) o.eye[(oy + (e / SP.w | 0)) * NC + ox + e % SP.w] = 1;
     fingers.forEach((f, k) => { for (let r = 0; r < NR; r++) for (let c = f.ca; c <= f.cb; c++) if (o.fin[r * NC + c] > 0) { o.fb[r * nf + k] = 1; o.fcol[k] = 1; } });
     return o;
   }
@@ -232,6 +236,9 @@ export default function (env) {
         }
       }
 
+      /* Рекс кліпає: на мить зіниця — це 1 (перезаписано кілька бітів) */
+      const bk = tt >= BL ? (tt - BL) % WP : 9, blink = bk < .22 ? Math.sin(bk / .22 * Math.PI) : 0;
+
       /* комірки */
       const dark = env.col.dark, bigS = s * 1.8;
       for (let r = 0; r < NR; r++) {
@@ -242,11 +249,12 @@ export default function (env) {
           if (tf >= 0 && tt > tf) a = lerp(a, d.nb[i] ? 0 : d.nl[i], smooth(tf, tf + .14, tt));
           let lvl = a, fl = 0;
           if (tt >= twi) { lvl = lerp(a, fin, smooth(twi, twi + .05, tt)); if (fin && tt - twi < 2) fl = Math.exp(-(tt - twi) / .3) * smooth(twi, twi + .02, tt); }
+          if (blink && d.eye[i]) lvl = Math.max(lvl, blink);
           if (lvl < .02 && w < .03) continue;
           const pop = (fl * fl * .55 + w * lvl * .3) * p * .22, al = Math.max(lvl, w * .62), x = colX[q] - pop, sz = s + 2 * pop;
           if (dark && lvl > .5) { c.globalAlpha = .07 * lvl; c.fillStyle = g.led; c.fillRect(colX[q] - s * .45, y - s * .45, s * 1.9, s * 1.9); }
           c.globalAlpha = al; c.fillStyle = g.led; c.fillRect(x, y - pop, sz, sz);
-          const hot = Math.max(fl, w * (lvl * .8 + .2));
+          const hot = Math.max(fl, w * (lvl * .8 + .2), blink && d.eye[i] ? blink * .5 : 0);
           if (hot > .03) { c.globalAlpha = hot; c.fillStyle = g.hot; c.fillRect(x, y - pop, sz, sz); }
         }
       }

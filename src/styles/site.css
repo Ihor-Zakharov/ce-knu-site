@@ -33,7 +33,7 @@ main { flex: 1; }
 .nav__wave { clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 620ms var(--ease-out), opacity 200ms var(--ease-out); }
 .nav__wave path { fill: none; stroke: var(--phosphor); stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-linecap: round; filter: var(--phosphor-glow); }
 .nav a:hover .nav__wave, .nav a:focus-visible .nav__wave { clip-path: inset(0 -2px 0 0); opacity: 1; }
-.nav__lens { position: absolute; top: 0; left: 0; height: 40px; width: var(--w, 0); translate: var(--x, 0) 0; border-radius: 10px; background: color-mix(in oklab, var(--ink) 6%, transparent); opacity: 0; scale: .92; pointer-events: none; transition: opacity 260ms var(--ease-out), scale 520ms var(--spring); }
+.nav__lens { position: absolute; top: 0; left: 0; height: 40px; width: calc(var(--w, 0px) + 28px); translate: calc(var(--x, 0px) - 14px) 0;   /* по слову + по 14 px з боків: світлодіод — усередині */ border-radius: 10px; background: color-mix(in oklab, var(--ink) 6%, transparent); opacity: 0; scale: .92; pointer-events: none; transition: opacity 260ms var(--ease-out), scale 520ms var(--spring); }
 .nav.is-hover .nav__lens { opacity: 1; scale: 1; }
 :root[data-theme="dark"] .nav__lens { background: color-mix(in oklab, var(--ink) 9%, transparent); }
 

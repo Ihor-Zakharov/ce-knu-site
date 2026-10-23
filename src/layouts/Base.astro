@@ -99,7 +99,7 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
     <div class="dlg__card">
       <div class="dlg__in">
         <svg width="20" height="20" aria-hidden="true"><use href="#i-search"/></svg>
-        <input type="search" role="combobox" aria-expanded="true" aria-controls="search-list" aria-autocomplete="list" aria-label={t.search} placeholder={t.searchPh} autocomplete="off" />
+        <input type="text" role="combobox" aria-expanded="false" enterkeyhint="search" aria-controls="search-list" aria-autocomplete="list" aria-label={t.search} placeholder={t.searchPh} autocomplete="off" />
         <button type="button" class="btn btn--ghost btn--icon btn--sm" onclick="this.closest('dialog').close()" aria-label={t.close} title={t.close}><svg width="18" height="18" aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
       <ul id="search-list" role="listbox" aria-label={t.search}></ul>
@@ -111,12 +111,11 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
   <dialog class="lightbox" id="lightbox" aria-label={t.photo}>
     <div class="lightbox__in">
       <img src="data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=" alt="" />
-      <div class="lightbox__bar">
-        <button type="button" class="btn btn--line btn--icon" data-lb-prev aria-label={t.lightboxPrev} title={t.lightboxPrev}><svg width="20" height="20" aria-hidden="true"><use href="#i-left"/></svg></button>
-        <span class="cap" data-lb-cap></span>
-        <button type="button" class="btn btn--line btn--icon" data-lb-next aria-label={t.lightboxNext} title={t.lightboxNext}><svg width="20" height="20" aria-hidden="true"><use href="#i-right"/></svg></button>
-        <button type="button" class="btn btn--line btn--icon" data-lb-close aria-label={t.lightboxClose} title={t.lightboxClose}><svg width="20" height="20" aria-hidden="true"><use href="#i-close"/></svg></button>
-      </div>
+      <p class="lightbox__cap cap" data-lb-cap></p>
+      <!-- кнопки зафіксовані по краях екрана: підпис будь-якої довжини їх не зсуває -->
+      <button type="button" class="btn btn--line btn--icon lightbox__nav lightbox__nav--prev" data-lb-prev aria-label={t.lightboxPrev} title={t.lightboxPrev}><svg width="22" height="22" aria-hidden="true"><use href="#i-left"/></svg></button>
+      <button type="button" class="btn btn--line btn--icon lightbox__nav lightbox__nav--next" data-lb-next aria-label={t.lightboxNext} title={t.lightboxNext}><svg width="22" height="22" aria-hidden="true"><use href="#i-right"/></svg></button>
+      <button type="button" class="btn btn--line btn--icon lightbox__close" data-lb-close aria-label={t.lightboxClose} title={t.lightboxClose}><svg width="22" height="22" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
   </dialog>
   <script>import '../scripts/site.js';</script>

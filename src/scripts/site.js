@@ -31,15 +31,17 @@ let vt = null;
 function setTheme(btn) {
   theme = theme === 'dark' ? 'light' : 'dark';            // намір фіксуємо одразу: подвійне натискання не губиться
   const next = theme;
-  const apply = () => { root.dataset.theme = next; store.set('ki-theme', next); reflectTheme(); document.dispatchEvent(new CustomEvent('themechange')); };
-  if (vt) { vt.skipTransition(); vt = null; apply(); return; }   // натиснули під час переходу — без анімації, одразу
-  if (!btn || REDUCED || !document.startViewTransition) return apply();
+  // під час зміни теми CSS-переходи кольорів вимкнено: інакше текст і фони «доганяють» нову тему вже після кола — мигтіння
+  const settle = () => requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+  const apply = () => { root.classList.add('theme-switching'); root.dataset.theme = next; store.set('ki-theme', next); reflectTheme(); document.dispatchEvent(new CustomEvent('themechange')); };
+  if (vt) { vt.skipTransition(); vt = null; apply(); settle(); return; }   // натиснули під час переходу — без анімації, одразу
+  if (!btn || REDUCED || !document.startViewTransition) { apply(); settle(); return; }
   const b = btn.getBoundingClientRect(), x = b.left + b.width / 2, y = b.top + b.height / 2;
   root.style.setProperty('--vt-x', x + 'px'); root.style.setProperty('--vt-y', y + 'px');
   root.style.setProperty('--vt-r', Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 2 + 'px');
   const t = document.startViewTransition(apply); vt = t;
   t.ready.catch(() => {});
-  t.finished.finally(() => { if (vt === t) vt = null; });
+  t.finished.finally(() => { if (vt === t) vt = null; settle(); });
 }
 $$('.theme-toggle').forEach(b => b.addEventListener('click', () => setTheme(b)));
 addEventListener('keydown', e => {
@@ -64,6 +66,31 @@ if (nav) {
 const hd = $('.hd');
 const onScroll = () => hd?.classList.toggle('is-scrolled', scrollY > 8);
 addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+/* ── Промінь у шапці: швидкість прокручування — амплітуда, позиція — фаза ── */
+const trace = $('.hd__trace');
+if (trace) {
+  const bg = $('.hd__trace-bg', trace);
+  let amp = 0, raf = 0, lastY = scrollY, lastT = performance.now();
+  const draw = () => {
+    const ph = scrollY / 90;
+    let d = 'M0 7';
+    for (let x = 0; x <= 1000; x += 5) {
+      const env = Math.sin(Math.PI * x / 1000);                                 // до країв промінь затухає
+      d += ` L${x} ${(7 - amp * env * Math.sin(x / 1000 * Math.PI * 18 - ph) * (.7 + .3 * Math.sin(x / 1000 * Math.PI * 3 + ph * .3))).toFixed(2)}`;
+    }
+    bg.setAttribute('d', d);
+  };
+  const tick = now => {
+    const dt = Math.max(1, now - lastT), v = Math.abs(scrollY - lastY) / dt; lastY = scrollY; lastT = now;
+    amp += (Math.min(6, v * 4) - amp) * .18;                                    // м'яко за швидкістю, без ривків
+    draw();
+    raf = amp > .02 ? requestAnimationFrame(tick) : 0;
+    if (!raf) { amp = 0; draw(); }
+  };
+  addEventListener('scroll', () => { if (REDUCED) { draw(); return; } if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(tick); } }, { passive: true });
+  addEventListener('resize', draw); draw();
+}
 
 /* ── Меню на телефоні й планшеті ─────────────────────────────── */
 const menu = $('#menu'), menuBtn = $('.menu-btn');
@@ -112,12 +139,13 @@ if (sd) {
   }
   async function run() {
     const q = input.value.trim(), my = ++seq;
-    if (q.length < 2) { list.innerHTML = ''; empty.textContent = T.hint; empty.hidden = false; return; }
+    if (q.length < 2) { list.innerHTML = ''; input.setAttribute('aria-expanded', 'false'); empty.textContent = T.hint; empty.hidden = false; return; }
     const p = await load();
     if (!p) { empty.textContent = T.off; empty.hidden = false; return; }
     const r = await p.debouncedSearch(q, {}, 160); if (!r || my !== seq) return;
     const data = await Promise.all(r.results.slice(0, 10).map(x => x.data()));
     if (my !== seq) return;
+    input.setAttribute('aria-expanded', String(data.length > 0));
     list.innerHTML = data.map((d, i) => `<li role="presentation"><a id="sr-${i}" role="option" href="${d.url}"><b>${d.meta?.title ?? d.url}</b><span>${d.excerpt}</span></a></li>`).join('');
     empty.textContent = T.none; empty.hidden = data.length > 0; idx = 0; mark();
   }
@@ -170,7 +198,8 @@ if (lb) {
   const img = $('img', lb), cap = $('[data-lb-cap]', lb);
   const shots = $$('.prose img').filter(i => !i.closest('.mascot'));
   let i = 0;
-  const full = im => { const a = im.closest('a'); return a && /\.(jpe?g|png|webp|avif)$/i.test(a.getAttribute('href')) ? a.href : im.currentSrc || im.src; };
+  // у перегляді — вже стиснене зображення сторінки, а не 5000-піксельний оригінал (оригінал лишається за посиланням)
+  const full = im => im.currentSrc || im.src;
   const show = (k, from) => {
     i = (k + shots.length) % shots.length; const s = shots[i];
     img.src = full(s); img.alt = s.alt;
@@ -181,7 +210,7 @@ if (lb) {
   };
   shots.forEach((s, k) => {
     s.style.cursor = 'zoom-in';
-    (s.closest('a') || s).addEventListener('click', e => { e.preventDefault(); lb.showModal(); root.classList.add('menu-open'); show(k, s); });
+    (s.closest('a') || s).addEventListener('click', e => { e.preventDefault(); lb.showModal(); root.classList.add('menu-open'); show(k, s); $(shots.length > 1 ? '[data-lb-next]' : '[data-lb-close]', lb).focus(); });
   });
   lb.addEventListener('close', () => root.classList.remove('menu-open'));
   $('[data-lb-prev]', lb).addEventListener('click', () => show(i - 1));
@@ -206,6 +235,8 @@ if (az) {
 $$('canvas[data-rex]').forEach(paintStatic);
 $$('.perch').forEach(perch);
 mountInstruments();
+// підказка «рухайте курсором» — лише там, де є курсор
+if (!FINE.matches) $$('.inst__hud span').forEach(s => { if (/MOVE CURSOR/.test(s.textContent)) s.textContent = ''; });
 
 /* ── На телефоні прилад з КІ-Рексом — після змісту сторінки, а не перед ним ── */
 const dock = $('[data-inst-dock]'), dockable = $('[data-dockable]');

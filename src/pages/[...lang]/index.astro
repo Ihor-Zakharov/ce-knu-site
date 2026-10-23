@@ -1,11 +1,10 @@
 ---
-import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { render } from 'astro:content';
-import { T, url, langOf, langParams, fmtDate, isoDate } from '../../lib/i18n';
-import { news, page, slugOf } from '../../lib/content';
+import { T, url, langOf, langParams } from '../../lib/i18n';
+import { page } from '../../lib/content';
 import { HISTORY, PARTNERS } from '../../lib/home';
-import NewsArt from '../../components/NewsArt.astro';
+import AlumniRibbon from '../../components/AlumniRibbon.astro';
 import Mascot from '../../components/Mascot.astro';
 
 export const getStaticPaths = langParams;
@@ -13,8 +12,6 @@ const lang = langOf(Astro.params.lang);
 const t = T[lang];
 const home = (await page(lang, 'index'))!;
 const { Content } = await render(home);
-const list = await news(lang);
-const [lead, ...rest] = list;
 const uk = lang === 'uk';
 const scopeKeys = [
   { mode: 'sine', label: 'SIN', on: true },
@@ -29,7 +26,7 @@ const scopeKeys = [
       <div class="ph__text">
         <p class="ph__eyebrow"><b>{uk ? 'КНУ' : 'KNU'}</b><span class="long">{uk ? 'Факультет радіофізики, електроніки та комп’ютерних систем' : 'Faculty of Radiophysics, Electronics and Computer Systems'}</span><span>{uk ? '· ФРЕКС' : '· FRECS'}</span></p>
         <h1>{(uk ? ['Кафедра', 'комп’ютерної', 'інженерії'] : ['Department', 'of Computer', 'Engineering']).map((w, i) => <><span class="w"><span style={`--i:${i}`}>{i === 1 ? <em>{w}</em> : w}</span></span> </>)}</h1>
-        <p class="lead">{uk ? 'Апаратні платформи й системне програмне забезпечення комп’ютерних систем і мереж — від мікропроцесора до суперкомп’ютера.' : 'Hardware platforms and system software of computer systems and networks — from the microprocessor to the supercomputer.'}</p>
+        <p class="lead">{uk ? 'Поєднання електроніки та комп’ютерних наук.' : 'Combining electronics and computer science.'}</p>
         <div class="cta">
           <a class="btn" href={url(lang, '/entrant/')}>{uk ? 'Вступникам' : 'Admission'} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn btn--line" href={url(lang, '/news/')}>{t.news}</a>
@@ -59,61 +56,18 @@ const scopeKeys = [
     </div>
     <div class="wrap">
       <div class="figures-wrap mt-l" data-rex-scope>
-      <div class="perch perch--line" data-acc="" data-start="460" data-lines={JSON.stringify(uk ? ['Привіт! Я КІ-Рекс', 'Гуляю по шині даних', '100 місць — поспішай!', 'Клацни ще раз!'] : ['Hi! I’m KI-Rex', 'Walking along the data bus', '100 places — hurry up!', 'Click me again!'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
+      <div class="perch perch--line" data-acc="" data-start="460" data-lines={JSON.stringify(uk ? ['КІ-Рекс на зв’язку', 'Гуляю по шині даних', 'Ловлю хвилю'] : ['KI-Rex on the line', 'Walking along the data bus', 'Catching a wave'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
       <div class="figures rv">
-        <div data-rex-say={uk ? '100 місць — встигни!' : '100 places — hurry!'}><b>100</b><span>{uk ? 'місць на 1-й курс бакалаврату' : 'first-year Bachelor’s places'}</span></div>
-        <div data-rex-say={uk ? 'Магістратура: 2 роки' : 'Master’s: 2 years'}><b>50</b><span>{uk ? 'місць у магістратурі' : 'Master’s places'}</span></div>
-        <div data-rex-say={uk ? 'PhD — для найдопитливіших' : 'PhD — for the most curious'}><b>10</b><span>{uk ? 'місць в аспірантурі (PhD)' : 'PhD places'}</span></div>
-        <div data-rex-say={uk ? 'Я тоді ще був яйцем' : 'I was still an egg back then'}><b>1991</b><span>{uk ? 'рік заснування спеціалізації' : 'specialisation founded'}</span></div>
+        <div data-rex-say={uk ? 'Перший курс, перший біт' : 'First year, first bit'}><b>100</b><span>{uk ? 'ліміт набору: бакалаврат' : 'Bachelor’s intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Ще два роки відкриттів' : 'Two more years of discovery'}><b>50</b><span>{uk ? 'ліміт набору: магістратура' : 'Master’s intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Гіпотеза кличе' : 'A hypothesis is calling'}><b>10</b><span>{uk ? 'ліміт набору: аспірантура' : 'PhD intake limit'}</span></div>
+        <div data-rex-say={uk ? 'Початок відліку' : 'The starting point'}><b>1991</b><span>{uk ? 'рік створення спеціалізації' : 'specialisation established'}</span></div>
       </div>
       </div>
     </div>
   </section>
-
-  {lead && (
-    <section class="section">
-      <div class="wrap">
-        <div class="sec-head rv">
-          <div><p class="eyebrow">CH 01 · {t.news}</p><h2 class="mt-s">{uk ? 'Що нового на кафедрі' : 'What’s new at the department'}</h2></div>
-          <a class="arrow-link" href={url(lang, '/news/')}>{t.allNews} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        </div>
-        <a class="feat rv" href={url(lang, `/posts/${slugOf(lead.id)}/`)}>
-          <figure class="plate rv"><div class="plate__f" style="--ar:16/10">{lead.data.cover && <Picture src={lead.data.cover} formats={['avif', 'webp']} alt={lead.data.coverAlt ?? ''} widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 56vw" quality={70} />}</div></figure>
-          <div>
-            <time datetime={isoDate(lead.data.date)}>{fmtDate(lead.data.date, lang)}</time>
-            <h3>{lead.data.title}</h3>
-            <p>{lead.data.summary}</p>
-            <span class="arrow-link mt-m">{t.readMore} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></span>
-          </div>
-        </a>
-        <div class="cards mt-l">
-          {rest.slice(0, 3).map((n, i) => (
-            <a class="card rv" style={`--i:${i}`} href={url(lang, `/posts/${slugOf(n.id)}/`)}>
-              <figure class="plate"><div class="plate__f">{n.data.cover ? <Image src={n.data.cover} alt="" widths={[360, 640]} sizes="(max-width: 640px) 100vw, 33vw" /> : <NewsArt slug={slugOf(n.id)} date={n.data.date} label="KI · NEWS" />}</div></figure>
-              <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
-              <h3>{n.data.title}</h3>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
 
   <div class="wrap inst-dock inst-dock--home" data-inst-dock hidden></div>
-
-  <section class="section" aria-labelledby="h-history">
-    <div class="wrap history">
-      <div class="rv">
-        <p class="eyebrow">{uk ? 'Хронологія' : 'Timeline'}</p>
-        <h2 class="mt-s sec-h2" id="h-history">{uk ? 'Від радіоелектроніки до комп’ютерної інженерії' : 'From radioelectronics to computer engineering'}</h2>
-        <p class="lead mt-m">{uk ? 'Понад тридцять років кафедра поєднує фізику, електроніку й програмування.' : 'For more than thirty years the department has combined physics, electronics and programming.'}</p>
-        <div class="mt-l"><p class="cap"><b>{uk ? 'Академії й партнери' : 'Academies and partners'}</b></p><div class="logos mt-m">{PARTNERS.map(p => <span>{p}</span>)}</div></div>
-      </div>
-      <ol class="timeline rv" style="--prog:100%">
-        {HISTORY[lang].map(h => <li class="done"><time>{h.y}</time><b>{h.t}</b>{h.d && <span>{h.d}</span>}</li>)}
-      </ol>
-    </div>
-  </section>
 
   <section class="section" aria-labelledby="h-about">
     <div class="wrap">
@@ -125,14 +79,30 @@ const scopeKeys = [
     </div>
   </section>
 
+  <AlumniRibbon lang={lang} />
+
+  <section class="section" aria-labelledby="h-history">
+    <div class="wrap history">
+      <div class="rv">
+        <p class="eyebrow">{uk ? 'Хронологія' : 'Timeline'}</p>
+        <h2 class="mt-s sec-h2" id="h-history">{uk ? 'Історія кафедри' : 'Department history'}</h2>
+        <p class="lead mt-m">{uk ? 'У 1991 році створено спеціалізацію «Автоматизація наукових досліджень».' : 'The Automation of Scientific Research specialisation was established in 1991.'}</p>
+        <div class="mt-l"><p class="cap"><b>{uk ? 'Академії й партнери' : 'Academies and partners'}</b></p><div class="logos mt-m">{PARTNERS.map(p => <span>{p}</span>)}</div></div>
+      </div>
+      <ol class="timeline rv" style="--prog:100%">
+        {HISTORY[lang].map(h => <li class="done"><time>{h.y}</time><b>{h.t}</b>{h.d && <span>{h.d}</span>}</li>)}
+      </ol>
+    </div>
+  </section>
+
   <section class="section section--tight">
     <div class="wrap">
       <div class="band rv">
         <div>
           <p class="eyebrow">F7 · {uk ? 'Комп’ютерна інженерія' : 'Computer Engineering'}</p>
-          <h3>{uk ? 'Вступайте на кафедру, де фізика стає кодом' : 'Join the department where physics becomes code'}</h3>
+          <h3>{uk ? 'Вивчайте комп’ютерну інженерію' : 'Study Computer Engineering'}</h3>
         </div>
-        <a class="btn" href={url(lang, '/entrant/')}>{uk ? 'Як вступити' : 'How to apply'} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn" href={url(lang, '/entrant/')}>{uk ? 'Про вступ' : 'Admissions'} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
     </div>
   </section>

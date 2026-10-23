@@ -12,7 +12,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // чинний сайт: аргумент, або current-site/ce у корені репозиторію команди, або локальна копія поруч
-const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '../refs/ce-knu-site-practice/current-site/ce'].filter(Boolean);
+// ../refs/merged/ce — копія з репозиторію керівника + новіші матеріали з живого ce.knu.ua (scripts/fetch-live.py)
+const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '../refs/merged/ce', '../refs/ce-knu-site-practice/current-site/ce'].filter(Boolean);
 const OLD = resolve(ROOT, CANDIDATES.find(c => existsSync(resolve(ROOT, c, 'conf.py'))) ?? CANDIDATES[0]);
 const DIST = join(ROOT, 'dist');
 const CONTENT = join(ROOT, 'src/content');
@@ -34,6 +35,8 @@ if (hasOld) {
   const urls = [];
   for (const f of readdirSync(join(OLD, 'posts')).filter(f => f.endsWith('.rst'))) urls.push(`posts/${meta(join(OLD, 'posts', f)).slug}`);
   for (const f of readdirSync(join(OLD, 'pages')).filter(f => f.endsWith('.rst'))) { const s = meta(join(OLD, 'pages', f)).slug; urls.push(s === 'index' ? '' : s); }
+  for (const d of readdirSync(join(OLD, 'pages'), { withFileTypes: true }).filter(d => d.isDirectory() && d.name !== 'personas'))
+    for (const f of readdirSync(join(OLD, 'pages', d.name)).filter(f => f.endsWith('.rst'))) urls.push(`${d.name}/${meta(join(OLD, 'pages', d.name, f)).slug}`);
   for (const f of readdirSync(join(OLD, 'pages/personas')).filter(f => f.endsWith('.rst'))) urls.push(`personas/${meta(join(OLD, 'pages/personas', f)).slug}`);
   urls.push('news');
   for (const u of urls) for (const lang of ['uk', 'en']) {
@@ -68,13 +71,13 @@ if (hasOld) {
 const cyr = s => (s.match(/[а-яіїєґ]/gi) || []).length / Math.max(1, (s.match(/\p{L}/gu) || []).length);
 for (const coll of ['news', 'pages', 'people']) {
   const ukDir = join(CONTENT, coll, 'uk');
-  for (const f of readdirSync(ukDir)) {
+  for (const f of walk(ukDir).filter(f => f.endsWith('.md')).map(f => relative(ukDir, f))) {
     const en = join(CONTENT, coll, 'en', f);
     if (!existsSync(en)) { fail('переклад', `${coll}/en/${f} — немає`); continue; }
     const body = readFileSync(en, 'utf8').replace(/\]\([^)]*\)/g, '');
     if (cyr(body) > 0.15) fail('переклад', `${coll}/en/${f} — переважно кирилиця (${Math.round(cyr(body) * 100)} %)`); else ok.translations++;
   }
-  for (const f of readdirSync(join(CONTENT, coll, 'en'))) if (!existsSync(join(ukDir, f))) fail('переклад', `${coll}/en/${f} — немає українського оригіналу`);
+  for (const f of walk(join(CONTENT, coll, 'en')).filter(f => f.endsWith('.md')).map(f => relative(join(CONTENT, coll, 'en'), f))) if (!existsSync(join(ukDir, f))) fail('переклад', `${coll}/en/${f} — немає українського оригіналу`);
 }
 
 // ── 5. внутрішні посилання зібраного сайту ──

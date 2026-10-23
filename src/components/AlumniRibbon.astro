@@ -1,0 +1,26 @@
+---
+// Стрічка компаній, де працюють випускники; кожна веде до історії випускника. Зупиняється під курсором.
+import { ALUMNI } from '../lib/home';
+import { url, type Lang } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const items = ALUMNI[lang];
+const loop = Array.from({ length: 4 }, () => items).flat();     // достатньо копій, щоб стрічка йшла без розриву
+---
+<section class="ribbon" aria-labelledby="h-alumni">
+  <div class="wrap ribbon__head">
+    <p class="eyebrow" id="h-alumni">{lang === 'uk' ? 'Де працюють наші випускники' : 'Where our alumni work'}</p>
+    <a class="arrow-link" href={url(lang, '/graduates/')}>{lang === 'uk' ? 'Історії випускників' : 'Alumni stories'} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+  </div>
+  <div class="ribbon__vp">
+    <ul class="ribbon__track">
+      {[0, 1].map(copy => loop.map(a => (
+        <li aria-hidden={copy ? 'true' : undefined}>
+          <a href={url(lang, '/graduates/') + '#' + a.anchor} tabindex={copy ? -1 : undefined}>
+            <b>{a.company}</b><span>{a.who} · {a.role}</span>
+          </a>
+        </li>
+      )))}
+    </ul>
+  </div>
+</section>

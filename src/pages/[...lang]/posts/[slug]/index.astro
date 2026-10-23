@@ -4,7 +4,8 @@ import { articleLd } from '../../../../lib/seo';
 import Base from '../../../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
 import { T, url, langOf, fmtDate, isoDate, type Lang } from '../../../../lib/i18n';
-import { news, slugOf } from '../../../../lib/content';
+import { news, slugOf, photo } from '../../../../lib/content';
+import NewsArt from '../../../../components/NewsArt.astro';
 
 export async function getStaticPaths() {
   const all = await getCollection('news', e => !e.data.draft);
@@ -21,10 +22,14 @@ const list = await news(lang);
 const i = list.findIndex(n => n.id === entry.id);
 const newer = list[i - 1], older = list[i + 1];
 const words = entry.data.title.split(/\s+/);
-const ogCover = entry.data.cover && (await getImage({ src: entry.data.cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 })).src;
+const cover = photo(entry);
+// обкладинка, що є й на початку тексту (так було на чинному сайті), — не дублюємо: показуємо лише в тексті
+const coverFile = entry.data.cover ? (entry.data.cover.src.split('/').pop() ?? '').split('.')[0] : '';
+const inBody = !!coverFile && (entry.body ?? '').includes(coverFile + '.');
+const ogCover = cover && (await getImage({ src: cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 })).src;
 const ld = articleLd({ lang, title: entry.data.title, description: entry.data.summary, path: `/posts/${Astro.params.slug}/`, date: entry.data.date, image: ogCover, site: Astro.site! });
 ---
-<Base lang={lang} title={entry.data.title} description={entry.data.summary} type="article" image={entry.data.cover} og="news" published={entry.data.date} crumbs={[{ name: t.news, path: '/news/' }]} jsonld={[ld]}>
+<Base lang={lang} title={entry.data.title} description={entry.data.summary} type="article" image={cover} og="news" published={entry.data.date} crumbs={[{ name: t.news, path: '/news/' }]} jsonld={[ld]}>
   <article>
     <header class="ph post-hd">
       <div class="wrap">
@@ -33,9 +38,11 @@ const ld = articleLd({ lang, title: entry.data.title, description: entry.data.su
         </nav>
         <p class="ph__eyebrow mt-m"><b>CH 01</b><time datetime={isoDate(entry.data.date)}>{fmtDate(entry.data.date, lang)}</time></p>
         <h1 class="post-title">{words.map((w, k) => <><span class="w"><span style={`--i:${Math.min(k, 12)}`}>{w}</span></span>{' '}</>)}</h1>
-        {entry.data.cover && (
+        {inBody ? null : cover ? (
           <figure class="plate post-cover rv">
-            <div class="plate__f"><Picture src={entry.data.cover} formats={['avif', 'webp']} alt={entry.data.coverAlt ?? ''} widths={[480, 800, 1200, 1600]} sizes="(max-width: 1320px) 100vw, 1320px" quality={68} loading="eager" fetchpriority="high" /></div></figure>
+            <div class="plate__f"><Picture src={cover} formats={['avif', 'webp']} alt={entry.data.coverAlt ?? ''} widths={[480, 800, 1200, 1600]} sizes="(max-width: 1320px) 100vw, 1320px" quality={68} loading="eager" fetchpriority="high" /></div></figure>
+        ) : (
+          <figure class="plate post-cover post-cover--art rv" aria-hidden="true"><div class="plate__f"><NewsArt slug={Astro.params.slug!} /></div></figure>
         )}
       </div>
     </header>

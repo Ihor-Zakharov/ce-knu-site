@@ -27,17 +27,21 @@ const ACC = {
   laptop: { x: 14, y: 10, px: ['.KKKKKK', '.KKyKKK', '.KKKKKK', 'ssssssss'] },
   pointer: { x: 15, y: 4, px: ['......y', '.....y.', '....y..', '...y...', '..y....', '.y.....', 'K......'] },
   headset: { x: 9, y: -1, px: ['..kkkkkk..', '.k......k.', 'k........k', 'K........K', 'K.........'] },
+  // листоноша: кашкет з козирком і кокардою, сумка через плече з листом, конверт у лапі
+  postcap: { x: 9, y: -3, px: ['...nnnnnn...', '..nnnnynnnn.', '.nnnnnnnnnnkk'] },
+  bag: { x: 3, y: 8, px: ['.........y', '........y.', '.......y..', 'WWWWWWy...', 'Wwwwww....', 'WwyywW....', 'WWWWWW....'] },
+  letter: { x: 16, y: 9, px: ['ooooo', 'onoon', 'ooWoo', 'ooooo'] },   // конверт: клапан «V» і сургучна печатка
 };
 
 const OX = 3, OY = 5, GW = 30, GH = 24;   // поле з запасом під аксесуари
 export function rexFrame({ legs = 0, blink = false, acc = null, flip = false } = {}) {
+  const accs = (Array.isArray(acc) ? acc : String(acc || '').split('+')).map(a => ACC[a]).filter(Boolean);
   const grid = Array.from({ length: GH }, () => Array(GW).fill(null));
   const put = (x, y, ch) => { const gx = flip ? GW - 1 - (x + OX) : x + OX, gy = y + OY; if (PAL[ch] && gy >= 0 && gy < GH && gx >= 0 && gx < GW) grid[gy][gx] = PAL[ch]; };
-  const a = acc && ACC[acc];
   const layer = l => l.px.forEach((row, yy) => [...row].forEach((ch, xx) => put(l.x + xx, l.y + yy, ch)));
-  if (a?.back) layer(a);
+  accs.filter(a => a.back).forEach(layer);
   [...REX, ...LEGS[legs]].forEach((row, y) => [...(blink && BLINK[y] ? BLINK[y] : row)].forEach((ch, x) => put(x, y, ch)));
-  if (a && !a.back) layer(a);
+  accs.filter(a => !a.back).forEach(layer);
   return grid;
 }
 export function drawGrid(c, grid, px, ox = 0, oy = 0) {
@@ -74,6 +78,7 @@ export function perch(box) {
   let x = clamp(+(box.dataset.start || 24)), target = x, dir = 1, walk = 0, jump = 0, vy = 0, speed = 30;
   let blinkT = 2 + Math.random() * 2, blinking = 0, pause = 1.2, curious = 0, raf = 0, last = 0, li = 0, sayT = 0, seen = false;
   let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
+  const stick = box.closest('.page__inst');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
 
   function speak(text, sec = 2.8) { say.textContent = text; say.classList.add('on'); sayT = sec; render(); }
@@ -88,6 +93,7 @@ export function perch(box) {
     const px = Math.round(x);                                  // ціла позиція — піксель-арт без розмиття
     cv.style.transform = `translate(${px}px, ${Math.round(jump)}px)`;
     cv.style.zIndex = jump < 0 ? '70' : '';                   // у стрибку — над шапкою; на місці — під нею
+    if (stick) stick.style.zIndex = jump < 0 ? '61' : '';     // липка колонка має власний шар — піднімаємо й її
     zz.style.left = px + (dir > 0 ? 62 : 6) + 'px';
     if (say.classList.contains('on')) {
       say.style.left = Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
@@ -109,7 +115,7 @@ export function perch(box) {
     bits++; store.set('ki-bits', bits);
     const n = bits % 8;
     if (!REDUCED) { vy = -170; jump = -.01; }
-    speak(n === 0 ? (uk ? `+1 байт! Разом ${bits / 8}` : `+1 byte! ${bits / 8} total`) : (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`), 2.2);
+    speak(n === 0 ? (uk ? `+1 байт · разом ${bits / 8}` : `+1 byte · total ${bits / 8}`) : (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`), 2.2);
   }
   function step(dt) {
     idle += dt;
@@ -142,7 +148,7 @@ export function perch(box) {
   cv.addEventListener('click', () => {
     const was = asleep; wake();
     if (!REDUCED && jump === 0) { vy = -480; jump = -.01; }   // ≈105 px угору — у стрибку перекриває шапку
-    if (was) speak(uk ? 'А? Я не спав!' : 'Huh? I wasn’t asleep!');
+    if (was) speak(uk ? 'Виходжу з режиму сну' : 'Leaving sleep mode');
     else if (lines.length) speak(lines[li++ % lines.length]);
     render();
   });
@@ -162,7 +168,7 @@ export function perch(box) {
   }));
   document.addEventListener('themechange', () => {
     const dark = document.documentElement.dataset.theme === 'dark';
-    if (seen) { wake(); speak(dark ? (uk ? 'Нічний режим: час кодити' : 'Night mode: time to code') : (uk ? 'Доброго ранку!' : 'Good morning!'), 2.2); }
+    if (seen) { wake(); speak(dark ? (uk ? 'Темна тема, ясна думка' : 'Dark theme, clear thinking') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }
   });
   new ResizeObserver(() => { x = clamp(x); target = clamp(target); render(); }).observe(box);
   render();

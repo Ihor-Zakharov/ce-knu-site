@@ -17,25 +17,39 @@ export const PROGRAMS: Record<Lang, { level: string; title: string; years: strin
 
 export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
   uk: [
-    { y: '1991', t: 'Автоматизація наукових досліджень', d: 'Спеціалізація на кафедрі радіоелектроніки — уперше в Україні комп’ютерні й мережеві технології для фізичного експерименту.' },
-    { y: '1996', t: 'Кафедра напівпровідникової електроніки', d: 'Об’єднання з кафедрою фізики напівпровідників; завідувач — професор О. В. Третяк.' },
-    { y: '2006', t: 'Завідувач — доцент Ю. В. Бойко', d: '' },
-    { y: '2009', t: 'Напрям «Комп’ютерна інженерія»', d: 'На базі спеціалізації почалася підготовка комп’ютерних інженерів.' },
-    { y: '2010', t: 'Кафедра комп’ютерної інженерії', d: 'Кафедра отримала сучасну назву.' },
-    { y: '2012', t: 'Завідувач — професор С. Д. Погорілий', d: 'Доктор технічних наук.' },
-    { y: '2017', t: 'Меморандум з IBM Ukraine', d: 'Кафедра отримала сервер IBM Power 550 з платформою AIX.' },
-    { y: '2021', t: 'Завідувач — доцент Ю. В. Бойко', d: '' },
+    { y: '1991', t: 'Автоматизація наукових досліджень', d: '' },
+    { y: '1996', t: 'Об’єднання кафедр', d: '' },
+    { y: '2006', t: 'Завідувач — Ю. В. Бойко', d: '' },
+    { y: '2009', t: 'Напрям «Комп’ютерна інженерія»', d: '' },
+    { y: '2010', t: 'Кафедра комп’ютерної інженерії', d: '' },
+    { y: '2012', t: 'Завідувач — С. Д. Погорілий', d: '' },
+    { y: '2017', t: 'Меморандум з IBM Ukraine', d: '' },
+    { y: '2021', t: 'Завідувач — Ю. В. Бойко', d: '' }
   ],
   en: [
-    { y: '1991', t: 'Automation of Scientific Research', d: 'A specialisation at the Department of Radioelectronics — the first in Ukraine to bring computer and network technologies to physical experiments.' },
-    { y: '1996', t: 'Department of Semiconductor Electronics', d: 'Merged with the Department of Semiconductor Physics; headed by Professor O. V. Tretiak.' },
-    { y: '2006', t: 'Head — Associate Professor Yu. V. Boiko', d: '' },
-    { y: '2009', t: 'Computer Engineering programme', d: 'Training of computer engineers began on the basis of the specialisation.' },
-    { y: '2010', t: 'Department of Computer Engineering', d: 'The department received its current name.' },
-    { y: '2012', t: 'Head — Professor S. D. Pohorilyi', d: 'D.Sc. in Engineering.' },
-    { y: '2017', t: 'Memorandum with IBM Ukraine', d: 'The department received an IBM Power 550 server with the AIX platform.' },
-    { y: '2021', t: 'Head — Associate Professor Yu. V. Boiko', d: '' },
+    { y: '1991', t: 'Automation of Scientific Research', d: '' },
+    { y: '1996', t: 'Departments merged', d: '' },
+    { y: '2006', t: 'Head — Yu. V. Boiko', d: '' },
+    { y: '2009', t: 'Computer Engineering programme', d: '' },
+    { y: '2010', t: 'Department of Computer Engineering', d: '' },
+    { y: '2012', t: 'Head — S. D. Pohorilyi', d: '' },
+    { y: '2017', t: 'Memorandum with IBM Ukraine', d: '' },
+    { y: '2021', t: 'Head — Yu. V. Boiko', d: '' }
   ],
 };
 
 export const PARTNERS = ['Huawei ICT Academy', 'Cisco Networking Academy', 'Microsoft', 'IBM Ukraine', 'Fortinet Academy', 'Intel', 'MIPS Technologies'];
+
+// Компанії випускників — лише ті, що названо на сторінці «Наші випускники» (src/content/pages/*/graduates.md)
+export const ALUMNI: Record<Lang, { company: string; who: string; role: string; anchor: string }[]> = {
+  uk: [
+    { company: 'Intel', who: 'Дмитро Калита', role: 'директор представництва в Україні', anchor: 'дмитро-калита' },
+    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'інженер-дослідник NLP, Тель-Авів', anchor: 'крамов-артем-андрійович' },
+    { company: 'Lyft', who: 'Максим Слинько', role: 'менеджер програмних проєктів', anchor: 'максим-слинько' },
+  ],
+  en: [
+    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of the office in Ukraine', anchor: 'dmytro-kalyta' },
+    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, Tel Aviv', anchor: 'artem-andriiovych-kramov' },
+    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager', anchor: 'maksym-slynko' },
+  ],
+};

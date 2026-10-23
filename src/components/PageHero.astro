@@ -1,14 +1,15 @@
 ---
-// Герой розділу: назва, що піднімається по словах, підзаголовок і прилад з КІ-Рексом на краї
+// Герой розділу — компактний: ланцюжок, назва, що піднімається по словах, один рядок підзаголовка.
+// Прилад з КІ-Рексом — окремо (Instrument.astro), у правій колонці поруч зі змістом.
 import { HEROES } from '../lib/heroes';
 import { T, url, type Lang } from '../lib/i18n';
+import Instrument from './Instrument.astro';
 interface Props { lang: Lang; title: string; kind: string; crumbs?: { href: string; label: string }[]; meta?: string[]; text?: string; data?: Record<string, string> }
 const { lang, title, kind, crumbs = [], meta = [], text = '', data = {} } = Astro.props;
-const dataAttrs = Object.fromEntries(Object.entries(data).map(([k, v]) => [`data-${k}`, v]));
 const h = HEROES[kind];
 const words = title.split(/\s+/);
 ---
-<section class="ph">
+<section class="ph ph--compact">
   <div class="wrap ph__grid">
     <div class="ph__text">
       <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
@@ -23,19 +24,6 @@ const words = title.split(/\s+/);
       <p class="lead">{h.lead[lang]}</p>
       {meta.length > 0 && <p class="ph__meta">{meta.map(m => <span class="cap" set:html={m} />)}</p>}
     </div>
-    <div class="inst-wrap" data-dockable aria-hidden="true">
-    <div class="perch" data-acc={h.acc} data-lines={JSON.stringify(h.lines[lang])}>
-      <span class="perch__say"></span>
-      <canvas width="90" height="72"></canvas>
-    </div>
-    <figure class="inst" data-inst={h.inst} data-text={text} {...dataAttrs}>
-      <div class="inst__screen">
-        <canvas data-draw></canvas>
-        <div class="inst__hud inst__hud--top"><span set:html={h.hud.top[0]} /><span set:html={h.hud.top[1]} /></div>
-        <div class="inst__hud inst__hud--bot"><span set:html={h.hud.bot[0]} /><span set:html={h.hud.bot[1]} /></div>
-      </div>
-      <div class="inst__bar"><i class="inst__led"></i><span>KI-REX · {h.ch}</span><span class="sp"></span><span>{lang === 'uk' ? 'клацніть Рекса' : 'click Rex'}</span></div>
-    </figure>
-    </div>
+    <Instrument lang={lang} kind={kind} text={text} data={data} />
   </div>
 </section>

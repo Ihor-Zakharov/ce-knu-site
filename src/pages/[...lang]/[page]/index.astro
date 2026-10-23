@@ -7,11 +7,12 @@ import { getCollection, render } from 'astro:content';
 import { langOf, type Lang } from '../../../lib/i18n';
 import { slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
+import AlumniRibbon from '../../../components/AlumniRibbon.astro';
 
 export async function getStaticPaths() {
   const SKIP = ['index', 'personas'];          // мають власні шаблони
   const all = await getCollection('pages');
-  return all.filter(p => !SKIP.includes(slugOf(p.id))).map(p => {
+  return all.filter(p => !SKIP.includes(slugOf(p.id)) && !slugOf(p.id).includes('/')).map(p => {
     const lang = p.id.split('/')[0] as Lang;
     return { params: { lang: lang === 'en' ? 'en' : undefined, page: slugOf(p.id) }, props: { entry: p } };
   });
@@ -36,4 +37,5 @@ const docText = entry.data.title + ' · ' + toc.map(h => h.text).join(' · ');
       <aside class="page__aside"><Mascot src={entry.data.mascot} alt={entry.data.mascotAlt} /></aside>
     </div>
   </section>
+  {Astro.params.page === 'graduates' && <AlumniRibbon lang={lang} />}
 </Base>

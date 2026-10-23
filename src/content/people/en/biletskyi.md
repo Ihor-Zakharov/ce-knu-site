@@ -15,6 +15,8 @@ source: "pages/personas/biletskyi.rst"
 
 email: <pavlo.biletskyi@knu.ua>
 
+ORCID: [0000-0001-5425-3706](https://orcid.org/0000-0001-5425-3706) \| Scopus Author ID: [58681437000](https://www.scopus.com/authid/detail.uri?authorId=58681437000)
+
 ## General information
 
 Research areas:
@@ -42,3 +44,34 @@ Most important scientific works:
 6.  Pogorilyy S., Slynko M., Biletskyi P. The verification of decision tree model for coreference resolution using marked transition systems, Petri nets and Buchi automata // UkrPROG 2024, CEUR Workshop Proceedings. – 2024. – Vol. 3806. – P. 361–371. (Scopus)
 7.  Pogorilyy S., Biletskyi P. Analysis of Decision Trees for Coreference Resolution Task in Ukrainian Language // IT&I-WS 2023, CEUR Workshop Proceedings. – 2024. – Vol. 3646. – P. 255–262. (Scopus)
 8.  Pogorilyy S., Biletskyi P. Coreference resolution algorithm for Ukrainian-language texts using decision trees // UkrPROG 2022, CEUR Workshop Proceedings. – 2023. – Vol. 3501. – P. 81–90. (Scopus)
+
+## Research supervision
+
+He leads a research group working on long-term memory and the evaluation of large language models. Co-investigator in this area: Leonid Chepel, Doctor of Philosophy (PhD).
+
+Supervision of bachelor's qualification theses:
+
+**2026**
+
+- Antoniuk I. V. "An intelligent assistant for a word processor based on cloud and local large language models" — [project repository](https://github.com/IrinaAntonuk/word-get-started-with-dev-kit)
+- Kulik A. K. "Development of a software system that processes non-deterministic elements using LLM agents for automated analysis and evaluation of NPL portfolios"
+- Mikhnenko V. M. "Development of a video stream relay system with monitoring and diagnostic tools"
+- Palchuk A. M. "Development of a comprehensive benchmark for evaluating the quality of large language models' performance in the Ukrainian language"
+- Solovei O. S. "Development of an intelligent assistant for spreadsheet processors based on open large language models" — [project repository](https://github.com/soloveyOlexandr/Solovei-Diplom)
+- Tyshchenko Ye. V. "Development of a training dataset for the internal memory system of large language models"
+
+**2025**
+
+- Khimin R. O. "Improving the performance of large language models on tasks in the Ukrainian language"
+
+## Research project
+
+**Principal investigator of the project** "Development of a scalable long-term memory architecture for large language models to process ultra-long contexts".
+
+- Implementing organisation: Taras Shevchenko National University of Kyiv, Department of Computer Engineering, FRECS
+- Research area: 7. Information Technologies and Electronics; speciality 123 "Computer Engineering"
+- Responsible executor: Chepel L. V., Doctor of Philosophy (PhD)
+- Proposed implementation period: 01.01.2027 — 31.12.2028 (24 months)
+- Status: submitted to the competition of research projects and scientific and technical (experimental) developments of young scientists of the Ministry of Education and Science of Ukraine (2026); the application is under review, a decision is expected at the end of 2026
+
+More about this research area: see the [research group](/research/llm-memory-group/) page.

@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
 import { T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
-import { news, slugOf } from '../../../lib/content';
+import { news, slugOf, photo } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
 import NewsArt from '../../../components/NewsArt.astro';
 
@@ -12,15 +12,14 @@ const lang = langOf(Astro.params.lang);
 const t = T[lang];
 const list = await news(lang);
 const years = [...new Set(list.map(n => n.data.date.getUTCFullYear()))];
-const last = list[0]?.data.date;
-const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', t.newsCount(list.length).toUpperCase(), last ? last.toISOString().slice(0, 10).split('-').reverse().join('.') : ''].filter(Boolean);
-const perYear = [...years].reverse().map(y => [y, list.filter(n => n.data.date.getUTCFullYear() === y).length]);
+const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
 ---
 <Base lang={lang} title={t.news} description={HEROES.news.lead[lang]} og="news" crumbs={[]}>
-  <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs), years: JSON.stringify(perYear) }}
+  <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs) }}
     meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`, `${years.at(-1)}–${years[0]}`, `<a href="${url(lang, '/rss.xml')}">RSS</a>`]} />
   <section class="section">
-    <div class="wrap">
+    <div class="wrap page">
+      <div class="page__main">
       <nav class="years" aria-label={t.year}>
         {years.map(y => <a class="chip" href={`#y${y}`}>{y} <span class="n">{list.filter(n => n.data.date.getUTCFullYear() === y).length}</span></a>)}
       </nav>
@@ -32,13 +31,14 @@ const perYear = [...years].reverse().map(y => [y, list.filter(n => n.data.date.g
               <a class="newsrow" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
                 <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
                 <div><h3>{n.data.title}</h3><p>{n.data.summary}</p></div>
-                <span class="thumb">{n.data.cover ? <Image src={n.data.cover} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} date={n.data.date} small />}</span>
+                <span class="thumb">{photo(n) ? <Image src={photo(n)!} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} small />}</span>
                 <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
               </a>
             ))}
           </div>
         </section>
       ))}
+      </div>
     </div>
   </section>
 </Base>

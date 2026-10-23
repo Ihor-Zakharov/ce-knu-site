@@ -12,6 +12,7 @@ The main areas of research at the department are:
 - the use of modern IT technologies to create high-performance computing and distributed systems
 - novel methods for creating and studying digital communication systems
 - the application of novel methods and approaches to the creation and analysis of supercomputer systems and the methodology of high-performance computing (the mathematical apparatus of modified systems of algorithmic algebras and real-time process algebra, genetic algorithms, workflow patterns, coloured Petri nets, etc.)
+- artificial intelligence and machine learning: neural networks, large language models, computational linguistics and natural language processing, computer vision and image processing
 
 For their participation in the research "Methods and Novel Approaches to the Design, Management and Application of High-Performance IT Infrastructures", two staff members of the Department of Computer Engineering (Prof. S. D. Pohorilyi and Assoc. Prof. Yu. V. Boiko) became Laureates of the State Prize of Ukraine in Science and Technology for 2018. The main result of the work is the development of a coherent, scientifically grounded methodology for supporting the processes of designing, managing and using IT infrastructure
 

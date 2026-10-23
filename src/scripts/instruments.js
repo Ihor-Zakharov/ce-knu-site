@@ -27,7 +27,7 @@ function mount(cv, make) {
   let raf = 0, last = 0, seen = false;
   const draw = () => { if (st.W) { c.clearRect(0, 0, st.W, st.H); inst.draw(st.t); } };
   const size = () => { const r = cv.getBoundingClientRect(); st.D = Math.min(2, devicePixelRatio || 1); st.W = r.width; st.H = r.height; cv.width = Math.round(st.W * st.D); cv.height = Math.round(st.H * st.D); c.setTransform(st.D, 0, 0, st.D, 0, 0); inst.resize?.(); draw(); };
-  const frame = now => { const dt = Math.min(.05, (now - last) / 1000); last = now; st.t += dt; inst.step?.(dt); draw(); raf = requestAnimationFrame(frame); };
+  const frame = now => { const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now; st.t += dt; inst.step?.(dt); draw(); raf = requestAnimationFrame(frame); };
   const upd = () => { const want = seen && !document.hidden && !REDUCED; if (want && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); } if (!want && raf) { cancelAnimationFrame(raf); raf = 0; } };
   new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }, { rootMargin: '60px' }).observe(cv);
   document.addEventListener('visibilitychange', upd);
@@ -44,7 +44,8 @@ const hud = (el, k, v) => { const n = el?.querySelector(`[data-hud="${k}"]`); if
 // прокреслюється стовпчиками зліва направо; знизу — справжня гістограма новин за роками.
 function ticker(c, st, cv) {
   const box = cv.closest('.inst');
-  const msgs = JSON.parse(box.dataset.msgs || '["NEWS"]').map(m => ({ m, cols: columns(m) }));
+  const now = new Date(), today = [now.getDate(), now.getMonth() + 1].map(n => String(n).padStart(2, '0')).join('.') + '.' + now.getFullYear();
+  const msgs = JSON.parse(box.dataset.msgs || '["NEWS"]').map(m => m.replace('{today}', today)).map(m => ({ m, cols: columns(m) }));
   const years = JSON.parse(box.dataset.years || '[]');
   const HOLD = 3.2, WIPE = .7;
   return {
@@ -53,10 +54,10 @@ function ticker(c, st, cv) {
       const { W, H, col } = st;
       const span = Math.max(...msgs.map(x => x.cols.length)) + 4;
       const pitch = Math.max(4, Math.min(Math.floor((W - 24) / span), Math.floor(H / 15)));
-      const r = pitch * .38, k = Math.floor(t / HOLD) % msgs.length, phase = t % HOLD;
+      const tt = Number.isFinite(t) ? Math.max(0, t) : 0, r = pitch * .38, k = Math.floor(tt / HOLD) % msgs.length, phase = tt % HOLD;
       const { cols } = msgs[k];
       const n = Math.floor((W - 24) / pitch), x0 = (W - n * pitch) / 2 + pitch / 2;
-      const y0 = Math.round(H * .4 - 3 * pitch), start = Math.floor((n - cols.length) / 2);
+      const y0 = Math.round(H / 2 - 3 * pitch), start = Math.floor((n - cols.length) / 2);
       const lit = Math.floor(Math.min(1, phase / WIPE) * (cols.length + 2));       // скільки стовпців уже «прокреслено»
       for (let i = 0; i < n; i++) {
         const ci = i - start, on = ci >= 0 && ci < cols.length && ci < lit ? cols[ci] : 0;

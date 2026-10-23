@@ -40,7 +40,7 @@ Under his supervision, 4 dissertations for the degree of Candidate of Technical 
 
 ## Most important scientific and teaching works:
 
-- O. V. Tretyak, V. A. Skryshevskу, V. A. Vikulov, Yu. V. Boyko, V. M. Zinchuk. A study of surface electronic states in metal-porous silicon-silicon structures. Thin Solid Films 445 (2003), p. 144-150.
+- O. V. Tretyak, V. A. Skryshevsky, V. A. Vikulov, Yu. V. Boyko, V. M. Zinchuk. A study of surface electronic states in metal-porous silicon-silicon structures. Thin Solid Films 445 (2003), p. 144-150.
 - Yu. V. Boiko, S. D. Pohorilyi, D. B. Hriaznov, O. D. Lomakin, V. A. Marianovskyi. The concept of creating flexible homogeneous architectures of cluster systems. Problems in Programming, 2008, No. 2-3, p. 84-90.
 - Yu. V. Boiko, O. O. Sudakov, M. H. Zinoviev, S. Ya. Svistunov. The Ukrainian Academic Grid: experience of creation and first results of operation. Mathematical Machines and Systems, 2008, No. 1, p. 67-84.
 - O. Sudakov, I. Meshcheriakov, Y. Boyko. CHPOX: Transparent Checkpointing System For Linux Clusters. Proc. 4-th IEEE Workshop IDAACS 2007, September 6–8, 2007, Dortmund, Germany. PP. 159-164.

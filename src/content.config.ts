@@ -5,7 +5,8 @@ import { glob } from 'astro/loaders';
 
 // id = «uk/назва-файла» без зміни регістру: адреси новин чинного сайту збережено (/posts/FortiNet/)
 const generateId = ({ entry }: { entry: string }) => entry.replace(/\.md$/, '');
-const loader = (dir: string) => glob({ pattern: '{uk,en}/*.md', base: `./src/content/${dir}`, generateId });
+// сторінки можуть бути вкладеними: pages/uk/research/llm-memory-group.md → /research/llm-memory-group/
+const loader = (dir: string) => glob({ pattern: dir === 'pages' ? '{uk,en}/**/*.md' : '{uk,en}/*.md', base: `./src/content/${dir}`, generateId });
 
 const news = defineCollection({
   loader: loader('news'),

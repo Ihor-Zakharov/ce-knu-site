@@ -7,8 +7,6 @@ legacy: "/"
 source: "pages/index.rst"
 ---
 
-![Photo: Computer Engineering](../../../assets/images/studying/01.jpg)
-
 **"Computer Engineering"** covers the hardware platforms and system software of general-purpose and special-purpose computer systems and networks, as well as their components.
 
 At Taras Shevchenko National University of Kyiv, training in speciality "F7 Computer Engineering" (field of study "F Information Technologies") is provided by the Department of Computer Engineering at the following levels of higher education:

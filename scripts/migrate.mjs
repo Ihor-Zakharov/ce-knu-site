@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // чинний сайт: аргумент, або current-site/ce у корені репозиторію команди, або локальна копія поруч
-const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '../refs/ce-knu-site-practice/current-site/ce'].filter(Boolean);
+// ../refs/merged/ce — копія з репозиторію керівника + новіші матеріали з живого ce.knu.ua (scripts/fetch-live.py)
+const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '../refs/merged/ce', '../refs/ce-knu-site-practice/current-site/ce'].filter(Boolean);
 const SRC = resolve(ROOT, CANDIDATES.find(c => existsSync(resolve(ROOT, c, 'conf.py'))) ?? CANDIDATES[0]);
 const FILTER = join(ROOT, 'scripts/nikola.lua');
 if (!existsSync(join(SRC, 'conf.py'))) throw new Error(`Не знайдено сайт Nikola: ${SRC}`);
@@ -30,10 +31,16 @@ function parse(file) {
 }
 
 function toMarkdown(rst) {
-  const prepared = rst.replace(/^(\s*)\.\. thumbnail::/gm, '$1.. figure::');
+  const prepared = rst.replace(/^(\s*)\.\. thumbnail::/gm, '$1.. figure::')
+    // ініціал на початку рядка («I. Antoniuk», «А. М. Коновалов») pandoc інакше читає як нумерований список
+    .replace(/^(\s*(?:[-*+]\s+)?)(\p{Lu})\.(\s)/gmu, '$1$2\\.$3');
   return execFileSync('pandoc', ['-f', 'rst', '-t', 'gfm+raw_html', '--wrap=none',
     '--shift-heading-level-by=1', '-L', FILTER], { input: prepared, encoding: 'utf8' })
     .replace(/\\&#39;/g, '’').replace(/(\p{L})\\`(\p{L})/gu, '$1’$2').replace(/&#39;/g, '’')
+    // залишки rst-посилань, яких pandoc не розпізнав («`Текст <url>`__» одразу після лапок)
+    .replace(/\\`([^`<\\]+?)\s*\\<(https?:\/\/[^>\\]+)\\>\\`\\_\\_/g, '[$1]($2)')
+    .replace(/\\&amp;/g, '&')                                  // «\&amp;» у джерелі — це просто «&»
+    .replace(/\[([^\]]+)\]\(#\)/g, '$1')                        // посилання-заглушки «<#>» — звичайним текстом
     .replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
 
@@ -47,6 +54,12 @@ function fillAlt(md, title, isPage) {
   }).join('\n');
 }
 
+// одиноке фото, що далі на тій самій сторінці є ще раз (у галереї), — дубль: не переносимо
+function dropDupes(md) {
+  const blocks = md.split('\n\n');
+  return blocks.filter((b, i) => { const m = b.trim().match(/^!\[[^\]]*\]\(([^ )]+)[^)]*\)$/); return !m || !blocks.slice(i + 1).some(x => x.includes(m[1])); }).join('\n\n');
+}
+
 // /images/a/b.jpg → відносний шлях від src/content/<колекція>/uk/ до src/assets/images
 const IMG = '../../../assets/images/';
 const relImages = md => md.replace(/\]\(\/images\//g, `](${IMG}`);
@@ -58,7 +71,7 @@ function frontmatter(obj) {
   return `---\n${lines.join('\n')}\n---\n\n`;
 }
 
-const plain = md => md.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+const plain = md => md.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\s*\(?<https?:\/\/[^>]+>\)?/g, '')
   .replace(/<[^>]+>/g, '').replace(/[*_`#>]/g, '').replace(/\s+/g, ' ').trim();
 const clip = (s, n = 220) => s.length > n ? s.slice(0, s.lastIndexOf(' ', n)) + '…' : s;
 const date = d => { const [y, m, dd] = (d || '').trim().slice(0, 10).trim().split('-'); return y ? [y, m.padStart(2, '0'), dd.padStart(2, '0')].join('-') : ''; };
@@ -71,9 +84,9 @@ function takeMascot(md) {
 }
 
 const out = (coll, slug, content) => {
-  const dir = join(ROOT, 'src/content', coll, 'uk');
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, `${slug}.md`), content);
+  const file = join(ROOT, 'src/content', coll, 'uk', `${slug}.md`);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
 };
 const report = { news: 0, pages: 0, people: 0, images: 0, files: 0 };
 
@@ -97,16 +110,21 @@ for (const f of readdirSync(join(SRC, 'posts')).filter(f => f.endsWith('.rst')).
 }
 
 // ── сторінки ───────────────────────────────────────────────────────
-for (const f of readdirSync(join(SRC, 'pages')).filter(f => f.endsWith('.rst'))) {
+// сторінки першого рівня + вкладені (pages/research/llm-memory-group.rst → /research/llm-memory-group/)
+const pageFiles = readdirSync(join(SRC, 'pages')).filter(f => f.endsWith('.rst'))
+  .concat(readdirSync(join(SRC, 'pages'), { withFileTypes: true }).filter(d => d.isDirectory() && d.name !== 'personas')
+    .flatMap(d => readdirSync(join(SRC, 'pages', d.name)).filter(f => f.endsWith('.rst')).map(f => `${d.name}/${f}`)));
+for (const f of pageFiles) {
   const { meta, body } = parse(join(SRC, 'pages', f));
+  const parent = f.includes('/') ? f.split('/')[0] + '/' : '';
   let { md, mascot, mascotAlt } = takeMascot(toMarkdown(body));
   // на сторінці «Персоналії» список людей рендерить компонент із колекції people
   if (meta.slug === 'personas') md = '';
   if (meta.slug === 'index') md = md.replace(/!\[[^\]]*\]\(\/images\/dino\/emblem\.png[^)]*\)\n*/, '');
-  out('pages', meta.slug, frontmatter({
+  out('pages', parent + meta.slug, frontmatter({
     title: meta.title, description: clip(plain(md), 160), mascot, mascotAlt,
-    legacy: meta.slug === 'index' ? '/' : `/${meta.slug}/`, source: `pages/${f}`,
-  }) + relImages(fillAlt(md, meta.title, true)));
+    legacy: meta.slug === 'index' ? '/' : `/${parent}${meta.slug}/`, source: `pages/${f}`,
+  }) + relImages(fillAlt(dropDupes(md), meta.title, true)));
   report.pages++;
 }
 

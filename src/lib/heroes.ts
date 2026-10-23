@@ -44,9 +44,9 @@ export const HEROES: Record<string, Hero> = {
     lines: { uk: ['Читаю дрібний шрифт', 'Читаю по біту', 'Усе за протоколом'], en: ['Reading the fine print', 'Reading bit by bit', 'Following the protocol'] },
   },
   graduates: {
-    ch: 'CH 06 · ALUM', inst: 'array', acc: 'cap',
+    ch: 'CH 06 · ALUM', inst: 'chladni', acc: 'cap',
     lead: { uk: 'Досвід і поради випускників кафедри.', en: 'Experience and advice from department alumni.' },
-    hud: { top: ['θ = <b data-hud="theta">0°</b>', 'N = 8 · d = λ/2'], bot: ['PHASED ARRAY', 'BEAM STEERING'] },
+    hud: { top: ['MODE (n, m) = <b data-hud="mode">(2, 3)</b>', 'f = 0'], bot: ['CHLADNI FIGURES', 'STANDING WAVES'] },
     lines: { uk: ['Диплом є. Пошук триває.', 'Тримаю курс на знання', 'Шапка вгору, сигнал теж'], en: ['Degree earned. Still curious', 'Steering towards knowledge', 'Caps up, signal up'] },
   },
   personas: {

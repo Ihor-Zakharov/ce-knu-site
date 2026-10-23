@@ -5,7 +5,8 @@
 //   mobius   — вступникам: стрічка Мебіуса, хвиля після обходу інвертує фазу
 //   spectrum — навчання: аналізатор спектра з утриманням піків
 //   tape     — документи: перфострічка, що кодує назви документів ASCII
-//   array    — випускники: фазована антенна решітка, промінь сканує світ
+//   chladni  — випускники: фігури Хладні, вузлові лінії стоячих хвиль
+//   array    — (запасний) фазована антенна решітка
 //   liss     — персоналії: фігури Ліссажу, що перетікають між відношеннями частот
 //   tess     — роботодавцям: тесеракт у 4D-обертанні
 //   smith    — (запасний) діаграма Сміта, імпеданс сходиться до узгодження
@@ -256,6 +257,60 @@ function array(c, st, cv) {
   };
 }
 
+/* ── Випускники: фігури Хладні — вузлові лінії стоячих хвиль на пластині ── */
+// f(x, y) = cos(nπx)·cos(mπy) − cos(mπx)·cos(nπy); пісок збирається там, де f = 0.
+// Моди (n, m) плавно перетікають одна в одну; лінії світяться, як промінь приладу.
+function chladni(c, st, cv) {
+  const box = cv.closest('.inst');
+  const MODES = [[2, 3], [1, 4], [3, 5], [2, 5], [1, 6], [4, 7], [3, 7], [2, 7], [5, 8]];
+  const o = document.createElement('canvas'), oc = o.getContext('2d');
+  let img = null, GW = 0, GH = 0, grain = null;
+  const rgb = h => { const n = parseInt((h || '#E2C27F').replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+  const P = Math.PI;
+  // значення й градієнт f для моди (n, m)
+  const fg = (n, m, x, y, out) => {
+    const cnx = Math.cos(n * P * x), cmy = Math.cos(m * P * y), cmx = Math.cos(m * P * x), cny = Math.cos(n * P * y);
+    const snx = Math.sin(n * P * x), smy = Math.sin(m * P * y), smx = Math.sin(m * P * x), sny = Math.sin(n * P * y);
+    out[0] = cnx * cmy - cmx * cny;
+    out[1] = -n * P * snx * cmy + m * P * smx * cny;
+    out[2] = -m * P * cnx * smy + n * P * cmx * sny;
+  };
+  const A = [0, 0, 0], B = [0, 0, 0];
+  return {
+    still: 1.2,
+    resize() {
+      const s = Math.min(st.W, st.H) * .8; GW = GH = Math.max(96, Math.round(s / 1.15));
+      o.width = GW; o.height = GH; img = oc.createImageData(GW, GH);
+      grain = new Float32Array(GW * GH); for (let q = 0; q < grain.length; q++) grain[q] = Math.random();   // «піщинки» — сталий шум
+    },
+    draw(t) {
+      if (!img) this.resize();
+      const { W, H, col } = st, ph = rgb(col.ph.startsWith('#') ? col.ph : '#E2C27F');
+      const HOLD = 4.4, k = Math.floor(t / HOLD), u = (t % HOLD) / HOLD;
+      const e = u < .6 ? 0 : (u - .6) / .4, w = e * e * (3 - 2 * e);
+      const [n1, m1] = MODES[k % MODES.length], [n2, m2] = MODES[(k + 1) % MODES.length];
+      const d = img.data, width = 1.6 / GW;                       // півширина лінії ≈ 1,6 комірки
+      for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+        const x = i / (GW - 1), y = j / (GH - 1);
+        fg(n1, m1, x, y, A); fg(n2, m2, x, y, B);
+        const v = A[0] * (1 - w) + B[0] * w, gx = A[1] * (1 - w) + B[1] * w, gy = A[2] * (1 - w) + B[2] * w;
+        const dist = Math.abs(v) / (Math.hypot(gx, gy) + 1e-3);    // відстань до вузлової лінії — лінії рівної товщини
+        const g = Math.exp(-((dist / width) ** 2)), q = j * GW + i;
+        const a = g > grain[q] * .9 ? Math.min(1, .55 + g * .6) : g * .25;   // пісок: щільно на лінії, зрідка поруч
+        d[q * 4] = ph[0]; d[q * 4 + 1] = ph[1]; d[q * 4 + 2] = ph[2]; d[q * 4 + 3] = Math.round(255 * a);
+      }
+      oc.putImageData(img, 0, 0);
+      const s = Math.min(W, H) * .8, x0 = (W - s) / 2, y0 = (H - s) / 2 + 2;
+      c.strokeStyle = col.gold; c.globalAlpha = .5; c.lineWidth = 1; c.strokeRect(x0 - .5, y0 - .5, s + 1, s + 1); c.globalAlpha = 1;
+      if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 5; }
+      c.imageSmoothingEnabled = true; c.drawImage(o, x0, y0, s, s); c.shadowBlur = 0;
+      c.fillStyle = col.gold; c.beginPath(); c.arc(W / 2, y0 + s / 2, 2.2, 0, TAU); c.fill();
+      const [n, m] = w < .5 ? [n1, m1] : [n2, m2];
+      hud(box, 'mode', `(${n}, ${m})`);
+    },
+  };
+}
+
 /* ── Персоналії: Ліссажу ──────────────────────────────────── */
 function liss(c, st, cv) {
   const box = cv.closest('.inst');
@@ -400,7 +455,7 @@ function tess(c, st, cv) {
   };
 }
 
-const KINDS = { ticker, field, fourier, spectrum, tape, array, liss, smith, tess, mobius };
+const KINDS = { ticker, field, fourier, spectrum, tape, array, chladni, liss, smith, tess, mobius };
 export function mountInstruments() {
   document.querySelectorAll('.inst[data-inst] canvas[data-draw]').forEach(cv => {
     const kind = KINDS[cv.closest('.inst').dataset.inst];

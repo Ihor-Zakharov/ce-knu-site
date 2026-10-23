@@ -19,7 +19,8 @@ const { Content } = await render(entry);
 // «підпис» людини — фігура Ліссажу з частот, виведених з імені
 const slug = slugOf(entry.id);
 let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-const a = 1 + (h % 5), b = 1 + ((h >> 3) % 4) + (((h >> 3) % 4) + 1 === a ? 1 : 0);
+const RATIOS = [[3, 2], [5, 4], [3, 4], [2, 3], [4, 5], [5, 6], [4, 3], [6, 5]];   // відношення, що дають гарні замкнені фігури
+const [a, b] = RATIOS[h % RATIOS.length];
 let d = ''; for (let i = 0; i <= 400; i++) { const s = i / 400 * Math.PI * 2; d += (i ? 'L' : 'M') + (50 + 44 * Math.sin(a * s + Math.PI / 2)).toFixed(2) + ' ' + (50 + 44 * Math.sin(b * s)).toFixed(2); }
 const words = entry.data.name.split(/\s+/);
 ---

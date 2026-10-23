@@ -103,7 +103,7 @@ const CHAN: Record<string, string> = { '/news/': 'news', '/research/': 'research
             <span class="ch">{h.ch}</span>
             <b>{n[lang]}</b>
             <span class="d">{h.lead[lang]}</span>
-            <svg class="w" viewBox="0 0 120 20" preserveAspectRatio="none" aria-hidden="true"><path d={`M0 10 ${Array.from({ length: 24 }, (_, k) => `L${(k + 1) * 5} ${(10 - 7 * Math.sin((k + 1) * (0.5 + i * 0.18))).toFixed(1)}`).join(' ')}`} pathLength="1"/></svg>
+            <svg class="w" viewBox="0 0 120 20" preserveAspectRatio="none" aria-hidden="true"><path d={'M' + Array.from({ length: 61 }, (_, k) => `${k * 2} ${(10 - 7 * Math.sin(k * 2 * (0.06 + i * 0.022)) * (i % 2 ? Math.sin(k / 60 * Math.PI) : 1)).toFixed(2)}`).join(' L')}/></svg>
           </a></li>
         ); })}
       </ul>

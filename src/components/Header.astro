@@ -23,7 +23,7 @@ const wave = 'M0 3 C1.5 0 3.5 0 5 3 S8.5 6 10 3 S13.5 0 15 3 S18.5 6 20 3';
         {NAV.map(n => (
           <li><a href={url(lang, n.path)} aria-current={isCur(n.path) ? 'page' : undefined} title={'title' in n ? n.title[lang] : undefined}>
             <i class="led" aria-hidden="true"></i>{n[lang]}
-            <svg class="nav__wave" viewBox="0 0 20 6" preserveAspectRatio="none" aria-hidden="true"><path d={wave} pathLength="1"/></svg>
+            <svg class="nav__wave" viewBox="0 0 20 6" preserveAspectRatio="none" aria-hidden="true"><path d={wave}/></svg>
           </a></li>
         ))}
       </ul>

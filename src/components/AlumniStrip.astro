@@ -25,7 +25,7 @@ const split = (c: string) => c.match(/^(.+?)\s+(Inc\.|LLC|Ltd\.?)$/);   // «One
             <span class="alum__mark">{m ? <>{m[1]} <small>{m[2]}</small></> : a.company}</span>
             <span class="alum__who">
               <span class="alum__ph"><Image src={PHOTOS[a.photo as keyof typeof PHOTOS]} width={96} alt="" loading="lazy" /></span>
-              <span><b>{a.who}</b> · {a.role}</span>
+              <span><b>{a.who}</b><span class="alum__role">{a.role}</span></span>
             </span>
           </a>
         </li>

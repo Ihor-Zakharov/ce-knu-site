@@ -1,0 +1,57 @@
+---
+// Персоналії: список як на чинному сайті (за посадами), усі видно одразу; згори — алфавітний покажчик-якорі
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Mascot from '../../../components/Mascot.astro';
+import { T, url, langOf, langParams } from '../../../lib/i18n';
+import { people, page, slugOf, initial, ALPHABET } from '../../../lib/content';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const t = T[lang];
+const meta = (await page(lang, 'personas'))!;
+const all = (await people(lang)).filter(p => !p.data.unlisted);
+const groups = [...new Set(all.map(p => p.data.group))];
+// перша людина на кожну літеру отримує якір #az-<літера>
+const firstOf = new Map<string, string>();
+[...all].sort((a, b) => a.data.name.localeCompare(b.data.name, lang)).forEach(p => { const L = initial(p.data.name, lang); if (!firstOf.has(L)) firstOf.set(L, slugOf(p.id)); });
+const anchorFor = (slug: string) => [...firstOf].filter(([, s]) => s === slug).map(([L]) => `az-${L}`)[0];
+const letters = ALPHABET[lang];
+const initials = (n: string) => n.split(/\s+/).slice(0, 2).map(w => w[0]).join('');
+---
+<Base lang={lang} title={meta.data.title} description={t.people}>
+  <PageHero lang={lang} title={meta.data.title} kind="personas" meta={[`<b>${all.length}</b> ${t.peopleCount(all.length).replace(/^\d+ /, '')}`, `${groups.length} ${lang === 'uk' ? 'груп' : 'groups'}`]} />
+  <section class="section" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="wrap">
+      <nav class="az-bar" aria-label={t.azLabel}>
+        {letters.map(L => firstOf.has(L) ? <a href={`#az-${L}`} title={`${t.azJump} ${L}`}>{L}</a> : <span aria-hidden="true">{L}</span>)}
+      </nav>
+      <div class="page">
+        <div>
+          {groups.map(g => {
+            const ps = all.filter(p => p.data.group === g);
+            return (
+              <section class="pgroup" aria-labelledby={`g-${ps[0].data.groupOrder}`}>
+                <h2 id={`g-${ps[0].data.groupOrder}`}>{g} <span class="n">{String(ps.length).padStart(2, '0')}</span></h2>
+                <ul class="people">
+                  {ps.map(p => {
+                    const slug = slugOf(p.id), id = anchorFor(slug);
+                    const inner = <>
+                      <span class="pcard__ph">{p.data.photo ? <Image src={p.data.photo} alt="" width={176} height={246} fit="cover" /> : <span aria-hidden="true">{initials(p.data.name)}</span>}</span>
+                      <span><span class="pcard__n">{p.data.name}</span>{p.data.role && <span class="pcard__r" style="display:block">{p.data.role}</span>}</span>
+                    </>;
+                    return <li>{p.data.legacy
+                      ? <a class="pcard" id={id} href={url(lang, `/personas/${slug}/`)}>{inner}<svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+                      : <div class="pcard" id={id}>{inner}</div>}</li>;
+                  })}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+        <aside class="page__aside"><Mascot src={meta.data.mascot} alt={meta.data.mascotAlt} /></aside>
+      </div>
+    </div>
+  </section>
+</Base>

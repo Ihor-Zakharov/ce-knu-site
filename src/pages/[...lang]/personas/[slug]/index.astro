@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { T, url, langOf, type Lang } from '../../../../lib/i18n';
+import { slugOf } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+  const all = await getCollection('people', p => !!p.data.legacy);
+  return all.map(p => {
+    const lang = p.id.split('/')[0] as Lang;
+    return { params: { lang: lang === 'en' ? 'en' : undefined, slug: slugOf(p.id) }, props: { entry: p } };
+  });
+}
+const { entry } = Astro.props;
+const lang = langOf(Astro.params.lang);
+const t = T[lang];
+const { Content } = await render(entry);
+// «підпис» людини — фігура Ліссажу з частот, виведених з імені
+const slug = slugOf(entry.id);
+let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+const a = 1 + (h % 5), b = 1 + ((h >> 3) % 4) + (((h >> 3) % 4) + 1 === a ? 1 : 0);
+let d = ''; for (let i = 0; i <= 400; i++) { const s = i / 400 * Math.PI * 2; d += (i ? 'L' : 'M') + (50 + 44 * Math.sin(a * s + Math.PI / 2)).toFixed(2) + ' ' + (50 + 44 * Math.sin(b * s)).toFixed(2); }
+const words = entry.data.name.split(/\s+/);
+---
+<Base lang={lang} title={entry.data.name} description={entry.data.role}>
+  <section class="ph">
+    <div class="wrap">
+      <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
+        <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li><a href={url(lang, '/personas/')}>{t.people}</a></li><li aria-current="page">{entry.data.name}</li></ol>
+      </nav>
+      <div class="profile-hero mt-l">
+        <div class="profile-hero__ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[200, 400]} sizes="200px" loading="eager" />}</div>
+        <div>
+          <p class="ph__eyebrow"><b>CH 07</b>{entry.data.group}</p>
+          <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{' '}</>)}</h1>
+          {entry.data.role && <p class="role">{entry.data.role}</p>}
+          <div class="row mt-m" style="align-items:center;gap:18px">
+            <svg class="profile-hero__sig" viewBox="0 0 100 100" aria-hidden="true"><path d={d} pathLength="1"/></svg>
+            <span class="cap">{lang === 'uk' ? 'Підпис-Ліссажу' : 'Lissajous signature'} · <b>{a}:{b}</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap page">
+      <article class="prose"><Content /></article>
+      <aside class="page__aside">
+        <a class="btn btn--line btn--sm" href={url(lang, '/personas/')}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg>{t.people}</a>
+      </aside>
+    </div>
+  </section>
+</Base>

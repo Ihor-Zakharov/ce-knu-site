@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { T, url } from '../lib/i18n';
+const t = T.uk, e = T.en;
+---
+<Base lang="uk" title={t.notFound} noindex>
+  <section class="ph nf">
+    <div class="wrap">
+      <p class="ph__eyebrow"><b>404</b>NO SIGNAL</p>
+      <h1>{t.notFound}</h1>
+      <p class="lead">{t.notFoundLead}</p>
+      <p class="lead" lang="en" style="font-size:15px">{e.notFound}. {e.notFoundLead}</p>
+      <div class="runner" id="runner" tabindex="0" role="application" aria-label="КІ-Рекс: гра. Пробіл або дотик — стрибок, P — пауза">
+        <canvas aria-hidden="true"></canvas>
+        <span class="sr-only" data-runner-live aria-live="polite"></span>
+      </div>
+      <div class="row mt-m"><a class="btn" href={url('uk', '/')}>{t.toHome}</a><a class="btn btn--line" href={url('en', '/')} lang="en">{e.toHome} (EN)</a></div>
+    </div>
+  </section>
+  <script>
+    import { runner } from '../scripts/rex.js';
+    const el = document.getElementById('runner');
+    if (el) runner(el, { start: 'Гра почалася', idle: 'ПРОБІЛ / ТАП — СТАРТ', again: 'ОБРИВ ЛІНІЇ · ПРОБІЛ — ЩЕ РАЗ', paused: 'ПАУЗА · ПРОБІЛ — ДАЛІ', over: (s: number, b: number) => `Обрив лінії. Рахунок ${s}, рекорд ${b}. Пробіл — ще раз` });
+  </script>
+</Base>

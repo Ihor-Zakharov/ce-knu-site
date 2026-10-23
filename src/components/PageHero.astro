@@ -1,0 +1,38 @@
+---
+// Герой розділу: назва, що піднімається по словах, підзаголовок і прилад з КІ-Рексом на краї
+import { HEROES } from '../lib/heroes';
+import { T, url, type Lang } from '../lib/i18n';
+interface Props { lang: Lang; title: string; kind: string; crumbs?: { href: string; label: string }[]; meta?: string[]; text?: string }
+const { lang, title, kind, crumbs = [], meta = [], text = '' } = Astro.props;
+const h = HEROES[kind];
+const words = title.split(/\s+/);
+---
+<section class="ph">
+  <div class="wrap ph__grid">
+    <div class="ph__text">
+      <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
+        <ol class="crumbs">
+          <li><a href={url(lang, '/')}>{T[lang].home}</a></li>
+          {crumbs.map(c => <li><a href={c.href}>{c.label}</a></li>)}
+          <li aria-current="page">{title.length > 48 ? title.slice(0, title.lastIndexOf(' ', 46)) + '…' : title}</li>
+        </ol>
+      </nav>
+      <p class="ph__eyebrow"><b>{h.ch.split(' · ')[0]}</b>{h.ch.split(' · ')[1]}</p>
+      <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>
+      <p class="lead">{h.lead[lang]}</p>
+      {meta.length > 0 && <p class="ph__meta">{meta.map(m => <span class="cap" set:html={m} />)}</p>}
+    </div>
+    <figure class="inst" data-inst={h.inst} data-text={text} aria-hidden="true">
+      <div class="perch" data-acc={h.acc} data-lines={JSON.stringify(h.lines[lang])}>
+        <span class="perch__say"></span>
+        <canvas width="90" height="72"></canvas>
+      </div>
+      <div class="inst__screen">
+        <canvas data-draw></canvas>
+        <div class="inst__hud inst__hud--top"><span set:html={h.hud.top[0]} /><span set:html={h.hud.top[1]} /></div>
+        <div class="inst__hud inst__hud--bot"><span set:html={h.hud.bot[0]} /><span set:html={h.hud.bot[1]} /></div>
+      </div>
+      <div class="inst__bar"><i class="inst__led"></i><span>KI-REX · {h.ch}</span><span class="sp"></span><span>{lang === 'uk' ? 'клацніть Рекса' : 'click Rex'}</span></div>
+    </figure>
+  </div>
+</section>

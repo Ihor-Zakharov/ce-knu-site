@@ -1,0 +1,40 @@
+---
+// Звичайні сторінки чинного сайту: дослідження, НМЗ, вступникам, документи, випускники, роботодавцям, навчання
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Mascot from '../../../components/Mascot.astro';
+import { getCollection, render } from 'astro:content';
+import { langOf, type Lang } from '../../../lib/i18n';
+import { slugOf } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const SKIP = ['index', 'personas'];          // мають власні шаблони
+  const all = await getCollection('pages');
+  return all.filter(p => !SKIP.includes(slugOf(p.id))).map(p => {
+    const lang = p.id.split('/')[0] as Lang;
+    return { params: { lang: lang === 'en' ? 'en' : undefined, page: slugOf(p.id) }, props: { entry: p } };
+  });
+}
+const { entry } = Astro.props;
+const lang = langOf(Astro.params.lang);
+const { Content, headings } = await render(entry);
+const toc = headings.filter(h => h.depth === 2);
+const docText = entry.data.title + ' · ' + toc.map(h => h.text).join(' · ');
+---
+<Base lang={lang} title={entry.data.title} description={entry.data.description}>
+  <PageHero lang={lang} title={entry.data.title} kind={Astro.params.page} text={docText} />
+  <section class="section">
+    <div class="wrap page">
+      <article class="prose"><Content /></article>
+      <aside class="page__aside">
+        <Mascot src={entry.data.mascot} alt={entry.data.mascotAlt} />
+        {toc.length > 2 && (
+          <nav class="toc-nav" aria-label={lang === 'uk' ? 'На сторінці' : 'On this page'}>
+            <p class="eyebrow">{lang === 'uk' ? 'На сторінці' : 'On this page'}</p>
+            <ul class="toc mt-s">{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+          </nav>
+        )}
+      </aside>
+    </div>
+  </section>
+</Base>

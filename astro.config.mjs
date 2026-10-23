@@ -4,6 +4,7 @@
 //   BASE_PATH — підкаталог, якщо сайт лежить не в корені (типово /)
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
 import rehypeSite from './src/lib/rehype-site.mjs';
 
 const site = process.env.SITE_URL || 'https://ce.knu.ua';
@@ -20,7 +21,7 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false },
   },
   markdown: {
-    rehypePlugins: [[rehypeSite, { base }]],
+    processor: unified({ rehypePlugins: [[rehypeSite, { base }]] }),
   },
   image: { responsiveStyles: false },
   integrations: [

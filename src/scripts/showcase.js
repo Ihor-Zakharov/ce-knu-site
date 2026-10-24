@@ -32,7 +32,7 @@ export function showcase(figure) {
   const st = { W: 0, H: 0, D: 1 };
   const layer = () => { const k = document.createElement('canvas'); return { k, c: k.getContext('2d') }; };
   const A = layer(), B = layer(), FILTER = 'filter' in c;
-  let cur = 0, prev = -1, tr = T, shown = 0, auto = !REDUCED, playing = !REDUCED, t = 0, acc = 0, raf = 0, last = 0, seen = false, nextKey = -1;
+  let cur = 0, prev = -1, tr = T, shown = 0, auto = !REDUCED, playing = !REDUCED, t = 0, acc = 0, raf = 0, last = 0, seen = false;
 
   function theme() {
     const v = { bg: '--bg', screen: '--screen', surface: '--surface', surface2: '--surface-2', ink: '--ink', ink2: '--ink-2', ink3: '--ink-3', gold: '--gold', goldInk: '--gold-ink', ph: '--phosphor', signal: '--signal', ok: '--ok', line: '--line', lineStrong: '--line-strong' };
@@ -85,11 +85,9 @@ export function showcase(figure) {
     for (const k of ['tr', 'bl', 'br']) if (hudLast[k] !== v[k]) { hudEl[k].textContent = v[k]; hudLast[k] = v[k]; }
   }
 
-  /* прогрес до наступного експоната — волосяна смужка на його клавіші */
+  /* прогрес автозміни — волосяна смужка на кнопці паузи (на клавіші наступного експоната вона читалася як другий вибір) */
   function progress() {
-    const nk = auto ? (cur + 1) % n : -1;
-    if (nk !== nextKey) { if (nextKey >= 0) keys[nextKey].style.setProperty('--p', 0); nextKey = nk; }
-    if (nk >= 0) keys[nk].style.setProperty('--p', Math.min(1, shown / HOLD).toFixed(3));
+    play?.style.setProperty('--p', auto && playing ? Math.min(1, shown / HOLD).toFixed(3) : 0);
   }
   function setAuto(on) {
     auto = on; shown = 0;
@@ -161,7 +159,7 @@ export function showcase(figure) {
     play.querySelector('use')?.setAttribute('href', playing ? '#i-pause' : '#i-play');
   };
   play?.addEventListener('click', () => {
-    playing = !playing; reflectPlay();
+    playing = !playing; reflectPlay(); progress();
     if (playing) start(); else { stop(); if (prev >= 0) { tr = T; prev = -1; } draw(); }
   });
 

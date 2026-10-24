@@ -628,28 +628,32 @@ a:hover .news-art { animation: none; }
   .progs__lvl { grid-area: lvl; } .progs__t { grid-area: t; font-size: 16.5px; } .progs__pl { grid-area: pl; }
 }
 
-/* роботодавцям: чотири картки-прилади — лінійний знак групи, назва, кількість і навички чипами */
-.skp__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); }
-.skc { display: grid; align-content: start; gap: 18px; padding: clamp(18px, 1.8vw, 26px); border-radius: 14px; background: var(--bezel); border: 1px solid var(--line); box-shadow: var(--bezel-shadow); transition: border-color var(--hover) var(--ease-out), translate 600ms var(--spring); }
-.skc:hover { border-color: var(--line-strong); translate: 0 -3px; }
-.skc__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-.skc__ico { width: 40px; height: 40px; padding: 6px; border-radius: 10px; background: var(--screen); box-shadow: inset 0 0 0 1px var(--line); fill: none; stroke: var(--gold); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
-.skc__t { font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.25; }
-.skc__n { font: 500 11px/1 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
-.skc__tags { margin: 0; }
-.skc__tags li { min-height: 32px; font-size: 13.5px; }
-.skp__bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-top: clamp(14px, 1.6vw, 22px); padding: 14px clamp(18px, 1.8vw, 26px); border-radius: 14px; border: 1px solid var(--line); }
-.skp__ok { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--ink-2); }
-.skp__ok svg { flex: none; color: var(--ok); }
-@media (max-width: 1100px) { .skp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* роботодавцям (рішення арт-директорів): твердження «вчать» одразу під заголовком із навчальним планом як доказом;
+   чотири легкі картки — знак і назва групи, шість навичок із зеленою позначкою; рядки спільні (subgrid) — картки рівні */
+.skp__claim { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; max-width: 62ch; font-size: clamp(1.125rem, 1rem + .45vw, 1.375rem); line-height: 1.45; color: var(--ink); }
+.skp__claim svg { flex: none; margin-top: .2em; color: var(--ok); }
+.skp__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 16px; }
+.skc { grid-row: span 2; display: grid; grid-template-rows: subgrid; row-gap: 14px; align-content: start; padding: 22px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.skc__t { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 500; letter-spacing: -.012em; line-height: 1.25; color: var(--ink); }
+.skc__ico { flex: none; width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.skc__list { list-style: none; margin: 0; padding: 0; display: grid; }
+.skc__list li { display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 15.5px; line-height: 1.3; color: var(--ink); overflow-wrap: anywhere; }
+.skc__list svg { flex: none; width: 15px; height: 15px; color: var(--ok); }
+.skp__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 20px; }
+.skp__bar .btn { margin-left: auto; }
+@media (max-width: 1099px) { .skp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); } .skc { padding: 20px; } }
 @media (max-width: 600px) {
-  .skp__grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .skc { gap: 14px; padding: 16px; }
-  .skc__head { padding-bottom: 12px; }
-  .skc__tags li { min-height: 30px; padding: 3px 11px; font-size: 13px; }
-  .skp__bar { padding: 14px 16px; }
-  .skp__bar .btn { width: 100%; }
+  .skp__grid { gap: 10px; }
+  .skc { padding: 14px; border-radius: 10px; row-gap: 10px; }
+  .skc__t { font-size: 15.5px; gap: 8px; }
+  .skc__ico { width: 18px; height: 18px; }
+  .skc__list li { min-height: 28px; gap: 7px; font-size: 13.5px; }
+  .skc__list svg { width: 13px; height: 13px; }
+  .skp__bar { flex-direction: column; align-items: stretch; gap: 14px; }
+  .skp__bar .btn { margin-left: 0; width: 100%; }
+  .skp__bar .arrow-link { order: 1; }
 }
+.progs__note { margin-top: 14px; font-size: 13.5px; color: var(--ink-3); }
 
 /* повний опис кафедри — згорнутий */
 .more { border-bottom: 1px solid var(--line); }
@@ -689,3 +693,61 @@ a:hover .news-art { animation: none; }
 .prof__mini { margin-bottom: 20px; }
 .prof__card .tags { margin-top: 16px; }
 @media (max-width: 760px) { .prof { row-gap: 28px; } }
+
+/* ── Головна після рев'ю арт-директорів ─────────────────────────────── */
+/* перший екран — одна композиція: виступ одразу під героєм, надзаголовок коротко */
+.hero-home .ph__eyebrow .long { display: none; }
+@media (min-width: 901px) { .hero-home { padding-bottom: 0; } }
+.alum { padding-top: 72px; }
+@media (max-width: 900px) { .hero-home .ph__grid { gap: 20px; } }
+@media (max-width: 860px) { .alum { padding-top: 72px; } }
+/* вітрина: прогрес автозміни — на кнопці паузи; «1/6» видно й на телефоні */
+.showcase .scope__hud--bot span:last-child { display: inline; }
+/* випускники: без світіння знаків; більші портрети; рівні поля карток у стрічці */
+.alum__mark { filter: none; }
+@media (min-width: 861px) { .alum__who { grid-template-columns: 48px minmax(0, 1fr); } .alum__ph { width: 48px; height: 48px; } }
+@media (max-width: 860px) {
+  .alum__row { column-gap: 32px; }
+  .alum__row > li, .alum__row > li + li { position: relative; padding: 0; border-left: 0; }
+  .alum__row > li + li::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: 6px; width: 1px; background: var(--line); }
+}
+/* стрілки й лічильник стрічок */
+.rail-nav { display: flex; align-items: center; gap: 8px; }
+.rail-nav[hidden] { display: none; }
+.rail-nav__n { min-width: 4.5ch; text-align: center; font: 500 12px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rail-nav .btn { width: 36px; height: 36px; }
+/* шапки розділів: посилання — на рівні низу заголовка; на телефоні — наприкінці розділу */
+.hm-head--row { align-items: end; }
+.hm-act-end { display: none; }
+@media (max-width: 860px) {
+  .hm-head--row .hm-act { display: none; }
+  .hm-act-end { display: inline-flex; margin-top: 20px; }
+  .hm-head--row .rail-nav { margin-left: auto; }
+}
+/* профілі: назва й рядок під шкалою, без номерів і чипів */
+.prof { grid-template-rows: repeat(3, auto); }
+.prof__card { grid-row: span 3; }
+.prof__card > p { margin-top: 10px; }
+:root[data-theme="dark"] .prof__card--hw .prof__mini { --c: var(--ink-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .prof__card--hw .prof__mini { --c: var(--ink-2); } }
+/* лабораторії: спільні рядки (фото, бренд, назва, текст) — тексти починаються на одній висоті; без збільшення при наведенні */
+.labs { grid-template-rows: repeat(4, auto); }
+.lab { display: grid; grid-template-rows: subgrid; grid-row: span 4; align-content: start; }
+.lab__ph img { object-position: var(--pos, 50% 50%); }
+.lab:hover .lab__ph img { scale: 1; filter: var(--grade); }
+.lab__ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 8%, transparent); pointer-events: none; }
+@media (max-width: 1199px) { .labs { grid-auto-flow: column; } }
+/* програми: спільні рядки — місця на одній лінії */
+.progs { grid-template-rows: repeat(4, auto); }
+.progs__i { grid-row: span 4; grid-template-rows: subgrid; }
+@media (max-width: 760px) { .progs { grid-template-rows: none; } .progs__i { grid-row: auto; grid-template-rows: none; } }
+/* хронологія: лінія закінчується на останній точці */
+.tl li:last-child { border-top-color: transparent; }
+.tl li:last-child::after { content: ""; position: absolute; left: 0; top: -1px; width: 4px; height: 1px; background: var(--line-strong); }
+/* повний опис: позначка як у інших розділах */
+.more summary .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
+/* поява: швидко й тихо, без розмиття; розмиття — лише знакам випускників */
+.rv { translate: 0 10px; filter: none; transition: opacity 600ms var(--ease-out), translate 700ms var(--spring); transition-delay: calc(var(--i, 0) * 60ms); }
+.alum__row .rv { filter: blur(4px); transition: opacity 600ms var(--ease-out), translate 700ms var(--spring), filter 600ms var(--ease-out); transition-delay: calc(120ms + var(--i) * 70ms); }
+.alum__row .rv.in { filter: none; }
+@media (prefers-reduced-motion: reduce) { .rv, .alum__row .rv { filter: none; } }

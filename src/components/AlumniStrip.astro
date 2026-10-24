@@ -5,6 +5,7 @@
 import { Image } from 'astro:assets';
 import { ALUMNI, COPY } from '../lib/home';
 import { url, type Lang } from '../lib/i18n';
+import RailNav from './RailNav.astro';
 import kalyta from '../assets/images/abiturient/d_kalita.jpg';
 import kramov from '../assets/images/abiturient/a_kramov.jpg';
 import slynko from '../assets/images/abiturient/m_slynko.png';
@@ -14,8 +15,7 @@ const { lang } = Astro.props;
 const uk = lang === 'uk';
 const t = COPY[lang];
 const list = ALUMNI[lang];
-const many = list.length > 3;
-const split = (c: string) => c.match(/^(.+?)\s+(Inc\.|LLC|Ltd\.?)$/);   // «One AI Inc.» → знак + дрібний суфікс
+const mark = (c: string) => c.replace(/\s+(Inc\.|LLC|Ltd\.?)$/, '');   // словесний знак без юридичного суфікса: «One AI Inc.» → «One AI»
 ---
 <section class="alum" aria-labelledby="h-alum">
   <div class="wrap">
@@ -23,17 +23,14 @@ const split = (c: string) => c.match(/^(.+?)\s+(Inc\.|LLC|Ltd\.?)$/);   // «One
       <div class="perch perch--line" data-acc="" data-start="460" data-lines={JSON.stringify(uk ? ['КІ-Рекс на зв’язку', 'Гуляю по шині даних', 'Ловлю хвилю'] : ['KI-Rex on the line', 'Walking along the data bus', 'Catching a wave'])} aria-hidden="true"><span class="perch__say"></span><canvas width="90" height="72"></canvas></div>
       <div class="alum__head">
         <h2 class="eyebrow" id="h-alum">{t.alumni_eyebrow}</h2>
-        {many && <div class="alum__nav" data-rail-nav>
-          <button type="button" class="btn btn--line btn--sm btn--icon" data-rail-prev aria-label={uk ? 'Попередні' : 'Previous'}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg></button>
-          <button type="button" class="btn btn--line btn--sm btn--icon" data-rail-next aria-label={uk ? 'Наступні' : 'Next'}><svg width="16" height="16" aria-hidden="true"><use href="#i-right"/></svg></button>
-        </div>}
+        <RailNav lang={lang} />
         <a class="arrow-link" href={url(lang, '/graduates/')}>{t.alumni_link} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
       <ul class="alum__row" role="list" data-rail>
-        {list.map((a, i) => { const m = split(a.company); const photo = a.photo && PHOTOS[a.photo as keyof typeof PHOTOS]; return (
+        {list.map((a, i) => { const photo = a.photo && PHOTOS[a.photo as keyof typeof PHOTOS]; return (
           <li class="rv" style={`--i:${i + 1}`}>
             <a class="alum__item" href={url(lang, '/graduates/') + (a.anchor ? '#' + a.anchor : '')} data-rex-say={a.say}>
-              <span class="alum__mark">{m ? <>{m[1]} <small>{m[2]}</small></> : a.company}</span>
+              <span class="alum__mark">{mark(a.company)}</span>
               {a.who && <span class="alum__who">
                 {photo ? <span class="alum__ph"><Image src={photo} width={96} alt="" loading="lazy" /></span> : <span></span>}
                 <span><b>{a.who}</b>{a.role && <span class="alum__role">{a.role}</span>}</span>

@@ -1,0 +1,11 @@
+---
+// Стрілки й лічильник для стрічки, що гортається (data-rail у тому ж розділі). Видно лише тоді, коли стрічка не вміщається.
+import type { Lang } from '../lib/i18n';
+interface Props { lang: Lang }
+const uk = Astro.props.lang === 'uk';
+---
+<div class="rail-nav" data-rail-nav hidden>
+  <button type="button" class="btn btn--line btn--sm btn--icon" data-rail-prev aria-label={uk ? 'Попередні' : 'Previous'}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg></button>
+  <span class="rail-nav__n" data-rail-count aria-hidden="true"></span>
+  <button type="button" class="btn btn--line btn--sm btn--icon" data-rail-next aria-label={uk ? 'Наступні' : 'Next'}><svg width="16" height="16" aria-hidden="true"><use href="#i-right"/></svg></button>
+</div>

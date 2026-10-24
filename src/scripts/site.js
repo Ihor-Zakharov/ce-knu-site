@@ -222,17 +222,21 @@ if (dock && dockable) {
   const mq = matchMedia('(max-width: 900px)'); place(mq); mq.addEventListener('change', place);
 }
 
-/* ── Стрічки з гортанням (випускники): стрілки ‹ › — на ширину картки; на телефоні — свайп ── */
+/* ── Стрічки з гортанням (випускники, лабораторії): ‹ 1 / 5 › у шапці розділу, лише коли стрічка не вміщається ── */
 $$('[data-rail]').forEach(rail => {
-  const nav = rail.parentElement.querySelector('[data-rail-nav]');
+  const nav = rail.closest('section')?.querySelector('[data-rail-nav]');
   if (!nav) return;
-  const prev = nav.querySelector('[data-rail-prev]'), next = nav.querySelector('[data-rail-next]');
+  const prev = nav.querySelector('[data-rail-prev]'), next = nav.querySelector('[data-rail-next]'), count = nav.querySelector('[data-rail-count]');
+  const items = [...rail.children];
+  const step = () => (items[1] ? items[1].offsetLeft - items[0].offsetLeft : rail.clientWidth);
   const upd = () => {
     const max = rail.scrollWidth - rail.clientWidth - 2;
     nav.hidden = max <= 0;
     prev.disabled = rail.scrollLeft <= 2; next.disabled = rail.scrollLeft >= max;
+    const i = rail.scrollLeft >= max ? items.length - 1 : Math.round(rail.scrollLeft / step());
+    count.textContent = `${i + 1} / ${items.length}`;
   };
-  const by = d => rail.scrollBy({ left: d * (rail.firstElementChild?.getBoundingClientRect().width || rail.clientWidth), behavior: REDUCED ? 'auto' : 'smooth' });
+  const by = d => rail.scrollBy({ left: d * step(), behavior: REDUCED ? 'auto' : 'smooth' });
   prev.addEventListener('click', () => by(-1)); next.addEventListener('click', () => by(1));
   rail.addEventListener('scroll', upd, { passive: true }); new ResizeObserver(upd).observe(rail); upd();
 });

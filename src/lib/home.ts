@@ -24,7 +24,7 @@ export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
     { y: '2010', t: 'Кафедра комп’ютерної інженерії', d: '' },
     { y: '2012', t: 'Завідувач: С. Д. Погорілий', d: '' },
     { y: '2017', t: 'Меморандум з IBM Ukraine', d: '' },
-    { y: '2021', t: 'Завідувач: Ю. В. Бойко', d: '' }
+    { y: '2021', t: 'Знову завідувач: Ю. В. Бойко', d: '' }
   ],
   en: [
     { y: '1991', t: 'Automation of Scientific Research', d: '' },
@@ -34,11 +34,10 @@ export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
     { y: '2010', t: 'Department of Computer Engineering', d: '' },
     { y: '2012', t: 'Head: S. D. Pohorilyi', d: '' },
     { y: '2017', t: 'Memorandum with IBM Ukraine', d: '' },
-    { y: '2021', t: 'Head: Yu. V. Boiko', d: '' }
+    { y: '2021', t: 'Head again: Yu. V. Boiko', d: '' }
   ],
 };
 
-export const PARTNERS = ['Huawei ICT Academy', 'Cisco Networking Academy', 'Microsoft', 'IBM Ukraine', 'Fortinet Academy', 'Intel', 'MIPS Technologies'];
 
 // Де працюють випускники — лише те, що названо на сторінці «Наші випускники» (src/content/pages/*/graduates.md).
 // Новий випускник = ще один запис; без людини (лише company) — просто знак компанії. Понад три — стрічка з гортанням.
@@ -46,14 +45,14 @@ export const PARTNERS = ['Huawei ICT Academy', 'Cisco Networking Academy', 'Micr
 export interface Alum { company: string; who?: string; role?: string; anchor?: string; photo?: string; say?: string }
 export const ALUMNI: Record<Lang, Alum[]> = {
   uk: [
-    { company: 'Intel', who: 'Дмитро Калита', role: 'директор представництва в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita', say: 'Intel inside' },
-    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'інженер-дослідник NLP, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov', say: 'Per aspera ad astra' },
-    { company: 'Lyft', who: 'Максим Слинько', role: 'менеджер програмних проєктів', anchor: 'максим-слинько', photo: 'm_slynko', say: 'Дискретна математика в ділі' },
+    { company: 'Intel', who: 'Дмитро Калита', role: 'Директор офісу Intel в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita', say: 'Я старший за x86.' },
+    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'Інженер-дослідник з NLP, One AI, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov', say: 'Моя мова теж природна.' },
+    { company: 'Lyft', who: 'Максим Слинько', role: 'Керівник проєктів розробки ПЗ, Lyft', anchor: 'максим-слинько', photo: 'm_slynko', say: 'Lyft не викликаю, я ходжу.' },
   ],
   en: [
-    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of the office in Ukraine, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita', say: 'Intel inside' },
-    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov', say: 'Per aspera ad astra' },
-    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager', anchor: 'maksym-slynko', photo: 'm_slynko', say: 'Discrete maths at work' },
+    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of Intel’s Ukraine office, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita', say: 'I predate x86.' },
+    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, One AI, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov', say: 'Roar is natural language.' },
+    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager, Lyft', anchor: 'maksym-slynko', photo: 'm_slynko', say: 'No Lyft for me. I walk.' },
   ],
 };
 
@@ -61,16 +60,6 @@ export const ALUMNI: Record<Lang, Alum[]> = {
 export const STACK: Record<Lang, string[]> = {
   uk: ['Транзистор', 'Логіка', 'Процесор', 'Вбудовані', 'ОС', 'Мережі', 'Хмари', 'ШІ'],
   en: ['Transistor', 'Logic', 'Processor', 'Embedded', 'OS', 'Networks', 'Cloud', 'AI'],
-};
-export const PROFILE_TAGS: Record<Lang, { hw: string[]; sw: string[] }> = {
-  uk: {
-    hw: ['Цифрова схемотехніка', 'ПЛІС · VHDL', 'Архітектура комп’ютерів', 'Вбудовані системи', 'Цифрова обробка сигналів'],
-    sw: ['Системне програмування', 'Операційні системи', 'Комп’ютерні мережі', 'Хмарні платформи', 'Машинне навчання'],
-  },
-  en: {
-    hw: ['Digital circuits', 'FPGA · VHDL', 'Computer architecture', 'Embedded systems', 'Digital signal processing'],
-    sw: ['Systems programming', 'Operating systems', 'Computer networks', 'Cloud platforms', 'Machine learning'],
-  },
 };
 
 // Роботодавцям: що вміють випускники — навички, як їх пишуть у вакансіях, від мов опису апаратури до ML.
@@ -93,82 +82,84 @@ export const SKILLS: Record<Lang, { g: string; items: string[] }[]> = {
 // img — ключ у LAB_IMG головної (фото з тексту «Про кафедру» з тими самими підписами); без фото — ілюстрація КІ-Рекса.
 // ReLab: DOU, «Relab — вільна лабораторія робототехніки та мікроелектроніки в КНУ» (03.04.2018; статтю передруковано на rex.knu.ua);
 // фото studying/relab.jpg — кадр «Резиденти лабораторії» з тієї ж статті.
-export interface Lab { brand: string; name: string; text: string; spec: string[]; img: string; alt: string }
+export interface Lab { brand: string; name: string; text: string; spec: string[]; img: string; alt: string; pos?: string }   // pos — object-position кадру
 export const LABS: Record<Lang, Lab[]> = {
   uk: [
-    { brand: 'HUAWEI', name: 'Мережева лабораторія Huawei', text: 'Комутація й маршрутизація на обладнанні Huawei для мереж великих підприємств: лабораторні практикуми й дослідження.', spec: ['Huawei ICT Academy', 'Комутація', 'Маршрутизація'], img: '01', alt: 'Робочі місця та обладнання виробництва компанії HUAWEI' },
-    { brand: 'CISCO · MICROSOFT · FORTINET', name: 'Академії вендорів', text: 'На кафедрі працюють Cisco Networking Academy, академії Microsoft і Fortinet.', spec: ['Мережі', 'Кібербезпека', 'Програмні платформи'], img: '03', alt: 'Проведення лабораторних робіт доцентом О. В. Барабановим в лабораторії цифрового зв’язку' },
-    { brand: 'IBM POWER 550', name: 'Сервер IBM Power 550', text: 'Unix AIX у навчанні. Сервер передано кафедрі за меморандумом з IBM Ukraine 2017 року.', spec: ['IBM Power', 'Unix AIX', 'з 2017'], img: 'ibm-1', alt: 'Сервер IBM Power 550, що використовується в навчальному процесі' },
-    { brand: 'ALTERA DE1 · MIPS', name: 'ПЛІС і мікропроцесори', text: 'Плати Altera DE1 для цифрової логіки й архітектури комп’ютерів, обладнання MIPS Technologies у лабораторії цифрового зв’язку.', spec: ['ПЛІС', 'Цифрова логіка', 'Архітектура'], img: '05', alt: 'Експериментальний стенд та збільшене зображення плати ALTERA DE1' },
-    { brand: 'RELAB', name: 'ReLab', text: 'Вільна лабораторія робототехніки й мікроелектроніки факультету з 2017 року: паяльні станції, осцилограф, 3D-принтер, мікроконтролери й датчики. Старші студенти навчають молодших.', spec: ['Робототехніка', 'IoT', '3D-друк'], img: 'relab', alt: 'Резидент ReLab паяє плату' },
+    { brand: 'HUAWEI', name: 'Мережева лабораторія Huawei', text: 'Корпоративні комутатори й маршрутизатори для практикумів і досліджень.', spec: ['Huawei ICT Academy', 'Комутація', 'Маршрутизація'], img: '01', alt: 'Робочі місця та обладнання виробництва компанії HUAWEI' },
+    { brand: 'АКАДЕМІЇ', name: 'Cisco, Microsoft, Fortinet', text: 'Партнерські академії: мережі, платформи Microsoft, кібербезпека.', spec: ['Мережі', 'Кібербезпека', 'Програмні платформи'], img: '03', alt: 'Проведення лабораторних робіт доцентом О. В. Барабановим в лабораторії цифрового зв’язку' },
+    { brand: 'IBM POWER 550', name: 'Сервер IBM Power 550', text: 'Unix AIX. Передано кафедрі 2017 року за меморандумом з IBM Україна.', spec: ['IBM Power', 'Unix AIX', 'з 2017'], img: 'ibm-1', alt: 'Сервер IBM Power 550, що використовується в навчальному процесі', pos: '86% 50%' },
+    { brand: 'ALTERA DE1 · MIPS', name: 'ПЛІС і мікропроцесори', text: 'Altera DE1: цифрова логіка й архітектура. MIPS: цифровий зв’язок.', spec: ['ПЛІС', 'Цифрова логіка', 'Архітектура'], img: '05', alt: 'Експериментальний стенд та збільшене зображення плати ALTERA DE1' },
+    { brand: 'RELAB', name: 'ReLab', text: 'Вільна лабораторія робототехніки факультету з 2017 року: паяльники, осцилограф, 3D-принтер.', spec: ['Робототехніка', 'IoT', '3D-друк'], img: 'relab', alt: 'Резидент ReLab паяє плату' },
   ],
   en: [
-    { brand: 'HUAWEI', name: 'Huawei networking lab', text: 'Switching and routing on Huawei enterprise equipment, used for lab classes and research.', spec: ['Huawei ICT Academy', 'Switching', 'Routing'], img: '01', alt: 'Workstations and equipment manufactured by HUAWEI' },
-    { brand: 'CISCO · MICROSOFT · FORTINET', name: 'Vendor academies', text: 'Cisco Networking Academy, Microsoft and Fortinet academies run at the department.', spec: ['Networks', 'Cybersecurity', 'Software platforms'], img: '03', alt: 'Laboratory classes conducted by Associate Professor O. V. Barabanov in the Digital Communications Laboratory' },
-    { brand: 'IBM POWER 550', name: 'IBM Power 550 server', text: 'Unix AIX in teaching. The server came to the department under a 2017 memorandum with IBM Ukraine.', spec: ['IBM Power', 'Unix AIX', 'since 2017'], img: 'ibm-1', alt: 'IBM Power 550 server used in the educational process' },
-    { brand: 'ALTERA DE1 · MIPS', name: 'FPGAs and microprocessors', text: 'Altera DE1 boards for digital logic and computer architecture, MIPS Technologies equipment in the digital communications lab.', spec: ['FPGA', 'Digital logic', 'Architecture'], img: '05', alt: 'Experimental test bench and an enlarged image of the ALTERA DE1 board' },
-    { brand: 'RELAB', name: 'ReLab', text: 'The faculty’s open robotics and microelectronics lab since 2017: soldering stations, an oscilloscope, a 3D printer, microcontrollers and sensors. Senior students teach the juniors.', spec: ['Robotics', 'IoT', '3D printing'], img: 'relab', alt: 'A ReLab resident soldering a board' },
+    { brand: 'HUAWEI', name: 'Huawei network lab', text: 'Enterprise switches and routers for practical classes and research.', spec: ['Huawei ICT Academy', 'Switching', 'Routing'], img: '01', alt: 'Workstations and equipment manufactured by HUAWEI' },
+    { brand: 'ACADEMIES', name: 'Cisco, Microsoft, Fortinet', text: 'Partner academies for networking, Microsoft platforms and security.', spec: ['Networks', 'Cybersecurity', 'Software platforms'], img: '03', alt: 'Laboratory classes conducted by Associate Professor O. V. Barabanov in the Digital Communications Laboratory' },
+    { brand: 'IBM POWER 550', name: 'IBM Power 550 server', text: 'Runs Unix AIX. Handed over under a 2017 memorandum with IBM Ukraine.', spec: ['IBM Power', 'Unix AIX', 'since 2017'], img: 'ibm-1', alt: 'IBM Power 550 server used in the educational process', pos: '86% 50%' },
+    { brand: 'ALTERA DE1 · MIPS', name: 'FPGA and microprocessor lab', text: 'Altera DE1 for logic and architecture, MIPS for digital communications.', spec: ['FPGA', 'Digital logic', 'Architecture'], img: '05', alt: 'Experimental test bench and an enlarged image of the ALTERA DE1 board' },
+    { brand: 'RELAB', name: 'ReLab', text: 'The faculty’s open robotics lab since 2017: soldering, an oscilloscope, a 3D printer.', spec: ['Robotics', 'IoT', '3D printing'], img: 'relab', alt: 'A ReLab resident soldering a board' },
   ],
 };
 
-/** Тексти головної. Писала панель із трьох моделей наосліп, фінал — за більшістю (див. опис PR). */
+/** Тексти головної: три моделі писали наосліп (Opus 5.5, Fable, Codex gpt-6-astra), ті самі три голосували за кожен рядок;
+ *  більшість перемагає, нічиї й дрібні правки — редактор. Блок роботодавців — за рішенням арт-директорів. */
+const ukSkills = (n: number) => `Усі ${n} ${n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'навички' : 'навичок'} викладають на кафедрі.`;
 export const COPY = {
   uk: {
-    meta_description: 'Кафедра комп’ютерної інженерії КНУ імені Тараса Шевченка: бакалаврат, магістратура й аспірантура F7. Апаратні й програмні платформи, лабораторії Huawei, Cisco, IBM.',
-    hero_lead: 'Електроніка й комп’ютерні науки в одній програмі.',
-    hero_cta_primary: 'Вступникам',
+    meta_description: 'Комп’ютерна інженерія в КНУ імені Тараса Шевченка: апаратні системи, програмування й мережі. Випускники з досвідом в Intel, One AI та Lyft.',
+    hero_lead: 'Інженери, які розуміють комп’ютер цілком: від транзистора до хмари.',
+    hero_cta_primary: 'Вступ 2027',
     hero_cta_secondary: 'Роботодавцям',
-    alumni_eyebrow: 'Де працюють наші випускники',
+    alumni_eyebrow: 'Ким стали наші випускники',
     alumni_link: 'Історії випускників',
-    profiles_title: 'Два профілі підготовки',
-    profiles_lead: 'Від схеми на платі до сервісу в мережі: обидві половини комп’ютера.',
+    profiles_title: 'Що ви навчитеся будувати',
+    profiles_lead: 'Комп’ютерна інженерія: електроніка плюс комп’ютерні науки. Одна програма, два профілі.',
     profile_hw_title: 'Апаратні платформи',
-    profile_hw_text: 'Цифрові схеми, процесори, ПЛІС і вбудовані системи.',
+    profile_hw_text: 'Цифрові схеми, мікропроцесори, ПЛІС. Проєктуєте на VHDL і SystemVerilog, перевіряєте на платі.',
     profile_sw_title: 'Програмні платформи',
-    profile_sw_text: 'Системне програмування, операційні системи, мережі й хмари.',
-    labs_title: 'Лабораторії й партнери',
-    programs_title: 'Програми',
-    programs_note: 'Спеціальність F7 «Комп’ютерна інженерія»',
-    employers_title: 'Інженер, який бачить систему цілком',
-    employers_text: 'Від Verilog до PyTorch: ваші вимоги з однієї вакансії вивчають в одній програмі.',
+    profile_sw_text: 'Операційні системи, мережі, бази даних, хмарні платформи. Програмуєте на C++, Python і C#.',
+    labs_title: 'Лабораторії та партнери',
+    programs_title: 'Програми навчання',
+    programs_note: 'Вказано максимальну кількість місць за ліцензією.',
+    employers_title: 'Інженери для ваших команд',
+    employers_ok: ukSkills,
+    employers_plan: 'Навчальний план F7, PDF',
+    employers_page: 'Сторінка для роботодавців',
     employers_cta: 'Написати кафедрі',
-    employers_pick: 'Що вміють випускники',
-    employers_ok: 'Усьому цьому вчать на кафедрі',
     employers_mail: 'Співпраця з кафедрою',
-    history_title: 'Історія',
-    history_lead: 'З 1991 року: від автоматизації фізичного експерименту до кафедри комп’ютерної інженерії.',
-    about_toggle: 'Повний опис кафедри',
+    history_title: 'Історія кафедри',
+    history_lead: '1991: першими в Україні почали автоматизувати фізичні експерименти комп’ютерами й мережами.',
+    about_toggle: 'Докладніше про кафедру',
     band_eyebrow: 'Вступ 2027',
-    band_title: 'Вивчайте комп’ютерну інженерію в КНУ',
-    band_cta: 'Про вступ',
+    band_title: 'Технології змінюються. Принципи лишаються.',
+    band_cta: 'Як вступити',
   },
   en: {
-    meta_description: 'Department of Computer Engineering, Taras Shevchenko National University of Kyiv: Bachelor’s, Master’s and PhD in F7. Hardware and software platforms, Huawei, Cisco and IBM labs.',
-    hero_lead: 'Electronics and computer science in one programme.',
-    hero_cta_primary: 'Admission',
-    hero_cta_secondary: 'Employers',
-    alumni_eyebrow: 'Where our alumni work',
+    meta_description: 'Computer Engineering at Taras Shevchenko National University of Kyiv. Hardware and software. Alumni careers at Intel, One AI and Lyft.',
+    hero_lead: 'Engineers who understand the whole computer: transistor to cloud.',
+    hero_cta_primary: 'Apply for 2027',
+    hero_cta_secondary: 'For employers',
+    alumni_eyebrow: 'Where our graduates went',
     alumni_link: 'Alumni stories',
-    profiles_title: 'Two profiles',
-    profiles_lead: 'From the circuit board to the networked service: both halves of a computer.',
+    profiles_title: 'What you will learn to build',
+    profiles_lead: 'Computer engineering is electronics plus computer science. One programme, two profiles.',
     profile_hw_title: 'Hardware platforms',
-    profile_hw_text: 'Digital circuits, processors, FPGAs and embedded systems.',
+    profile_hw_text: 'Digital circuits, microprocessors, FPGAs. Design in VHDL and SystemVerilog, then test on a board.',
     profile_sw_title: 'Software platforms',
-    profile_sw_text: 'Systems programming, operating systems, networks and cloud.',
+    profile_sw_text: 'Operating systems, networks, databases and cloud. You program in C++, Python and C#.',
     labs_title: 'Labs and partners',
-    programs_title: 'Programmes',
-    programs_note: 'Speciality F7 Computer Engineering',
-    employers_title: 'Engineers who see the whole system',
-    employers_text: 'Verilog or PyTorch, networks or embedded C: the skills in your job post are taught in one programme.',
+    programs_title: 'Degree programmes',
+    programs_note: 'Places shown are licensed intake limits.',
+    employers_title: 'Engineers for your team',
+    employers_ok: (n: number) => `All ${n} skills are taught at the department.`,
+    employers_plan: 'F7 curriculum, PDF',
+    employers_page: 'Employers page',
     employers_cta: 'Write to the department',
-    employers_pick: 'What our graduates know',
-    employers_ok: 'The department teaches all of it',
     employers_mail: 'Working with the department',
-    history_title: 'History',
-    history_lead: 'Since 1991: from automating physics experiments to a Department of Computer Engineering.',
-    about_toggle: 'Full description',
-    band_eyebrow: 'Admission 2027',
-    band_title: 'Study Computer Engineering at KNU',
-    band_cta: 'Admissions',
+    history_title: 'Department history',
+    history_lead: '1991: the first in Ukraine to start automating physics experiments with computers and networks.',
+    about_toggle: 'About the department',
+    band_eyebrow: '2027 admissions',
+    band_title: 'Technology changes. Principles stay.',
+    band_cta: 'How to apply',
   },
 } as const;

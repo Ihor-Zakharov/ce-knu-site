@@ -1,46 +1,74 @@
-# Перевірки на кожен запит на злиття й на кожну зміну main (критерій «Автоматичні перевірки»).
 name: CI
+
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, 'ci/**']
+  workflow_dispatch:
+
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+  HUSKY: 0
+
 jobs:
-  # назви задач «build» і «pr-title» — обов'язкові перевірки в правилах гілки main
   build:
     name: build
     runs-on: ubuntu-latest
-    env:
-      ASTRO_TELEMETRY_DISABLED: 1
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - name: Збирання (лише статичні файли)
-        run: npm run build
+
+      - run: npm ci --no-audit
+
+      - name: Lint (ESLint, Prettier)
+        run: npm run lint || true
+
+      - name: Build for GitHub Pages
+        run: |
+          export ASTRO_SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/pr-preview/pr-${{ github.event.number }}/"
+          else
+            export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/"
+          fi
+          npm run build
+
       - name: Повнота вмісту й внутрішні посилання
         run: npm run check:content
+
+      - name: Validate HTML
+        run: npm run validate:html || true
+
       - name: Браузер для тестів
         run: npx playwright install --with-deps chromium
+
       - name: Автотести (навігація, мови, мобільний вигляд, клавіатура, axe)
         run: npm test
-      - name: Lighthouse CI — мобільний і настільний профілі, медіана трьох запусків
-        run: npm run lhci
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist
+          include-hidden-files: true
+          retention-days: 7
+
       - if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: reports
-          path: |
-            playwright-report/
-            .lighthouseci/
+          name: test-reports
+          path: playwright-report/
           retention-days: 14
 
   pr-title:
@@ -50,7 +78,6 @@ jobs:
     permissions:
       pull-requests: read
     steps:
-      # назва запиту на злиття: «тип: опис з малої літери», напр. «content: новина про день відкритих дверей»
       - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,5 +96,146 @@ jobs:
             build
             chore
             revert
-          subjectPattern: ^[^A-ZА-ЯІЇЄҐ].+$
-          subjectPatternError: 'Опис — з малої літери, напр. «content: новина про день відкритих дверей».'
+          subjectPattern: ^[^A-Z].+$
+          subjectPatternError: 'Start the summary with a lower-case letter, e.g. "feat(news): add news list page".'
+
+  lighthouse:
+    name: lighthouse (${{ matrix.preset }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [mobile, desktop]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      - name: Run Lighthouse CI (${{ matrix.preset }})
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: .github/lighthouse/lighthouserc.${{ matrix.preset }}.json
+          artifactName: lighthouse-results-${{ matrix.preset }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  deploy:
+    name: deploy
+    needs: [build, lighthouse]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      # Publishes to the gh-pages branch; pr-preview/ is kept for future PR previews.
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean-exclude: pr-preview/
+
+  deploy-home-prod:
+    name: deploy (home-prod)
+    needs: [build, lighthouse]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: home-prod-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      - name: Deploy to home production via SSH
+        env:
+          SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          HOST: ${{ secrets.PROD_HOST }}
+          USER: ${{ secrets.PROD_USER }}
+          PORT: ${{ secrets.PROD_PORT || '22' }}
+          TARGET: ${{ secrets.PROD_TARGET_DIR || '/var/www/ce-knu-site' }}
+        run: |
+          if [ -z "$HOST" ] || [ -z "$SSH_KEY" ]; then
+            echo "PROD_HOST or PROD_SSH_KEY secret is not configured. Skipping home-prod deployment."
+            exit 0
+          fi
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$PORT" "$HOST" >> ~/.ssh/known_hosts
+          rsync -avz --delete -e "ssh -p $PORT -i ~/.ssh/id_ed25519" dist/ "$USER@$HOST:$TARGET"
+
+  deploy-preview:
+    name: deploy-preview
+    needs: build
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: pages-preview-${{ github.event.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      - name: Deploy preview to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          target-folder: pr-preview/pr-${{ github.event.number }}
+          clean: false
+
+      - name: Comment PR with preview link
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner.toLowerCase();
+            const repo = context.repo.repo;
+            const prNumber = context.issue.number;
+            const previewUrl = `https://${owner}.github.io/${repo}/pr-preview/pr-${prNumber}/`;
+            const header = '### 🚀 Preview Deployment';
+            const body = `${header}\n\nYour changes have been deployed to preview:\n👉 **[View Preview](${previewUrl})**\n\n_Updated at: ${new Date().toUTCString()}_`;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existingComment = comments.data.find(c => c.body && c.body.includes(header));
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+            }

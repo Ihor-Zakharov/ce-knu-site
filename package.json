@@ -2,6 +2,10 @@
   "name": "ce-knu-site",
   "private": true,
   "type": "module",
+  "description": "Новий сайт кафедри комп'ютерної інженерії КНУ (ce.knu.ua)",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
@@ -10,8 +14,13 @@
     "check:content": "node scripts/check-content.mjs",
     "test": "playwright test",
     "lhci": "lhci autorun --config=lighthouserc.mobile.json && lhci autorun --config=lighthouserc.desktop.json",
+    "lint": "npm run format:check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:html": "html-validate \"dist/**/*.html\"",
     "check": "npm run check:content && npm test",
-    "verify": "npm run build && npm run check:content && npm test"
+    "verify": "npm run check && npm run build && npm run validate:html",
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.4",
@@ -22,13 +31,22 @@
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.64.1",
-    "pagefind": "^1.5.2"
-  },
-  "description": "Новий сайт кафедри комп'ютерної інженерії КНУ (ce.knu.ua)",
-  "engines": {
-    "node": ">=24"
+    "@types/node": "^24.19.2",
+    "eslint": "^10.13.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.13.0",
+    "html-validate": "^11.17.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "pagefind": "^1.5.2",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0"
   }
 }

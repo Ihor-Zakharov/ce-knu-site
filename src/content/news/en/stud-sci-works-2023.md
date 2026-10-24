@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/stud-sci-works-2023.jpg"
 coverAlt: "Award ceremony for the winners of the All-Ukrainian Student Research Paper Competition and their supervisors"
 legacy: "/posts/stud-sci-works-2023/"
 source: "posts/20-stud-sci-works.rst"
+tags: [awards, science]
 ---
 
 ![Photo: Award ceremony for the winners of the All-Ukrainian Student Research Paper Competition and their supervisors](../../../assets/images/news/stud-sci-works-2023.jpg)

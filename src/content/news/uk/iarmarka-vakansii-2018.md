@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg"
 coverAlt: "Ярмарка вакансій 2018"
 legacy: "/posts/iarmarka-vakansii-2018/"
 source: "posts/iarmarka-vakansii-2018.rst"
+tags: [partners, admission]
 ---
 
 ![Фото: Ярмарка вакансій 2018](../../../assets/images/news/fd8b0f77d767f1f6640afba6916ff67c_L.jpg)

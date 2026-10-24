@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/3899dfe821816fbcb3db3e3b23f81585_M.jpg"
 coverAlt: "День відкритих дверей"
 legacy: "/posts/den-vidkritikh-dverei/"
 source: "posts/den-vidkritikh-dverei.rst"
+tags: [admission]
 ---
 
 ![Фото: День відкритих дверей](../../../assets/images/news/3899dfe821816fbcb3db3e3b23f81585_M.jpg)

@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/greeting-tuv.jpg"
 coverAlt: "Вітаємо переможців!!"
 legacy: "/posts/greeting-tuv/"
 source: "posts/greeting-tuv.rst"
+tags: [awards]
 ---
 
 ![Фото: Вітаємо переможців](../../../assets/images/news/greeting-tuv.jpg)

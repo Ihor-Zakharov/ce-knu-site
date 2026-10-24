@@ -1,5 +1,6 @@
 // Нова новина однією командою: обидва файли (uk і en) у src/content/news/ і фірмова картка прев’ю.
-//   npm run news -- "Заголовок українською" ["English title"] [--date 2026-11-01] [--slug moya-novyna]
+//   npm run news -- "Заголовок українською" ["English title"] [--tags science,awards] [--date 2026-11-01] [--slug moya-novyna]
+// Теми (--tags): science наука · awards нагороди · partners партнери · events конференції й лекції · admission вступ і студенти · study навчальний процес
 // Далі — лише Markdown: відкрийте створені файли, напишіть текст, фото покладіть у src/assets/images/news/.
 // Перегляд: npm run dev → http://localhost:4321/posts/<slug>/
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -12,9 +13,13 @@ const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); if (i < 0) return undefined; const v = args[i + 1]; args.splice(i, 2); return v; };
 const date = opt('--date') ?? new Date().toISOString().slice(0, 10);
 let slug = opt('--slug');
+const TOPICS = ['science', 'awards', 'partners', 'events', 'admission', 'study'];   // як у src/lib/topics.ts
+const tags = (opt('--tags') ?? '').split(',').map(t => t.trim()).filter(Boolean);
+const bad = tags.filter(t => !TOPICS.includes(t));
+if (bad.length) { console.error(`Невідомі теми: ${bad.join(', ')}. Можна: ${TOPICS.join(', ')}`); process.exit(1); }
 const [uk, en] = args;
 if (!uk) {
-  console.error('Як користуватися:\n  npm run news -- "Заголовок українською" ["English title"] [--date РРРР-ММ-ДД] [--slug latynytseyu]');
+  console.error('Як користуватися:\n  npm run news -- "Заголовок українською" ["English title"] [--tags science,awards] [--date РРРР-ММ-ДД] [--slug latynytseyu]\nТеми: science · awards · partners · events · admission · study');
   process.exit(1);
 }
 
@@ -31,7 +36,7 @@ date: ${q(date)}
 summary: ${q(summary)}
 # cover: "../../../assets/images/news/${slug}.jpg"   # фото-обкладинка (необов’язково): покладіть файл і приберіть «#»
 # coverAlt: "Що зображено на фото"
-tags: []
+tags: [${tags.join(', ')}]   # теми: science, awards, partners, events, admission, study
 ---
 
 ${body}

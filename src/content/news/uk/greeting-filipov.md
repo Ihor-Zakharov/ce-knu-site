@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/greeting-filipov.jpg"
 coverAlt: "Вітаємо нашого студента – Філіпова Микиту з перемогою на Чемпіонату Світу!"
 legacy: "/posts/greeting-filipov/"
 source: "posts/greeting-filipov.rst"
+tags: [awards]
 ---
 
 ![Фото: Вітаємо нашого студента – Філіпова Микиту з перемогою на Чемпіонату Світу](../../../assets/images/news/greeting-filipov.jpg)

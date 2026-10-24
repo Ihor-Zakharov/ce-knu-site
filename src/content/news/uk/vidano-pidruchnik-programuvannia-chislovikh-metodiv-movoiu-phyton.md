@@ -4,6 +4,7 @@ date: "2016-04-14"
 summary: "."
 legacy: "/posts/vidano-pidruchnik-programuvannia-chislovikh-metodiv-movoiu-phyton/"
 source: "posts/vidano-pidruchnik-programuvannia-chislovikh-metodiv-movoiu-phyton.rst"
+tags: [science]
 ---
 
 .

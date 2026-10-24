@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Department meeting: teaching load for the 2026–2027 academic year"
 legacy: "/posts/zasidannia-kafedry-navantazhennia-2026/"
 source: "posts/zasidannia-kafedry-navantazhennia-2026.rst"
+tags: [study]
 ---
 
 On 24 September 2026, a meeting of the Department of Computer Engineering was held, the main item of which was the distribution of the lecturers' teaching load for the 2026–2027 academic year.

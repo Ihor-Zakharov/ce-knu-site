@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/greeting-filipov.jpg"
 coverAlt: "Congratulations to our student Mykyta Filipov on his victory at the World Championship!"
 legacy: "/posts/greeting-filipov/"
 source: "posts/greeting-filipov.rst"
+tags: [awards]
 ---
 
 ![Photo: Congratulations to our student Mykyta Filipov on his victory at the World Championship](../../../assets/images/news/greeting-filipov.jpg)

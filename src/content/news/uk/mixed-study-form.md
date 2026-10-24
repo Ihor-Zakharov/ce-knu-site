@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/greeting-tuv.jpg"
 coverAlt: "Змішана форма навчання"
 legacy: "/posts/mixed-study-form/"
 source: "posts/mixed-study-form.rst"
+tags: [study]
 ---
 
 ![Фото: Змішана форма навчання](../../../assets/images/news/greeting-tuv.jpg)

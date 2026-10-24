@@ -1,5 +1,6 @@
 // Колекції вмісту. Кожен файл — окрема новина, сторінка чи людина; мова — підкаталог uk/ або en/.
 // Схема перевіряється під час збирання: пропущене обов'язкове поле зупиняє збирання з поясненням.
+import { TOPICS } from './lib/topics';
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -16,7 +17,7 @@ const news = defineCollection({
     summary: z.string().default(''),
     cover: image().optional(),
     coverAlt: z.string().optional(),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.enum(TOPICS)).default([]),   // теми новин — src/lib/topics.ts
     draft: z.boolean().default(false),
     legacy: z.string().optional(),
     source: z.string().optional(),

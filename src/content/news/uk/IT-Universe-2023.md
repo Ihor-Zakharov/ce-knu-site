@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/olymp-2023.jpg"
 coverAlt: "IT-Universe-2023"
 legacy: "/posts/IT-Universe-2023/"
 source: "posts/olympiada-2023.rst"
+tags: [awards]
 ---
 
 ![Фото: IT-Universe-2023](../../../assets/images/news/olymp-2023.jpg)

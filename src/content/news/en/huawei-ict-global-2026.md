@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/huawei-global-2026-team.jpg"
 coverAlt: "KNU teams among the prize-winners of the Huawei ICT Competition 2025–2026 Global Final"
 legacy: "/posts/huawei-ict-global-2026/"
 source: "posts/33-huawei-global.rst"
+tags: [awards, partners]
 ---
 
 The Huawei ICT Competition is an annual global event for students and teachers of colleges and universities. It has become an international platform for competition and exchange of experience that enables participants to strengthen their ICT knowledge, improve their practical skills and foster innovation using the latest technologies and platforms. In China, the competition is included in the list of national competitions for university students, and worldwide it is recognised as a key partner flagship programme of the UNESCO Global Skills Academy.

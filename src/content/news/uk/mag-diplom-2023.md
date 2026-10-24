@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/mag-diplom-2023.jpg"
 coverAlt: "Урочисте вручення дипломів магістрам!"
 legacy: "/posts/mag-diplom-2023/"
 source: "posts/19-mag-diplom.rst"
+tags: [admission]
 ---
 
 ![Фото: Урочисте вручення дипломів магістрам](../../../assets/images/news/mag-diplom-2023.jpg)

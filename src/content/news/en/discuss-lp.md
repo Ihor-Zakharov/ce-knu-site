@@ -4,6 +4,7 @@ date: "2024-03-20"
 summary: "."
 legacy: "/posts/discuss-lp/"
 source: "posts/28-discuss-lp.rst"
+tags: [study]
 ---
 
 .

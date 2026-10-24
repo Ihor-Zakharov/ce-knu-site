@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/study-2023.jpg"
 coverAlt: "Інформація про організацію освітнього процесу"
 legacy: "/posts/study-2023/"
 source: "posts/22-study-23-24.rst"
+tags: [study]
 ---
 
 ![Фото: Інформація про організацію освітнього процесу](../../../assets/images/news/study-2023.jpg)

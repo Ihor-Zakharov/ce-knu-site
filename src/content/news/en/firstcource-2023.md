@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/firstcource-2023.jpg"
 coverAlt: "Welcome ceremony for first-year students!"
 legacy: "/posts/firstcource-2023/"
 source: "posts/23-firstcource23.rst"
+tags: [admission]
 ---
 
 ![Photo: Welcome ceremony for first-year students](../../../assets/images/news/firstcource-2023.jpg)

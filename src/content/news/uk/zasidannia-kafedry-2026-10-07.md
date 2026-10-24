@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Засідання кафедри 7 жовтня 2026 року"
 legacy: "/posts/zasidannia-kafedry-2026-10-07/"
 source: "posts/zasidannia-kafedry-2026-10-07.rst"
+tags: [study]
 ---
 
 7 жовтня 2026 року відбулося засідання кафедри комп'ютерної інженерії під головуванням завідувача кафедри доцента [Ю. В. Бойка](/personas/boiko/). Засідання пройшло онлайн.

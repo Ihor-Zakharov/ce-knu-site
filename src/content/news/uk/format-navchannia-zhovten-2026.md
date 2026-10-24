@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Формат навчання з 17 жовтня по 1 листопада 2026 року"
 legacy: "/posts/format-navchannia-zhovten-2026/"
 source: "posts/format-navchannia-zhovten-2026.rst"
+tags: [study]
 ---
 
 Відповідно до наказу Київського національного університету імені Тараса Шевченка від 14 жовтня 2026 року № 1165-32, [формат навчання на період із 17 жовтня до 1 листопада 2026 року включно](https://knu.ua/news/14174) визначено так:

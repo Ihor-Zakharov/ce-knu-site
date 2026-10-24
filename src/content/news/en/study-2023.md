@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/study-2023.jpg"
 coverAlt: "Information on the organisation of the educational process"
 legacy: "/posts/study-2023/"
 source: "posts/22-study-23-24.rst"
+tags: [study]
 ---
 
 ![Photo: Information on the organisation of the educational process](../../../assets/images/news/study-2023.jpg)

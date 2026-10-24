@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/phd2026-chepel-teaser.jpg"
 coverAlt: "Successful thesis defence by Leonid Chepel"
 legacy: "/posts/zakhyst-phd-chepel/"
 source: "posts/zakhyst-phd-chepel.rst"
+tags: [science]
 ---
 
 On 10 September 2026, **Leonid Chepel**, a PhD student of the Department of Computer Engineering, successfully defended his thesis "Methods and Tools for Building Internet of Things Networks Based on a Hybrid Blockchain Architecture with Adaptive Consensus and Multifactor Node Management", submitted for the degree of Doctor of Philosophy (PhD) in speciality 123 "Computer Engineering". Supervisor: PhD in Physics and Mathematics (Candidate of Sciences), Associate Professor [Yu. V. Boiko](/personas/boiko/).

@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/c82cc4e14a1d2c8c8ffff9840d24b558_L.jpg"
 coverAlt: "IBM Day at the Faculty of Radiophysics, Electronics and Computer Systems"
 legacy: "/posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem/"
 source: "posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem.rst"
+tags: [partners, events]
 ---
 
 ![Dean of the Faculty Professor I. O. Anisimov and O. M. Danko](../../../assets/images/news/1703-ibm-01.jpg "Dean of the Faculty Professor I. O. Anisimov and O. M. Danko")

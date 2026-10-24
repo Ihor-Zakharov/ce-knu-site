@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/e31ace2a15a7c70645ad83df9ecd43b0_L.jpg"
 coverAlt: "Memorandum of cooperation signed between Taras Shevchenko National University of Kyiv and HUAWEI Technologies Ukraine"
 legacy: "/posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim-universitetom-imeni-tarasa-shevchenka-ta-kompaniieiu-huawei-technologies-ukraine/"
 source: "posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim-universitetom-imeni-tarasa-shevchenka-ta-kompaniieiu-huawei-technologies-ukraine.rst"
+tags: [partners]
 ---
 
 ![On 28 October, a Memorandum on expanding cooperation was signed in the Main (Red) Building of Taras Shevchenko National University of Kyiv (photo by Andrii Yelovikov)](../../../assets/images/news/1610-huawei-01.jpg "On 28 October, a Memorandum on expanding cooperation was signed in the Main (Red) Building of Taras Shevchenko National University of Kyiv (photo by Andrii Yelovikov)")

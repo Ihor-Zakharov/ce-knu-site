@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/c82cc4e14a1d2c8c8ffff9840d24b558_L.jpg"
 coverAlt: "День корпорації IBM на факультеті радіофізики, електроніки та комп’ютерних систем"
 legacy: "/posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem/"
 source: "posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem.rst"
+tags: [partners, events]
 ---
 
 ![Декан факультету професор І. О. Анісімов і О. М. Данько](../../../assets/images/news/1703-ibm-01.jpg "Декан факультету професор І. О. Анісімов і О. М. Данько")

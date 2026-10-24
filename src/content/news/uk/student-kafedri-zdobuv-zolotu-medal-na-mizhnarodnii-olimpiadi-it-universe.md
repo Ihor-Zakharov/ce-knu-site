@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg"
 coverAlt: "Студент кафедри здобув золоту медаль на міжнародній олімпіаді IT-Universe"
 legacy: "/posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe/"
 source: "posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe.rst"
+tags: [awards]
 ---
 
 ![Фото: Студент кафедри здобув золоту медаль на міжнародній олімпіаді IT-Universe](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)

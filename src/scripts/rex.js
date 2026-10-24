@@ -78,16 +78,39 @@ export function perch(box) {
   let x = clamp(+(box.dataset.start || 24)), target = x, dir = 1, walk = 0, jump = 0, vy = 0, speed = 30;
   let blinkT = 2 + Math.random() * 2, blinking = 0, pause = 1.2, curious = 0, raf = 0, last = 0, li = 0, sayT = 0, seen = false;
   let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
-  const stick = box.closest('.page__inst');
+  let side = '', drop = 0, failed = false, sayTimer = 0;        // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
+  const stick = box.closest('.page__inst'), hd = document.querySelector('.hd');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
 
-  function speak(text, sec = 2.8) { say.textContent = text; say.classList.add('on'); sayT = sec; render(); }
+  function speak(text, sec = 2.8) {
+    say.textContent = text; sayT = sec; pick(); say.classList.add('on'); render();
+    if (REDUCED) { clearTimeout(sayTimer); sayTimer = setTimeout(() => say.classList.remove('on'), sec * 1000); }   // без руху цикл не йде — репліку прибирає таймер
+  }
+  const headerLimit = () => Math.max(0, hd ? hd.getBoundingClientRect().bottom : 0) + 6;
+  /* репліка не ховається під липку шапку: над головою, якщо там є місце; інакше — збоку від Рекса на рівні голови
+     (праворуч або ліворуч, де вміщається); якщо й збоку тісно — опускається рівно під шапку */
+  const SIDE_R = 84, SIDE_L = 6;                                // відступи від лівого краю полотна до репліки збоку
+  function pick() {
+    say.classList.remove('is-r', 'is-l'); say.style.maxWidth = ''; side = ''; drop = 0;
+    const w = say.offsetWidth, b = box.getBoundingClientRect();
+    const limit = headerLimit();
+    if (b.bottom - 66 - say.offsetHeight >= limit || b.bottom - 40 < limit) return;   // над головою досить місця — або сам Рекс уже під шапкою (сторінку гортають)
+    // збоку можна в 2–3 рядки: 104 px вистачає з одного боку Рекса в будь-якому місці приладу завширшки від 300 px
+    const px = Math.round(x), roomR = box.clientWidth - px - SIDE_R, roomL = px + SIDE_L, need = Math.min(w, 104);
+    side = roomR >= w ? 'r' : roomL >= w ? 'l' : Math.max(roomR, roomL) >= need ? (roomR >= roomL ? 'r' : 'l') : '';
+    if (side) {
+      say.classList.add('is-' + side);
+      const room = side === 'r' ? roomR : roomL;
+      if (room < w) say.style.maxWidth = room + 'px';
+    }
+    drop = Math.max(0, Math.round(limit - (b.bottom - (side ? 24 : 66) - say.offsetHeight)));   // і все одно не вище за шапку
+  }
   function wake() { idle = 0; if (asleep) { asleep = false; zz.classList.remove('on'); pause = .6; } }
   function goTo(px, run, then) { target = clamp(px - HALF); dir = target > x ? 1 : -1; speed = run ? 95 : 30; pause = 0; curious = 0; goal = then || null; }
 
   function render() {
     c.clearRect(0, 0, CW, CH);
-    const moving = pause <= 0 && curious <= 0 && !asleep && Math.abs(target - x) > .5;
+    const moving = pause <= 0 && curious <= 0 && !asleep && !(side && sayT > 0) && Math.abs(target - x) > .5;
     const legs = jump < 0 ? 1 : moving ? (Math.floor(walk) % 2 ? 1 : 2) : 0;
     drawGrid(c, rexFrame({ legs, blink: asleep || blinking > 0, acc, flip: dir < 0 }), PX);
     const px = Math.round(x);                                  // ціла позиція — піксель-арт без розмиття
@@ -96,15 +119,17 @@ export function perch(box) {
     if (stick) stick.style.zIndex = jump < 0 ? '61' : '';     // липка колонка має власний шар — піднімаємо й її
     zz.style.left = px + (dir > 0 ? 62 : 6) + 'px';
     if (say.classList.contains('on')) {
-      say.style.left = Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth)) + 'px';
-      // у стрибку репліка летить над головою над шапкою, але не вище 8 px від верху вікна;
-      // на місці — звичайний шар сторінки: прокручується разом із Рексом і ховається під шапку
+      say.style.left = (side === 'r' ? px + SIDE_R : side === 'l' ? px + SIDE_L - say.offsetWidth : Math.min(Math.max(0, px - 10), Math.max(0, box.clientWidth - say.offsetWidth))) + 'px';
+      // у стрибку репліка летить разом із Рексом над шапкою, але не вище 8 px від верху вікна;
+      // на місці — звичайний шар сторінки, що прокручується разом із Рексом
       const jumping = jump < 0;
       const top = say.getBoundingClientRect().top - (parseFloat(say.dataset.dy) || 0);
-      const dy = jumping ? Math.max(Math.round(jump), 8 - top) : 0;
+      const dy = jumping ? Math.max(Math.round(jump) + drop, 8 - top) : drop;
       say.dataset.dy = dy; say.style.transform = dy ? `translateY(${dy}px)` : '';
       say.style.zIndex = jumping ? '71' : '';
-      say.style.setProperty('--tail', Math.min(Math.max(10, px - parseFloat(say.style.left) + (dir > 0 ? 50 : 26)), say.offsetWidth - 16) + 'px');
+      // сторінку гортають, і репліка дійшла до шапки — гасне, а не ховається під неї
+      if (!jumping && sayT > 0 && top + dy < headerLimit() - 8) { say.classList.remove('on'); sayT = 0; }
+      if (!side) say.style.setProperty('--tail', Math.min(Math.max(10, px - parseFloat(say.style.left) + (dir > 0 ? 50 : 26)), say.offsetWidth - 16) + 'px');
     }
   }
   function dropBit() {
@@ -128,6 +153,7 @@ export function perch(box) {
     if (!asleep && idle > 28 && !bit && !goal) { asleep = true; zz.classList.add('on'); pause = 1e9; }
     if (asleep) return;
     if (curious > 0) curious -= dt;
+    else if (side && sayT > 0) { /* говорить збоку — стоїть на місці, репліка не їде */ }
     else if (pause > 0) {
       pause -= dt;
       if (pause <= 0) { goTo(Math.random() * box.clientWidth, false); if (Math.abs(target - x) < 40) target = clamp(x + (x > maxX() / 2 ? -90 : 90)); dir = target > x ? 1 : -1; }
@@ -145,8 +171,9 @@ export function perch(box) {
     bitT -= dt; if (bitT <= 0 && !bit) { dropBit(); bitT = 14 + Math.random() * 16; }
   }
   function loop(now) {
-    const dt = Math.min(.05, (now - last) / 1000); last = now;
-    step(dt); render(); raf = requestAnimationFrame(loop);
+    raf = requestAnimationFrame(loop);                         // наступний кадр — першим: збій не зупиняє Рекса
+    const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now;
+    try { step(dt); render(); } catch (e) { if (!failed) { failed = true; console.error(e); } }
   }
   const start = () => { if (!raf && !REDUCED) { last = performance.now(); raf = requestAnimationFrame(loop); } };
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
@@ -174,13 +201,15 @@ export function perch(box) {
   }));
   document.addEventListener('themechange', () => {
     const dark = document.documentElement.dataset.theme === 'dark';
-    if (seen) { wake(); speak(dark ? (uk ? 'Темно — пора кодити' : 'It’s dark — time to code') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }
+    if (seen) { wake(); speak(dark ? (uk ? 'Темно. Час кодити' : 'Lights down. Time to code') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }
   });
   new ResizeObserver(() => { x = clamp(x); target = clamp(target); render(); }).observe(box);
   render();
   const upd = () => (seen && !document.hidden ? start() : stop());
-  new IntersectionObserver(([e]) => { seen = e.isIntersecting; if (!seen) { say.classList.remove('on'); sayT = 0; } upd(); }).observe(box);
+  // у пакеті подій видимості чинна — остання
+  new IntersectionObserver(es => { seen = es[es.length - 1].isIntersecting; if (!seen) { say.classList.remove('on'); sayT = 0; } upd(); }).observe(box);
   document.addEventListener('visibilitychange', upd);
+  addEventListener('pageshow', upd);
 }
 
 /* раннер для сторінки 404 — з кіту: фіксований крок 1/120 с, «час койота», буфер стрибка */

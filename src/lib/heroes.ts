@@ -23,7 +23,7 @@ export const HEROES: Record<string, Hero> = {
     ch: 'CH 02 · RSRC', inst: 'lorenz', acc: 'tube',
     lead: { uk: 'Високопродуктивні обчислення, цифровий зв’язок і штучний інтелект.', en: 'High-performance computing, digital communications and artificial intelligence.' },
     hud: { top: ['σ 10 · ρ 28 · β 8/3', 'z = <b data-hud="z">0</b>'], bot: ['LORENZ ATTRACTOR', 'MOVE CURSOR'] },
-    lines: { uk: ['Дві хвилі — одна картина', 'Додаю трохи інтерференції', 'Звіряю з експериментом'], en: ['Two waves, one pattern', 'A little interference', 'Checking the experiment'] },
+    lines: { uk: ['Хаос, але детермінований', 'Одне крило, потім друге', 'Звіряю з експериментом'], en: ['Chaos, but deterministic', 'One wing, then the other', 'Checking the experiment'] },
   },
   'medu-guide': {
     ch: 'CH 03 · EDU', inst: 'fourier', acc: 'book',
@@ -59,12 +59,12 @@ export const HEROES: Record<string, Hero> = {
     ch: 'CH 08 · EMPL', inst: 'nnet', acc: 'tie',
     lead: { uk: 'Знання випускників і пропозиції щодо змісту освіти.', en: 'Graduate skills and suggestions for educational content.' },
     hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['NEURAL NETWORK · FORWARD PASS', 'MOVE CURSOR'] },
-    lines: { uk: ['Звіряємо протоколи', 'Знайдемо спільну частоту', 'Краватка в чотирьох вимірах'], en: ['Comparing protocols', 'Finding a shared frequency', 'A tie in four dimensions'] },
+    lines: { uk: ['Звіряємо протоколи', 'Знайдемо спільну частоту', 'Краватка є, мережа навчена'], en: ['Comparing protocols', 'Finding a shared frequency', 'Tie on, network trained'] },
   },
   studying: {
     ch: 'CH 09 · STUD', inst: 'spectrum', acc: 'laptop',
     lead: { uk: 'Навчальні плани, робочі програми та розклад занять.', en: 'Curricula, course syllabi and class timetables.' },
     hud: { top: ['RBW 30 kHz', 'SPAN 5 GHz'], bot: ['SPECTRUM ANALYZER', 'PEAK HOLD'] },
-    lines: { uk: ['Компілюю розклад', 'Лабораторна на горизонті', 'Сесія — на піку'], en: ['Compiling the timetable', 'A lab on the horizon', 'Exams at their peak'] },
+    lines: { uk: ['Компілюю розклад', 'Лабораторна на горизонті', 'Сесія на піку'], en: ['Compiling the timetable', 'A lab on the horizon', 'Exams at their peak'] },
   },
 };

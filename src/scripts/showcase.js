@@ -29,10 +29,11 @@ export function showcase(figure) {
   const L = root.lang === 'en' ? 'en' : 'uk';
   const env = { m: machine(), col: {}, L, gen: 0 };
   const ex = EXHIBITS.map(f => f(env)), failed = new Set();
-  const st = { W: 0, H: 0, D: 1 };
+  const st = { W: 0, H: 0, D: 1, cap: 2 };
   const layer = () => { const k = document.createElement('canvas'); return { k, c: k.getContext('2d') }; };
-  const A = layer(), B = layer(), FILTER = 'filter' in c;
+  const A = layer(), B = layer(), FILTER = 'filter' in c, small = {};
   let cur = 0, prev = -1, tr = T, shown = 0, auto = !REDUCED, playing = !REDUCED, t = 0, acc = 0, raf = 0, last = 0, seen = false;
+  let hudPrev = null, hudCur = null, oops = false, lite = false;   // lite — полегшений перехід, лише якщо звичайний на цій машині гальмує
 
   function theme() {
     const v = { bg: '--bg', screen: '--screen', surface: '--surface', surface2: '--surface-2', ink: '--ink', ink2: '--ink-2', ink3: '--ink-3', gold: '--gold', goldInk: '--gold-ink', ph: '--phosphor', signal: '--signal', ok: '--ok', line: '--line', lineStrong: '--line-strong' };
@@ -40,7 +41,8 @@ export function showcase(figure) {
     env.col.dark = isDark(); env.col.goldRGB = rgb(env.col.gold); env.gen++;
   }
   function size() {
-    st.D = Math.min(2, devicePixelRatio || 1); st.W = cv.clientWidth; st.H = cv.clientHeight;   // розмір макета, без transform появи картки
+    st.D = Math.min(st.cap, devicePixelRatio || 1); st.W = cv.clientWidth; st.H = cv.clientHeight;   // розмір макета, без transform появи картки
+    if (lite && prev >= 0) { tr = T; prev = -1; }                  // знімок старого експоната зітреться разом із шаром — перехід одразу до кінця
     for (const k of [cv, A.k, B.k]) { k.width = Math.round(st.W * st.D); k.height = Math.round(st.H * st.D); }
     env.gen++; draw();
   }
@@ -56,24 +58,43 @@ export function showcase(figure) {
     return h;
   }
 
+  /* полегшене розмиття (лише в режимі lite): на зменшеній копії шару, у 4–16 разів менше пікселів */
+  function soften(src, blur) {
+    const f = blur > 3 ? 4 : 2, w = Math.max(1, Math.round(src.width / f)), h = Math.max(1, Math.round(src.height / f));
+    const s = small[f] ||= layer();
+    if (s.k.width !== w || s.k.height !== h) { s.k.width = w; s.k.height = h; } else s.c.clearRect(0, 0, w, h);
+    const r = (blur * st.D - f / 2) / f;
+    if (FILTER && r > .2) s.c.filter = `blur(${r.toFixed(2)}px)`;
+    s.c.drawImage(src, 0, 0, w, h);
+    if (FILTER) s.c.filter = 'none';
+    return s.k;
+  }
   /* шар експоната на полотно k: прозорість, масштаб від центру, розмиття */
   function put(k, src, alpha, scale, blur) {
     if (alpha < .004) return;
+    let img = src;
     k.save(); k.globalAlpha = alpha;
-    if (FILTER && blur > .3) k.filter = `blur(${blur.toFixed(2)}px)`;
-    k.translate(st.W / 2, st.H / 2); k.scale(scale, scale); k.drawImage(src, -st.W / 2, -st.H / 2, st.W, st.H);
+    if (lite) { if (blur > .6) img = soften(src, blur); }
+    else if (FILTER && blur > .3) k.filter = `blur(${blur.toFixed(2)}px)`;
+    k.translate(st.W / 2, st.H / 2); k.scale(scale, scale); k.drawImage(img, -st.W / 2, -st.H / 2, st.W, st.H);
     k.restore();
   }
 
   function draw(dt = 0) {
     if (!st.W || !st.H) return;
     const u = tr / T;
-    if (prev < 0 || u >= 1) { hud(paint(cur, c, dt), cur, 1); return; }
-    const ho = paint(prev, A.c, dt), hi = paint(cur, B.c, dt), o = soft(.04, .8, u), v = clamp((u - .12) / .88);
+    if (prev < 0 || u >= 1) { hud(hudCur = paint(cur, c, dt), cur, 1); return; }
+    const ho = lite ? hudPrev : paint(prev, A.c, dt), hi = paint(cur, B.c, dt), o = soft(.04, .8, u), v = clamp((u - .12) / .88);   // у lite старий експонат — знімок у шарі A
     c.setTransform(st.D, 0, 0, st.D, 0, 0); c.clearRect(0, 0, st.W, st.H);
     put(c, A.k, 1 - o, 1 - .05 * o, 10 * o);                                       // старий іде вглиб
     put(c, B.k, soft(.12, .72, u), 1 + .045 * Math.exp(-5 * v) * Math.cos(5.5 * v), 9 * (1 - soft(.12, .85, u)));   // новий — назустріч, 1,045 → 1 з ледь помітним недольотом
+    hudCur = hi;
     hud(u < .5 ? ho : hi, u < .5 ? prev : cur, u < .5 ? 1 - soft(0, .42, u) : soft(.58, 1, u));
+  }
+  /* lite: кадр, що йде, — знімок полотна; далі він лише тане й відступає вглиб, не перемальовується */
+  function snap() {
+    A.c.setTransform(1, 0, 0, 1, 0, 0); A.c.clearRect(0, 0, A.k.width, A.k.height); A.c.drawImage(cv, 0, 0);
+    hudPrev = hudCur;
   }
 
   const hudLast = {};
@@ -98,9 +119,10 @@ export function showcase(figure) {
     i = (i + n) % n;
     if (manual && auto) setAuto(false);
     if (i === cur) return;
-    if (prev >= 0) { tr = T; prev = -1; }                          // незавершений перехід — одразу до кінця
+    if (prev >= 0 && !lite) { tr = T; prev = -1; }                 // незавершений перехід — одразу до кінця (у lite він іде у знімок)
+    if (lite && raf) snap();
     prev = cur; cur = i; shown = 0;
-    tr = playing ? 0 : T; if (tr >= T) prev = -1;
+    tr = raf && st.W && st.H ? 0 : T; if (tr >= T) prev = -1;
     safe(cur, () => ex[cur].enter?.(t));
     keys.forEach((k, j) => k.setAttribute('aria-pressed', String(j === cur)));
     reveal(keys[cur]);
@@ -113,17 +135,37 @@ export function showcase(figure) {
     rail.scrollTo({ left: k.offsetLeft - (rail.clientWidth - k.offsetWidth) / 2, behavior: REDUCED ? 'auto' : 'smooth' });
   }
 
-  function frame(now) {
-    const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now;
-    t += dt; acc += dt;
-    while (acc >= TICK) { acc -= TICK; const ev = env.m.tick(); ex.forEach((e, i) => safe(i, () => e.tick?.(ev, t))); }
-    if (tr < T) { tr += dt; if (tr >= T) prev = -1; }
-    if (auto) { shown += dt; if (shown >= HOLD) go(cur + 1, false); }
-    progress();
-    draw(dt);
-    raf = requestAnimationFrame(frame);
+  /* запобіжники лише для критичних випадків (ПК без апаратного прискорення, 4K): за звичайних умов — повна якість.
+     Мірило — власний ритм кадрів браузера (base, нижні 10 %), тож браузер, що просто працює на 30 к/с
+     (енергозбереження, монітор 30 Гц), повільним не вважається:
+     • два переходи поспіль у середньому довші за 33 мс і за 1,8 ритму — наступні переходи полегшені (lite);
+     • медіана кадру довша за 33 мс і за 1,8 ритму — полотно переходить на меншу щільність пікселів (2 → 1,5 → 1) */
+  const perf = { buf: new Float32Array(90), n: 0, base: 1 / 60, ts: 0, tn: 0, slow: 0 };
+  function watch(raw) {
+    if (prev >= 0) { perf.ts += raw; perf.tn++; }
+    else if (perf.tn) { const m = perf.ts / perf.tn; perf.slow = perf.tn > 12 && m > Math.max(.033, perf.base * 1.8) ? perf.slow + 1 : 0; if (perf.slow >= 2) lite = true; perf.ts = perf.tn = 0; }
+    perf.buf[perf.n++ % 90] = raw;
+    if (perf.n < 180 || perf.n % 90) return;                         // перші ~1,5 с після старту не рахуються
+    const q = [...perf.buf].sort((a, b) => a - b), med = q[45]; perf.base = q[9];
+    if (st.D > 1 && med > Math.max(.033, perf.base * 1.8)) { st.cap = st.D > 1.5 ? 1.5 : 1; perf.n = 0; size(); }
   }
-  const start = () => { if (!raf && playing && seen && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+  function frame(now) {
+    raf = requestAnimationFrame(frame);                            // наступний кадр — першим: збій усередині не зупиняє вітрину
+    const raw = Math.max(0, (now - last) / 1000) || 0, dt = Math.min(.05, raw); last = now;
+    try {
+      t += dt; acc += dt;
+      while (acc >= TICK) { acc -= TICK; const ev = env.m.tick(); ex.forEach((e, i) => safe(i, () => e.tick?.(ev, t))); }
+      if (tr < T) { tr += dt; if (tr >= T) prev = -1; }
+      if (auto) { shown += dt; if (shown >= HOLD) go(cur + 1, false); }
+      progress();
+      draw(dt);
+      watch(raw);
+    } catch (e) {
+      c.reset?.(); tr = T; prev = -1;
+      if (!oops) { oops = true; console.error(e); }
+    }
+  }
+  const start = () => { if (!raf && playing && seen && !document.hidden) { last = performance.now(); perf.n = 0; raf = requestAnimationFrame(frame); } };
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
 
   keys.forEach((k, j) => k.addEventListener('click', () => go(j, true)));
@@ -170,7 +212,9 @@ export function showcase(figure) {
   safe(cur, () => ex[cur].enter?.(0));
   reflectPlay(); progress();
   new ResizeObserver(size).observe(cv);
-  new IntersectionObserver(([e]) => { seen = e.isIntersecting; seen ? start() : stop(); }, { rootMargin: '80px' }).observe(figure);
+  // у пакеті подій видимості чинна — остання (швидке гортання колесом дає «вийшов, увійшов» одним пакетом)
+  new IntersectionObserver(es => { seen = es[es.length - 1].isIntersecting; seen ? start() : stop(); }, { rootMargin: '80px' }).observe(figure);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  addEventListener('pageshow', () => { stop(); start(); });         // повернення кнопкою «Назад» зі збереженої сторінки
   document.fonts?.ready.then(() => { env.gen++; draw(); });
 }

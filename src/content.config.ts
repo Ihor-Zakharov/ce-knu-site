@@ -17,6 +17,7 @@ const news = defineCollection({
     summary: z.string().default(''),
     cover: image().optional(),
     coverAlt: z.string().optional(),
+    coverFit: z.enum(['cover', 'contain']).default('cover'),   // contain — логотип чи таблиця, не фото: у списку без мініатюри, у новині малою плашкою
     tags: z.array(z.enum(TOPICS)).default([]),   // теми новин — src/lib/topics.ts
     draft: z.boolean().default(false),
     legacy: z.string().optional(),

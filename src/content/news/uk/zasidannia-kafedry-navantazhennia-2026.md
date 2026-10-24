@@ -6,7 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Засідання кафедри: навчальне навантаження на 2026–2027 навчальний рік"
 legacy: "/posts/zasidannia-kafedry-navantazhennia-2026/"
 source: "posts/zasidannia-kafedry-navantazhennia-2026.rst"
-tags: [study]
+tags: [department, study]
 ---
 
 24 вересня 2026 року відбулося засідання кафедри комп'ютерної інженерії, основним питанням якого став розподіл навчального навантаження викладачів на 2026–2027 навчальний рік.

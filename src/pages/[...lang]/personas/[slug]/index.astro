@@ -18,16 +18,19 @@ const { entry } = Astro.props;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
 const { headings } = await render(entry);
+const uk = lang === 'uk';
 // текст людини — розділи h2 зі змістом збоку; двокрапку наприкінці заголовків із чинного сайту прибираємо
-const html = (entry.rendered?.html ?? '').replace(/:\s*<\/h([23])>/g, '</h$1>');
+let html = (entry.rendered?.html ?? '').replace(/:\s*<\/h([23])>/g, '</h$1>');
 const toc = headings.filter(h => h.depth === 2).map(h => ({ ...h, text: h.text.replace(/:\s*$/, '') }));
-// «підпис» людини — фігура Ліссажу з частот, виведених з імені
+// довгий перелік праць (розділ «…праці…», від 6 пунктів) — розкривний блок з кількістю; решта розділів відкрита
+html = html.split(/(?=<h2[\s>])/).map(sec => {
+  const m = sec.match(/^<h2[^>]*>([\s\S]*?)<\/h2>/);
+  const n = (sec.match(/<li[\s>]/g) ?? []).length;
+  if (!m || n < 6 || !/праці|публікац|works|publications|papers/i.test(m[1])) return sec;
+  const label = uk ? `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'позиція' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'позиції' : 'позицій'}` : `${n} items`;
+  return `<details class="fold"><summary data-more="${uk ? 'Розгорнути' : 'Expand'}" data-less="${uk ? 'Згорнути' : 'Collapse'}">${m[0]}<span class="fold__n">${label}</span></summary>${sec.slice(m[0].length)}</details>`;
+}).join('');
 const slug = slugOf(entry.id);
-let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-const RATIOS = [[3, 2], [5, 4], [3, 4], [2, 3], [4, 5], [5, 6], [4, 3], [6, 5]];   // відношення, що дають гарні замкнені фігури
-const [a, b] = RATIOS[h % RATIOS.length];
-let d = ''; for (let i = 0; i <= 400; i++) { const s = i / 400 * Math.PI * 2; d += (i ? 'L' : 'M') + (50 + 44 * Math.sin(a * s + Math.PI / 2)).toFixed(2) + ' ' + (50 + 44 * Math.sin(b * s)).toFixed(2); }
-const words = entry.data.name.split(/\s+/);
 const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: `/personas/${slug}/`, image: entry.data.photo?.src, site: Astro.site! });
 ---
 <Base lang={lang} title={entry.data.name} description={`${entry.data.name}. ${entry.data.role}`} og={`personas/${slug}`} ogFallback="personas" type="profile" crumbs={[{ name: t.people, path: '/personas/' }]} jsonld={[ld]}>
@@ -37,22 +40,22 @@ const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: 
         <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li><a href={url(lang, '/personas/')}>{t.people}</a></li><li aria-current="page">{entry.data.name}</li></ol>
       </nav>
       <div class="pp-profile">
-        <div class="pp-ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[240, 480]} sizes="240px" loading="eager" />}</div>
+        <div class="pp-ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[176, 320]} sizes="(max-width: 600px) 88px, 160px" loading="eager" />}</div>
         <div class="pp-id">
-          <p class="ph__eyebrow"><b>{lang === 'uk' ? 'Персоналії' : 'People'}</b><span>· {entry.data.group}</span></p>
-          <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{' '}</>)}</h1>
-          {entry.data.role && <p class="pp-role">{entry.data.role}</p>}
-          <p class="pp-sig"><svg viewBox="0 0 100 100" aria-hidden="true"><path d={d} pathLength="1"/></svg><span class="cap">{lang === 'uk' ? 'Фігура Ліссажу' : 'Lissajous figure'} · <b>{a}:{b}</b></span></p>
+          {entry.data.group && <p class="pp-kicker">{entry.data.group}</p>}
+          <h1>{entry.data.name}</h1>
         </div>
+        {entry.data.role && <p class="pp-role">{entry.data.role}</p>}
       </div>
     </div>
   </section>
   <section class="section pp-body">
     <div class="wrap pp-grid">
       {toc.length > 1 && (
-        <nav class="pp-toc" aria-label={lang === 'uk' ? 'Розділи' : 'Sections'}>
-          <p class="eyebrow">{lang === 'uk' ? 'Розділи' : 'Sections'}</p>
-          <ol>{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        <nav class="pp-toc" aria-label={uk ? 'Розділи' : 'Sections'}>
+          <details open><summary>{uk ? 'На сторінці' : 'On this page'}</summary>
+            <ol>{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+          </details>
         </nav>
       )}
       <div class="pp-main">
@@ -62,3 +65,12 @@ const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: 
     </div>
   </section>
 </Base>
+
+<script>
+  // зміст на телефоні згорнуто; посилання на розділ у згорнутому блоці спершу розгортає його; друк — усе розгорнуто
+  const toc = document.querySelector<HTMLDetailsElement>('.pp-toc details');
+  if (toc && matchMedia('(max-width: 900px)').matches) toc.open = false;
+  const reveal = () => { const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = el && el.closest('details.fold'); if (d && !d.open) { d.open = true; el.scrollIntoView(); } };
+  addEventListener('hashchange', reveal); reveal();
+  addEventListener('beforeprint', () => document.querySelectorAll<HTMLDetailsElement>('details.fold').forEach(d => (d.open = true)));
+</script>

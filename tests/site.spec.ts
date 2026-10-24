@@ -7,7 +7,7 @@ const NAV = ['/news/', '/research/', '/medu-guide/', '/entrant/', '/documents/',
 const both = (p: string) => [p, '/en' + p];
 async function firstPost(page: Page, lang = '') {
   await page.goto(lang + '/news/');
-  return (await page.locator('a.nl-item').first().getAttribute('href'))!;
+  return (await page.locator('.nl-t a').first().getAttribute('href'))!;
 }
 
 test.describe('навігація', () => {
@@ -55,9 +55,9 @@ test.describe('мови', () => {
   }
   test('у кожної новини є переклад', async ({ page }) => {
     await page.goto('/news/');
-    const uk = await page.locator('a.nl-item').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname));
+    const uk = await page.locator('.nl-t a').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname));
     await page.goto('/en/news/');
-    const en = await page.locator('a.nl-item').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname.replace(/^\/en/, '')));
+    const en = await page.locator('.nl-t a').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname.replace(/^\/en/, '')));
     expect(en.sort()).toEqual(uk.sort());
   });
 });
@@ -129,15 +129,34 @@ test.describe('доступність (axe)', () => {
 });
 
 test.describe('персоналії', () => {
-  test('усі люди видно одразу, літера веде до людини', async ({ page }) => {
+  test('пошук за ім’ям і посада звужують список; «З нами працювали» розгортається', async ({ page }) => {
     await page.goto('/personas/');
-    const cards = page.locator('.pl-card');
-    expect(await cards.count()).toBeGreaterThanOrEqual(19);
-    for (const c of await cards.all()) await expect(c).toBeAttached();
-    const letter = page.locator('.az-bar a').first();
-    const hash = await letter.getAttribute('href');
-    await letter.click();
-    await expect(page.locator(hash!)).toBeInViewport();
+    expect(await page.locator('.pl-card').count()).toBeGreaterThanOrEqual(19);
+    const rows = page.locator('.pl-list > li:not([hidden])');
+    await page.locator('#pf-q').fill('володимирович бойко');
+    await expect(rows).toHaveCount(1);
+    await expect(page).toHaveURL(/\?q=/);
+    await page.locator('#pf-q').fill('');
+    await page.locator('.nf__y[data-v="former"]').click();
+    await expect(page.locator('details.pl-former')).toHaveAttribute('open', '');
+    await expect(page.locator('.pl-group:not([hidden])')).toHaveCount(1);
+    await expect(page).toHaveURL(/position=former/);
+  });
+});
+
+test.describe('новини', () => {
+  test('фільтр за роком і темою береться з адреси й скидається', async ({ page }) => {
+    await page.goto('/news/?year=2024&topic=awards');
+    const shown = page.locator('.nl-list > li:not([hidden])');
+    expect(await shown.count()).toBeGreaterThan(0);
+    for (const li of await shown.all()) {
+      await expect(li).toHaveAttribute('data-year', '2024');
+      expect(await li.getAttribute('data-topics')).toContain('awards');
+    }
+    await expect(page.locator('.nf__t[data-v="awards"]')).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('.nf__state [data-nf-reset]').click();
+    await expect(page).toHaveURL(/\/news\/$/);
+    await expect(shown).toHaveCount(await page.locator('.nl-list > li').count());
   });
 });
 

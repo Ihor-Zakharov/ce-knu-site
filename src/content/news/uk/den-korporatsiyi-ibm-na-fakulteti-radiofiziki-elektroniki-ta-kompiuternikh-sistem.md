@@ -4,6 +4,7 @@ date: "2017-03-10"
 summary: "10 березня 2017 р. на факультеті відбувся День корпорації IBM. Був підписаний Меморандум про взаєморозуміння між факультетом радіофізики, електроніки та комп’ютерних систем Київського національного університету імені…"
 cover: "../../../assets/images/news/c82cc4e14a1d2c8c8ffff9840d24b558_L.jpg"
 coverAlt: "День корпорації IBM на факультеті радіофізики, електроніки та комп’ютерних систем"
+coverFit: contain
 legacy: "/posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem/"
 source: "posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem.rst"
 tags: [partners, events]

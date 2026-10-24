@@ -1,53 +1,77 @@
 ---
-// Персоналії: групи за посадами (як на чинному сайті), у кожній — сітка карток «фото · ім’я · посада»;
-// згори — алфавітний покажчик-якорі (перша людина на кожну літеру отримує #az-<літера>).
+// Персоналії: пошук за ім’ям і вибір посади (стан — в адресі: ?q=бойко&position=docents), групи за посадами (як на чинному сайті)
+// реєстром у дві колонки «фото · ім’я · посада». «З нами працювали» — згорнуто; пошук і вибір посади розгортають.
+// Без JS — усі групи й люди одразу, колишні працівники — розкриваються вручну.
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
 import { T, url, langOf, langParams } from '../../../lib/i18n';
-import { people, page, slugOf, initial, ALPHABET } from '../../../lib/content';
+import { people, page, slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
 import '../../../styles/lists.css';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
+const uk = lang === 'uk';
 const meta = (await page(lang, 'personas'))!;
 const all = (await people(lang)).filter(p => !p.data.unlisted);
-const groups = [...new Set(all.map(p => p.data.group))];
-const firstOf = new Map<string, string>();
-[...all].sort((a, b) => a.data.name.localeCompare(b.data.name, lang)).forEach(p => { const L = initial(p.data.name, lang); if (!firstOf.has(L)) firstOf.set(L, slugOf(p.id)); });
-const anchorFor = (slug: string) => [...firstOf].filter(([, s]) => s === slug).map(([L]) => `az-${L}`)[0];
-const letters = ALPHABET[lang];
+// ключ групи для адреси — за groupOrder (порядок груп однаковий в обох мовах)
+const KEYS = ['professors', 'docents', 'assistants', 'engineers', 'former'];
+const groups = [...new Map(all.map(p => [p.data.groupOrder, p.data.group])).entries()].map(([o, name]) => ({ key: KEYS[o] ?? `g${o}`, name, ps: all.filter(p => p.data.groupOrder === o) }));
 const initials = (n: string) => n.split(/\s+/).slice(0, 2).map(w => w[0]).join('');
+const norm = (s: string) => s.toLocaleLowerCase(lang).replace(/[’ʼ'`]/g, '\'').replace(/\s+/g, ' ').trim();
+const L = uk
+  ? { search: 'Ім’я', q: 'Ім’я або прізвище', pos: 'Посада', all: 'Усі', reset: 'Скинути', shown: 'Показано', of: 'з', none: 'Нікого не знайдено.', hint: 'Змініть запит або посаду.', more: 'Показати', less: 'Сховати' }
+  : { search: 'Name', q: 'Name or surname', pos: 'Position', all: 'All', reset: 'Reset', shown: 'Showing', of: 'of', none: 'Nobody found.', hint: 'Change the query or the position.', more: 'Show', less: 'Hide' };
 ---
 <Base lang={lang} title={meta.data.title} description={HEROES.personas.lead[lang]} og="personas" crumbs={[]}>
-  <PageHero lang={lang} title={meta.data.title} kind="personas" meta={[`<b>${all.length}</b> ${t.peopleCount(all.length).replace(/^\d+ /, '')}`, `${groups.length} ${lang === 'uk' ? 'груп' : 'groups'}`]} />
+  <PageHero lang={lang} title={meta.data.title} kind="personas" meta={[`<b>${all.length}</b> ${t.peopleCount(all.length).replace(/^\d+ /, '')}`]} />
   <section class="section pl">
     <div class="wrap">
-      <nav class="az-bar pl-az" aria-label={t.azLabel}>
-        {letters.map(L => firstOf.has(L) ? <a href={`#az-${L}`} title={`${t.azJump} ${L}`}>{L}</a> : <span aria-hidden="true">{L}</span>)}
-      </nav>
+      <div class="nf" data-people-filter hidden>
+        <div class="pf-q"><label for="pf-q">{L.search}</label><span class="pf-q__f"><svg width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg><input id="pf-q" type="search" placeholder={L.q} autocomplete="off" spellcheck="false" enterkeyhint="search" /></span></div>
+        <div class="nf__row" role="group" aria-labelledby="pf-kp">
+          <span class="nf__k" id="pf-kp">{L.pos}</span>
+          <div class="nf__opts nf__years">
+            <button type="button" class="nf__y" data-v="" data-t={L.all} aria-pressed="true">{L.all}</button>
+            {groups.map(g => <button type="button" class="nf__y" data-v={g.key} data-t={g.name} aria-pressed="false">{g.name}</button>)}
+          </div>
+        </div>
+      </div>
+      <p class="nf__state" data-pf-state hidden>
+        <span aria-live="polite" data-pf-count data-w={`${L.shown}|${L.of}`}>{L.shown} {all.length} {L.of} {all.length}</span>
+        <button type="button" class="nf__reset" data-pf-reset hidden>{L.reset}</button>
+      </p>
+      <div class="nf__empty" data-pf-empty hidden>
+        <p><b>{L.none}</b> {L.hint}</p>
+        <button type="button" class="btn btn--line" data-pf-reset>{L.reset}</button>
+      </div>
       {groups.map(g => {
-        const ps = all.filter(p => p.data.group === g);
-        return (
-          <section class="pl-group" aria-labelledby={`g-${ps[0].data.groupOrder}`}>
-            <header class="pl-group__h"><h2 id={`g-${ps[0].data.groupOrder}`}>{g}</h2><span>{t.peopleCount(ps.length)}</span></header>
-            <ul class="pl-grid" role="list">
-              {ps.map(p => {
-                const slug = slugOf(p.id), id = anchorFor(slug);
-                const inner = <>
-                  <span class="pl-ph">{p.data.photo ? <Image src={p.data.photo} alt="" width={240} height={300} fit="cover" /> : <span class="pl-ini" aria-hidden="true">{initials(p.data.name)}</span>}</span>
-                  <span class="pl-txt"><span class="pl-n">{p.data.name}</span>{p.data.role && <span class="pl-r">{p.data.role}</span>}</span>
-                </>;
-                return <li>{p.data.legacy
-                  ? <a class="pl-card" id={id} href={url(lang, `/personas/${slug}/`)}>{inner}</a>
-                  : <div class="pl-card" id={id}>{inner}</div>}</li>;
-              })}
-            </ul>
-          </section>
+        const id = `g-${g.key}`;
+        const head = <><h2 id={id}>{g.name}</h2><span>{t.peopleCount(g.ps.length)}</span></>;
+        const rows = (
+          <ul class="pl-list" role="list">
+            {g.ps.map(p => {
+              const inner = <>
+                <span class="pl-ph">{p.data.photo ? <Image src={p.data.photo} alt="" width={160} height={200} fit="cover" /> : <span class="pl-ini" aria-hidden="true">{initials(p.data.name)}</span>}</span>
+                <span class="pl-txt"><span class="pl-n">{p.data.name}</span>{p.data.role && <span class="pl-r">{p.data.role}</span>}</span>
+              </>;
+              return <li data-s={norm(p.data.name)}>{p.data.legacy
+                ? <a class="pl-card" href={url(lang, `/personas/${slugOf(p.id)}/`)}>{inner}</a>
+                : <div class="pl-card">{inner}</div>}</li>;
+            })}
+          </ul>
         );
+        return g.key === 'former'
+          ? <details class="pl-group pl-former" data-group={g.key}><summary class="pl-group__h" data-more={L.more} data-less={L.less}>{head}</summary>{rows}</details>
+          : <section class="pl-group" aria-labelledby={id} data-group={g.key}><header class="pl-group__h">{head}</header>{rows}</section>;
       })}
     </div>
   </section>
 </Base>
+
+<script>
+  import { peopleFilter } from '../../../scripts/peoplefilter.js';
+  peopleFilter();
+</script>

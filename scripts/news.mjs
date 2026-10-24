@@ -1,25 +1,26 @@
 // Нова новина однією командою: обидва файли (uk і en) у src/content/news/ і фірмова картка прев’ю.
 //   npm run news -- "Заголовок українською" ["English title"] [--tags science,awards] [--date 2026-11-01] [--slug moya-novyna]
-// Теми (--tags): science наука · awards нагороди · partners партнери · events конференції й лекції · admission вступ і студенти · study навчальний процес
+// Теми (--tags) — з src/lib/topics.ts; рік і тема у фільтрі на сторінці «Новини» з’являються самі, макет не змінюється.
 // Далі — лише Markdown: відкрийте створені файли, напишіть текст, фото покладіть у src/assets/images/news/.
 // Перегляд: npm run dev → http://localhost:4321/posts/<slug>/
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { TOPICS, TOPIC_LABEL } from '../src/lib/topics.ts';   // Node 24 читає .ts без збирання
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opt = k => { const i = args.indexOf(k); if (i < 0) return undefined; const v = args[i + 1]; args.splice(i, 2); return v; };
 const date = opt('--date') ?? new Date().toISOString().slice(0, 10);
 let slug = opt('--slug');
-const TOPICS = ['science', 'awards', 'partners', 'events', 'admission', 'study'];   // як у src/lib/topics.ts
+const topicList = TOPICS.map(k => `${k} (${TOPIC_LABEL[k].uk})`).join(' · ');
 const tags = (opt('--tags') ?? '').split(',').map(t => t.trim()).filter(Boolean);
 const bad = tags.filter(t => !TOPICS.includes(t));
-if (bad.length) { console.error(`Невідомі теми: ${bad.join(', ')}. Можна: ${TOPICS.join(', ')}`); process.exit(1); }
+if (bad.length) { console.error(`Невідомі теми: ${bad.join(', ')}. Можна: ${topicList}`); process.exit(1); }
 const [uk, en] = args;
 if (!uk) {
-  console.error('Як користуватися:\n  npm run news -- "Заголовок українською" ["English title"] [--tags science,awards] [--date РРРР-ММ-ДД] [--slug latynytseyu]\nТеми: science · awards · partners · events · admission · study');
+  console.error('Як користуватися:\n  npm run news -- "Заголовок українською" ["English title"] [--tags science,awards] [--date РРРР-ММ-ДД] [--slug latynytseyu]\nТеми: ' + topicList);
   process.exit(1);
 }
 
@@ -36,7 +37,7 @@ date: ${q(date)}
 summary: ${q(summary)}
 # cover: "../../../assets/images/news/${slug}.jpg"   # фото-обкладинка (необов’язково): покладіть файл і приберіть «#»
 # coverAlt: "Що зображено на фото"
-tags: [${tags.join(', ')}]   # теми: science, awards, partners, events, admission, study
+tags: [${tags.join(', ')}]   # теми: ${TOPICS.join(', ')}
 ---
 
 ${body}
@@ -69,6 +70,7 @@ for (const lang of ['uk', 'en']) {
 const og = spawnSync(process.execPath, [join(ROOT, 'scripts/og.mjs'), `posts/${slug}-`], { cwd: ROOT, stdio: 'inherit' });
 if (og.status !== 0) console.log('! Картку прев’ю не створено (немає браузера?): npx playwright install chromium && npm run og -- posts/' + slug);
 
+if (!tags.length) console.log(`! Тем не вказано: новина буде лише в «Усі теми». Допишіть tags в обох файлах: ${TOPICS.join(', ')}`);
 console.log(`
 Далі:
   1. Напишіть текст у src/content/news/uk/${slug}.md і переклад у src/content/news/en/${slug}.md

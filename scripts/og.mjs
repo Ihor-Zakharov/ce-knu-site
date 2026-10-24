@@ -68,6 +68,9 @@ for (const lang of ['uk', 'en']) {
   }
 }
 
+// node scripts/og.mjs posts/<slug>  — лише картки, шлях яких містить цей фрагмент (наприклад, щойно створена новина)
+const only = process.argv[2];
+if (only) JOBS.splice(0, JOBS.length, ...JOBS.filter(([out]) => out.includes(only)));
 const br = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const pg = await br.newPage({ viewport: { width: 1200, height: 630 } });
 for (const [out, c, lang] of JOBS) {

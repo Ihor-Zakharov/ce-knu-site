@@ -7,6 +7,8 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "migrate": "node scripts/migrate.mjs",
+    "news": "node scripts/news.mjs",
+    "og": "node scripts/og.mjs",
     "check:content": "node scripts/check-content.mjs",
     "test": "playwright test",
     "lhci": "lhci autorun --config=lighthouserc.mobile.json && lhci autorun --config=lighthouserc.desktop.json",

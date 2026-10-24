@@ -39,7 +39,7 @@ export function pages() {
   const form = root.querySelector('[data-reg]');
   const list = root.querySelector('[data-reg-list]');
   if (!form || !list) return;
-  const q = form.querySelector('[data-reg-q]'), y = form.querySelector('[data-reg-y]');
+  const q = form.querySelector('[data-reg-q]'), ys = [...form.querySelectorAll('[data-reg-y]')];
   const n = form.querySelector('[data-reg-n]'), empty = list.querySelector('[data-reg-empty]');
   const resets = [...root.querySelectorAll('[data-reg-reset]')];
   const items = [...list.querySelectorAll('.sec li')].map(li => ({ li, sec: li.closest('.sec'), text: norm(li.textContent) }));
@@ -49,10 +49,11 @@ export function pages() {
   const total = items.length, tpl = form.dataset.shown;
   const params = new URLSearchParams(location.search);
   q.value = params.get('q') ?? '';
-  if (y && [...y.options].some(o => o.value === params.get('year'))) y.value = params.get('year');
+  let yr = ys.some(b => b.dataset.regY === params.get('year')) ? params.get('year') : '';
 
   const apply = () => {
-    const words = norm(q.value).split(' ').filter(Boolean), yr = y?.value ?? '';
+    const words = norm(q.value).split(' ').filter(Boolean);
+    ys.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.regY === yr)));
     let shown = 0;
     for (const it of items) {
       const ok = words.every(w => it.text.includes(w)) && (!yr || yearOf(it.sec) === yr);
@@ -76,8 +77,8 @@ export function pages() {
   };
   let t;
   q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(apply, 120); });
-  y?.addEventListener('change', apply);
-  resets.forEach(b => b.addEventListener('click', () => { q.value = ''; if (y) y.value = ''; apply(); q.focus(); }));
+  ys.forEach(b => b.addEventListener('click', () => { yr = b.dataset.regY; apply(); }));
+  resets.forEach(b => b.addEventListener('click', () => { q.value = ''; yr = ''; apply(); q.focus(); }));
   form.hidden = false;
   apply();
 }

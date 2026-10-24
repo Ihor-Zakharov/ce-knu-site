@@ -120,8 +120,21 @@
 /* пошук у реєстрі (документи, НМЗ) */
 .reg { display: grid; gap: 14px; }
 .reg__f { display: grid; gap: 6px; font-size: 13px; color: var(--ink-3); }
-.reg__f :is(input, select) { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--surface); color: var(--ink); font: 400 15px/1.2 var(--font-sans); }
-.reg__f :is(input, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.reg__q { position: relative; display: block; }
+.reg__q svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; color: var(--ink-3); pointer-events: none; }
+.reg__q input { width: 100%; height: 44px; padding: 0 12px 0 42px; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--surface); color: var(--ink); font: 400 15px/1 var(--font-sans); }
+.reg__q input::placeholder { color: var(--ink-3); opacity: 1; }
+.reg__q input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+/* роки — текстовий ряд, як у фільтрі новин: один рік, вибраний підкреслено */
+.reg__y { min-width: 0; margin: 0; padding: 0; border: 0; }
+.reg__y legend { padding: 0; margin-bottom: 2px; font-size: 13px; color: var(--ink-3); }
+.reg__ys { display: grid; grid-template-columns: repeat(4, max-content); justify-content: space-between; margin-left: -6px; }
+.reg__yb--all { grid-column: 1 / -1; justify-self: start; }
+.reg__yb { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40px; padding: 0 6px; border: 0; background: none; font: 400 15px/1.2 var(--font-sans); font-variant-numeric: lining-nums tabular-nums; color: var(--ink-2); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.reg__yb::after { content: attr(data-t); height: 0; overflow: hidden; visibility: hidden; font-weight: 500; }
+.reg__yb:hover { color: var(--ink); }
+.reg__yb[aria-pressed="true"] { font-weight: 500; color: var(--ink); text-decoration: underline 2px var(--ink); text-underline-offset: 6px; }
+.reg__yb:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--r-sm); }
 .reg__n { margin: 0; font-size: 13.5px; color: var(--ink-3); }
 .reg__reset { min-height: 44px; margin-left: 4px; padding: 0 4px; border: 0; background: none; font: 500 14px/1 var(--font-sans); color: var(--link); text-decoration: underline; text-decoration-color: var(--link-line); text-underline-offset: 3px; cursor: pointer; }
 .reg__empty { margin-top: 24px; color: var(--ink-2); }
@@ -144,9 +157,9 @@
   .pg-margin { order: -1; position: static; margin-bottom: 28px; }
   .pg-awards { display: none; }
   .pg-side:has(.reg) { margin-bottom: 24px; }
-  .reg { grid-template-columns: minmax(0, 1fr) minmax(0, 11rem); align-items: end; column-gap: 12px; }
-  .reg:not(:has(select)) { grid-template-columns: minmax(0, 1fr); }
-  .reg__n { grid-column: 1 / -1; }
+  .reg__ys { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 0 4px; }
+  .reg__yb--all { grid-column: auto; }
+  .reg__yb { min-height: 44px; padding: 0 8px; }
 }
 @media (max-width: 700px) {
   .prose--people .sec { grid-template-columns: 5rem minmax(0, 1fr); column-gap: 16px; }
@@ -165,7 +178,6 @@
   .fold > summary > :first-child { grid-column: 1; }
   .fold__m { grid-column: 1; grid-row: 2; }
   .fold > summary::after { grid-column: 2; grid-row: 1; font-size: 13.5px; }
-  .reg { grid-template-columns: minmax(0, 1fr) 7.5rem; }
 }
 /* прилад розділу на телефоні — після тексту, скромного розміру */
 @media (max-width: 900px) {

@@ -44,11 +44,14 @@ const proseKind = { documents: 'prose--files', 'medu-guide': 'prose--books', gra
         <div class="pg-side">
           {reg && (
             <form class="reg" data-reg hidden role="search" aria-label={u.find} data-shown={u.shown} onsubmit="return false">
-              <label class="reg__f"><span>{u.find}</span><input type="search" data-reg-q autocomplete="off" placeholder={kind === 'documents' ? u.findDocs : u.findBooks} /></label>
+              <label class="reg__f"><span>{u.find}</span><span class="reg__q"><svg width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg><input type="search" data-reg-q autocomplete="off" placeholder={kind === 'documents' ? u.findDocs : u.findBooks} /></span></label>
               {years.length > 0 && (
-                <label class="reg__f"><span>{u.year}</span>
-                  <select data-reg-y><option value="">{u.allYears}</option>{years.map(y => <option value={y}>{y}</option>)}</select>
-                </label>
+                <fieldset class="reg__y"><legend>{u.year}</legend>
+                  <div class="reg__ys">
+                    <button type="button" class="reg__yb reg__yb--all" data-reg-y="" data-t={u.allYears} aria-pressed="true">{u.allYears}</button>
+                    {years.map(y => <button type="button" class="reg__yb" data-reg-y={y} data-t={y} aria-pressed="false">{y}</button>)}
+                  </div>
+                </fieldset>
               )}
               <p class="reg__n" aria-live="polite"><span data-reg-n></span> <button type="button" class="reg__reset" data-reg-reset hidden>{u.reset}</button></p>
             </form>

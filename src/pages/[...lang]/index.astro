@@ -39,7 +39,7 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
           <a class="btn btn--line" href={url(lang, '/stateholders/')}>{c.hero_cta_secondary}</a>
         </div>
       </div>
-      <div class="inst-wrap">
+      <div class="inst-wrap" data-dockable>
       <figure class="scope scope-home showcase" aria-label={uk ? 'Вітрина: процесор, пам’ять, логіка, код, мережі, штучний інтелект' : 'Showcase: processor, memory, logic, code, networks, artificial intelligence'}>
         <div class="scope__screen">
           <canvas aria-hidden="true"></canvas>
@@ -80,6 +80,16 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
     </div>
   </section>
 
+  <!-- телефон і планшет: вітрина з героя переїжджає сюди (site.js, data-inst-dock), після профілів — як ілюстрація до шкали -->
+  <section class="section hm hm-showcase" aria-labelledby="h-sc">
+    <div class="wrap" data-inst-dock hidden>
+      <header class="hm-head">
+        <p class="eyebrow">{uk ? 'Вітрина' : 'Showcase'}</p>
+        <h2 class="sec-h2 mt-s" id="h-sc">{uk ? 'Шість речей усередині комп’ютера' : 'Six things inside a computer'}</h2>
+      </header>
+    </div>
+  </section>
+
   <section class="section hm" aria-labelledby="h-labs">
     <div class="wrap">
       <header class="hm-head hm-head--row rv">
@@ -88,7 +98,6 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
           <h2 class="sec-h2 mt-s" id="h-labs">{c.labs_title}</h2>
         </div>
         <a class="arrow-link hm-act" href={url(lang, '/studying/')}>{t.studying} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <RailNav lang={lang} />
       </header>
       <ul class="labs" role="list" tabindex="0" aria-label={c.labs_title} data-rail>
         {LABS[lang].map((l, i) => (
@@ -100,7 +109,10 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
           </li>
         ))}
       </ul>
-      <a class="arrow-link hm-act-end" href={url(lang, '/studying/')}>{t.studying} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <div class="rail-foot">
+        <RailNav lang={lang} />
+        <a class="arrow-link hm-act-end" href={url(lang, '/studying/')}>{t.studying} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
     </div>
   </section>
 

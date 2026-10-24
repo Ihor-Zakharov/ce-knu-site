@@ -1,6 +1,6 @@
 /* «Вступникам»: перший екран — текст, факти й прилад з КІ-Рексом (стрічка Мебіуса); нижче — цикли дисциплін, «чому тут», спойлери */
 .ent { padding-block: clamp(16px, 2vw, 28px) clamp(28px, 3vw, 44px); }
-.ent__grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); grid-template-areas: "text inst" "facts inst"; column-gap: clamp(32px, 5vw, 96px); row-gap: clamp(24px, 2.6vw, 36px); align-items: start; }
+.ent__grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 520px); grid-template-areas: "text inst" "facts inst"; column-gap: clamp(32px, 5vw, 96px); row-gap: clamp(24px, 2.6vw, 36px); align-items: start; }
 .ent__text { grid-area: text; }
 .ent__facts { grid-area: facts; }
 .ent__inst { grid-area: inst; align-self: center; justify-self: end; width: min(100%, 440px); }   /* компактний прилад: перший екран уміщується цілком */
@@ -72,3 +72,22 @@
   .cyc__list b { grid-area: b; margin-top: 0; }
   .cyc__some { grid-area: s; }
 }
+
+/* телефон (раунд дизайнерів): короткий герой, одна кнопка, усі шість фактів на першому екрані; прилад — перед фінальною плашкою */
+@media (max-width: 900px) {
+  .ent__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "facts" "inst"; row-gap: 18px; }
+  .ent__inst { display: none; }
+}
+@media (max-width: 600px) {
+  .ent { padding-block: 12px 20px; }
+  .ent .crumbs { margin-bottom: 10px; font-size: 13px; }
+  .ent h1 { margin-top: 10px; font-size: clamp(2rem, 1.3rem + 3.2vw, 2.375rem); }
+  .ent .lead { max-width: none; }
+  .ent__cta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 16px; }
+  .ent__cta .btn--line { display: none; }   /* навчальний план — посилання розділу «Що ви вивчатимете» */
+  .ent__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; }
+  .ent__facts li { padding-top: 10px; gap: 4px; }
+  .ent__facts b { font-size: 1.5rem; }
+  .ent__facts span { font-size: 13px; }
+}
+.ent__pdf { font-size: 12px; }

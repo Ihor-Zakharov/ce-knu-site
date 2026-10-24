@@ -43,7 +43,6 @@ if (crumbs) ld.push(breadcrumbLd(lang, [...crumbs, { name: title, path }], Astro
 if (path === '/') ld.push(...orgLd(lang, Astro.site!));
 if (path === '/' || path === '/entrant/') ld.push(...programsLd(lang, Astro.site!));
 // «Поділитися» — на новинах і сторінках для вступників і роботодавців (кнопку додає webapi.js)
-const sharable = path.startsWith('/posts/') || path === '/entrant/' || path === '/stateholders/';
 // миттєві переходи: браузер заздалегідь готує сторінку, на яку навели (Speculation Rules; де не підтримується — просто ігнорується)
 const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches: `${base}*` }, { not: { href_matches: ['*.pdf', '*.xml', '*.txt', `${base}files/*`] } }, { not: { selector_matches: '[download], [target=_blank], [rel~=external]' } }] }, eagerness: 'moderate' }] });
 ---
@@ -102,7 +101,7 @@ const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches
     })();
   </script>
 </head>
-<body data-share={sharable ? '' : undefined} data-pagefind-ignore={noindex ? 'all' : undefined}>
+<body data-pagefind-ignore={noindex ? 'all' : undefined}>
   <a class="skip" href="#main">{t.skip}</a>
   <Icons />
   <Header lang={lang} path={path} alt={alt} />

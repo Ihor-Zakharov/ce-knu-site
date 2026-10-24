@@ -121,7 +121,7 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
       <header class="hm-head rv">
         <p class="eyebrow">{uk ? 'Роботодавцям' : 'For employers'}</p>
         <h2 class="sec-h2 mt-s" id="h-emp">{c.employers_title}</h2>
-        <p class="skp__claim"><svg width="22" height="22" aria-hidden="true"><use href="#i-check"/></svg><span>{c.employers_ok(nSkills)} <a class="link" href={PLAN}>{c.employers_plan}</a></span></p>
+        <p class="skp__claim"><svg width="22" height="22" aria-hidden="true"><use href="#i-check"/></svg><span>{c.employers_ok(nSkills)} <a class="link" href={PLAN} target="_blank" rel="noopener">{c.employers_plan}</a></span></p>
       </header>
       <SkillCards lang={lang}>
         <div class="skp__bar">

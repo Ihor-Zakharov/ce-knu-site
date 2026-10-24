@@ -13,7 +13,7 @@ const year = new Date().getFullYear();
     <div class="footer__grid">
       <div>
         <Image src={emblem} width={192} height={192} alt={lang === 'uk' ? 'Емблема кафедри комп’ютерної інженерії' : 'Emblem of the Department of Computer Engineering'} loading="lazy" />
-        <p class="footer__about">{t.footNote}<br />{t.uni}</p>
+        <p class="footer__about">{t.footNote.split(' · ')[0]}<span class="footer__aff">{t.footNote.split(' · ').slice(1).join(' · ')}</span>{t.uni}</p>
       </div>
       <nav class="footer__nav" aria-label={t.sections}>
         <h2 class="h3f">{t.sections}</h2>

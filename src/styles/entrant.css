@@ -75,7 +75,7 @@
 
 /* телефон (раунд дизайнерів): короткий герой, одна кнопка, усі шість фактів на першому екрані; прилад — перед фінальною плашкою */
 @media (max-width: 900px) {
-  .ent__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "facts" "inst"; row-gap: 18px; }
+  .ent__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "facts"; row-gap: 18px; }
   .ent__inst { display: none; }
 }
 @media (max-width: 600px) {
@@ -91,3 +91,9 @@
   .ent__facts span { font-size: 13px; }
 }
 .ent__pdf { font-size: 12px; }
+
+/* перехід «факти → навчальний план» без порожнечі (фінальний огляд) */
+.ent { padding-bottom: 24px; }
+.ent + .hm.section { padding-top: 24px; }
+@media (min-width: 901px) { #h-study { max-width: none; } }
+@media (max-width: 600px) { .ent { padding-bottom: 16px; } .ent + .hm.section { padding-top: 16px; } }

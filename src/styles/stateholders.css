@@ -21,14 +21,14 @@
 .sh-proof__l { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
 
 /* заголовок розділу з приміткою праворуч */
-.sh-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; margin-bottom: clamp(16px, 2vw, 24px); }
-.sh-head .sec-h2 { max-width: none; font-size: clamp(1.625rem, 1.2rem + 1.4vw, 2.5rem); }
+.sh-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; margin-bottom: clamp(16px, 2vw, 24px); }
+.sh-head .sec-h2 { max-width: none; }
 .sh-head__note { max-width: 52ch; font-size: 15px; line-height: 1.5; color: var(--ink-3); }
 .ph + .sh-skills { padding-top: clamp(16px, 2vw, 28px); }
 
 /* як працювати з кафедрою */
 .sh-ways { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.4vw, 40px); }
-.sh-ways__i { padding-top: 16px; border-top: 2px solid var(--gold); }
+.sh-ways__i { padding-top: 16px; border-top: 1px solid var(--line-strong); }
 .sh-ways__n { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; color: var(--gold-ink); }
 .sh-ways__i h3 { margin-top: 10px; font-size: clamp(1.25rem, 1.05rem + .6vw, 1.5rem); font-weight: 400; letter-spacing: -.015em; line-height: 1.2; }
 .sh-ways__t { margin-top: 8px; max-width: 40ch; color: var(--ink-2); line-height: 1.55; }
@@ -65,7 +65,6 @@
   .sh-proof__l { font-size: 13px; }
   .ph + .sh-skills { padding-top: 10px; }
   .sh-head { margin-bottom: 12px; }
-  .sh-head .sec-h2 { font-size: 1.75rem; }
   .sh-skills .skc { row-gap: 10px; padding: 16px; }
 }
 @media (max-width: 600px) {

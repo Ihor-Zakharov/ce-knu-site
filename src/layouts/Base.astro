@@ -92,8 +92,8 @@ const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches
       var q = new URLSearchParams(location.search).get('theme'), s = null;
       try { s = localStorage.getItem('ki-theme'); } catch (e) {}
       var v = q === 'dark' || q === 'light' ? q : s;
-      if (v === 'dark' || v === 'light') document.documentElement.dataset.theme = v;
       var dark = v ? v === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';   // і системна тема — через data-theme: усі правила [data-theme] діють
       document.querySelector('meta[name="theme-color"]').content = dark ? '#141211' : '#F6F2EA';
       // «js» — до першого кадру: блоки з появою (.rv) малюються вже у вихідному стані й з'являються з рухом;
       // якщо скрипт сайту так і не запустився — повертаємо все видимим

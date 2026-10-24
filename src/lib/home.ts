@@ -19,22 +19,22 @@ export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
   uk: [
     { y: '1991', t: 'Автоматизація наукових досліджень', d: '' },
     { y: '1996', t: 'Об’єднання кафедр', d: '' },
-    { y: '2006', t: 'Завідувач: Ю. В. Бойко', d: '' },
+    { y: '2006', t: 'Завідувач: Ю.\u00a0В.\u00a0Бойко', d: '' },
     { y: '2009', t: 'Напрям «Комп’ютерна інженерія»', d: '' },
     { y: '2010', t: 'Кафедра комп’ютерної інженерії', d: '' },
-    { y: '2012', t: 'Завідувач: С. Д. Погорілий', d: '' },
+    { y: '2012', t: 'Завідувач: С.\u00a0Д.\u00a0Погорілий', d: '' },
     { y: '2017', t: 'Меморандум з IBM Ukraine', d: '' },
-    { y: '2021', t: 'Знову завідувач: Ю. В. Бойко', d: '' }
+    { y: '2021', t: 'Знову завідувач: Ю.\u00a0В.\u00a0Бойко', d: '' }
   ],
   en: [
     { y: '1991', t: 'Automation of Scientific Research', d: '' },
     { y: '1996', t: 'Departments merged', d: '' },
-    { y: '2006', t: 'Head: Yu. V. Boiko', d: '' },
+    { y: '2006', t: 'Head: Yu.\u00a0V.\u00a0Boiko', d: '' },
     { y: '2009', t: 'Computer Engineering programme', d: '' },
     { y: '2010', t: 'Department of Computer Engineering', d: '' },
-    { y: '2012', t: 'Head: S. D. Pohorilyi', d: '' },
+    { y: '2012', t: 'Head: S.\u00a0D.\u00a0Pohorilyi', d: '' },
     { y: '2017', t: 'Memorandum with IBM Ukraine', d: '' },
-    { y: '2021', t: 'Head again: Yu. V. Boiko', d: '' }
+    { y: '2021', t: 'Head again: Yu.\u00a0V.\u00a0Boiko', d: '' }
   ],
 };
 

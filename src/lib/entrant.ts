@@ -52,7 +52,7 @@ export const COPY = {
     why: [
       { title: 'Залізо у ваших руках', text: 'Комутатори Huawei, плати FPGA, сервер IBM Power. У ReLab старші студенти вчать молодших.' },
       { title: 'Нейромережі й мовні моделі', text: 'Їх досліджує кафедра. Студенти доповідають на конференціях у Німеччині й Фінляндії.' },
-      { title: 'Кар’єри випускників', text: 'Intel: директор офісу в Україні. One\u00a0AI: дослідження\u00a0NLP. Lyft: програмні\u00a0проєкти.' },
+      { title: 'Кар’єри випускників', text: 'Intel: директор офісу в\u00a0Україні\nOne\u00a0AI: дослідження\u00a0NLP\nLyft: програмні\u00a0проєкти' },
     ],
     spoiler_steps: 'Порядок вступу: заяви та документи',
     spoiler_courses: 'Усі 40 дисциплін за циклами',
@@ -82,7 +82,7 @@ export const COPY = {
     why: [
       { title: 'Hardware in your hands', text: 'Huawei switches, FPGA boards, an IBM Power server. In ReLab senior students teach juniors.' },
       { title: 'AI and language models', text: 'The department researches both. Students present at conferences in Germany and Finland.' },
-      { title: 'Graduates at work', text: 'Intel: head of the Ukraine office. One\u00a0AI: NLP\u00a0research. Lyft: software\u00a0projects.' },
+      { title: 'Graduates at work', text: 'Intel: head of the Ukraine office\nOne\u00a0AI: NLP\u00a0research\nLyft: software\u00a0projects' },
     ],
     spoiler_steps: 'Full application process and documents',
     spoiler_courses: 'All 40 courses by cycle',

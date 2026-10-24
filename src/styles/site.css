@@ -757,7 +757,7 @@ a:hover .news-art { animation: none; }
 .prof__mini { font-size: 12px; letter-spacing: .02em; }
 .prof__mini li { padding-right: 4px; white-space: nowrap; overflow-wrap: normal; }
 .arrow-link { min-height: 44px; }
-.skp__claim .link, .crumbs a, .sh-band__mail { display: inline-block; padding-block: 11px; margin-block: -11px; }
+.crumbs a, .sh-band__mail { display: inline-block; padding-block: 11px; margin-block: -11px; }
 /* стрілки стрічки — під самою стрічкою, поруч із тим, що вони гортають */
 .rail-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
 .rail-foot .rail-nav { order: -1; }
@@ -886,3 +886,5 @@ a:hover .news-art { animation: none; }
   .footer__nav a { display: flex; align-items: center; min-height: 44px; }
   .footer__nav li { margin-bottom: 0; }
 }
+.sec-h2 { max-width: 26ch; text-wrap: balance; }
+.section--tight:has(> .wrap > :is(.band, .sh-band)) { border-top: 0; }   /* без подвійної лінії над фінальною плашкою */

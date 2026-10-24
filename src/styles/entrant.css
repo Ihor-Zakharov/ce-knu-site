@@ -97,3 +97,6 @@
 .ent + .hm.section { padding-top: 24px; }
 @media (min-width: 901px) { #h-study { max-width: none; } }
 @media (max-width: 600px) { .ent { padding-bottom: 16px; } .ent + .hm.section { padding-top: 16px; } }
+
+.why p { white-space: pre-line; }   /* «Кар’єри випускників»: одна професія — один рядок */
+.ent__facts b { font-variant-numeric: normal; }   /* без перекреслених нулів Fixel */

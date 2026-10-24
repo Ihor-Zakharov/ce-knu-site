@@ -10,10 +10,10 @@ const brand = `${import.meta.env.BASE_URL}brand/`;
   <svg class="smith footer__smith" aria-hidden="true"></svg>
   <div class="wrap">
     <div class="footer__grid">
-      <div>
+      <div class="footer__brand">
         <picture>
           <source media="(max-width: 860px)" srcset={brand + 'seal-compact.svg'} />
-          <img src={brand + 'seal.svg'} width="144" height="144" alt={lang === 'uk' ? 'Герб кафедри комп’ютерної інженерії' : 'Seal of the Department of Computer Engineering'} loading="lazy" />
+          <img src={brand + 'seal.svg'} width="88" height="88" alt={lang === 'uk' ? 'Герб кафедри комп’ютерної інженерії' : 'Seal of the Department of Computer Engineering'} loading="lazy" />
         </picture>
         <p class="footer__about">{t.footNote.split(' · ')[0]}<span class="footer__aff">{t.footNote.split(' · ').slice(1).join(' · ')}</span>{t.uni}</p>
       </div>
@@ -35,8 +35,8 @@ const brand = `${import.meta.env.BASE_URL}brand/`;
       </div>
     </div>
     <div class="footer__bot">
-      <span>© {year} · {t.dept}</span>
-      <span>{t.made} <a href="https://www.linkedin.com/in/zakharov-ihor/" rel="noopener" target="_blank">ZakharovLabs</a> · <a href={url(lang, '/sitemap/')}>{t.sitemap}</a></span>
+      <span>© {year} · {t.dept} · <a href={url(lang, '/sitemap/')}>{t.sitemap}</a></span>
+      <span class="footer__credit">{t.made} <a class="footer__lab" href="https://www.linkedin.com/in/zakharov-ihor/" rel="noopener" target="_blank">ZakharovLabs<svg width="13" height="13" aria-hidden="true"><use href="#i-ext"/></svg></a></span>
     </div>
   </div>
   <canvas class="footer__rex" data-rex="cap" width="90" height="72" aria-hidden="true"></canvas>

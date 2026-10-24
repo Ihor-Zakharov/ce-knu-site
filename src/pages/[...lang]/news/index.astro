@@ -19,15 +19,15 @@ const msgs = [uk ? 'НОВИНИ' : 'NEWS', '{today}'];
 function getCategory(title: string, summary: string) {
   const text = (title + ' ' + summary).toLowerCase();
   if (/перемог|чемпіон|конкурс|huawei|призер|нагород|олімпіад|грант|winner|award|champion|competition|contest|hackathon/i.test(text)) {
-    return { key: 'awards', label: uk ? '🏆 Перемога' : '🏆 Award' };
+    return { key: 'awards', label: uk ? 'Досягнення' : 'Awards' };
   }
   if (/лаборатор|наук|підручник|конференц|партнер|ibm|cisco|монограф|lab|science|research|conference|штучн|intel/i.test(text)) {
-    return { key: 'tech', label: uk ? '🔬 Наука & Лабораторії' : '🔬 Science & Labs' };
+    return { key: 'tech', label: uk ? 'Наука та лабораторії' : 'Science & Labs' };
   }
   if (/навчан|вступ|сесі|графік|іспит|дистанційн|освітн|студент|бакалавр|магістр|study|exam|admission|curriculum|student/i.test(text)) {
-    return { key: 'edu', label: uk ? '🎓 Навчання' : '🎓 Education' };
+    return { key: 'edu', label: uk ? 'Навчання' : 'Education' };
   }
-  return { key: 'general', label: uk ? '📢 Подія' : '📢 Event' };
+  return { key: 'general', label: uk ? 'Події' : 'Events' };
 }
 
 const featured = list[0];
@@ -52,16 +52,16 @@ const restNews = list.slice(1);
             aria-label={uk ? "Пошук новин" : "Search news"}
             autocomplete="off"
           />
-          <button type="button" id="news-search-clear" class="news-search__clear" hidden aria-label={uk ? "Очистити поле пошуку" : "Clear search input"}>✕</button>
+          <button type="button" id="news-search-clear" class="news-search__clear" hidden aria-label={uk ? "Очистити поле пошуку" : "Clear search input"}>&times;</button>
         </div>
 
         <div class="news-filters-row">
           <div class="news-categories" role="group" aria-label={uk ? 'Категорії новин' : 'News categories'}>
             <button type="button" class="news-chip is-active" data-filter="all" aria-pressed="true">{uk ? 'Всі новини' : 'All news'}</button>
-            <button type="button" class="news-chip" data-filter="awards" aria-pressed="false">{uk ? '🏆 Досягнення' : '🏆 Awards'}</button>
-            <button type="button" class="news-chip" data-filter="edu" aria-pressed="false">{uk ? '🎓 Навчання' : '🎓 Education'}</button>
-            <button type="button" class="news-chip" data-filter="tech" aria-pressed="false">{uk ? '🔬 Наука & Партнери' : '🔬 Science & Labs'}</button>
-            <button type="button" class="news-chip" data-filter="general" aria-pressed="false">{uk ? '📢 Події' : '📢 Events'}</button>
+            <button type="button" class="news-chip" data-filter="awards" aria-pressed="false">{uk ? 'Досягнення' : 'Awards'}</button>
+            <button type="button" class="news-chip" data-filter="edu" aria-pressed="false">{uk ? 'Навчання' : 'Education'}</button>
+            <button type="button" class="news-chip" data-filter="tech" aria-pressed="false">{uk ? 'Наука та партнери' : 'Science & Partners'}</button>
+            <button type="button" class="news-chip" data-filter="general" aria-pressed="false">{uk ? 'Події' : 'Events'}</button>
           </div>
 
           <div class="news-view-controls">

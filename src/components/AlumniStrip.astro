@@ -29,19 +29,12 @@ const mark = (c: string) => c.replace(/\s+(Inc\.|LLC|Ltd\.?)$/, '');   // сло
       <ul class="alum__row" role="list" data-rail>
         {list.map((a, i) => { const photo = a.photo && PHOTOS[a.photo as keyof typeof PHOTOS]; return (
           <li class="rv" style={`--i:${i + 1}`}>
-            <a class="alum__item alum__card" href={url(lang, '/graduates/') + (a.anchor ? '#' + a.anchor : '')} data-rex-say={a.say}>
-              <div class="alum__top">
-                <span class="alum__mark">{mark(a.company)}</span>
-                {a.tag && <span class="alum__badge">{a.tag}</span>}
-              </div>
-              {a.who && <div class="alum__who">
+            <a class="alum__item" href={url(lang, '/graduates/') + (a.anchor ? '#' + a.anchor : '')} data-rex-say={a.say}>
+              <span class="alum__mark">{mark(a.company)}</span>
+              {a.who && <span class="alum__who">
                 {photo ? <span class="alum__ph"><Image src={photo} width={96} alt="" loading="lazy" /></span> : <span></span>}
-                <div><b>{a.who}</b>{a.role && <span class="alum__role">{a.role}</span>}</div>
-              </div>}
-              <div class="alum__foot">
-                <span class="alum__read">{uk ? 'Історія успіху' : 'Alumni story'}</span>
-                <svg class="alum__arrow" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
-              </div>
+                <span><b>{a.who}</b>{a.role && <span class="alum__role">{a.role}</span>}</span>
+              </span>}
             </a>
           </li>
         ); })}

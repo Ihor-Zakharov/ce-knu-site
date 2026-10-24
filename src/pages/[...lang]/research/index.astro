@@ -33,28 +33,28 @@ const docText = uk
 // Напрями
 const TRACKS = [
   {
-    icon: '⚡',
+    code: '01 · HPC',
     title: uk ? 'Високопродуктивні та розподілені системи' : 'High-Performance & Distributed Computing',
     desc: uk
       ? 'Використання сучасних ІТ-технологій для створення високопродуктивних обчислювальних і розподілених систем, грід-середовищ та хмарних платформ.'
       : 'The use of modern IT technologies to create high-performance computing and distributed systems, grid environments and cloud platforms.',
   },
   {
-    icon: '📡',
+    code: '02 · COMM',
     title: uk ? 'Цифровий зв’язок і мережеві протоколи' : 'Digital Communications & Protocols',
     desc: uk
       ? 'Новітні методи створення та дослідження систем цифрового зв’язку, оптимізації передачі сигналів та спеціалізованих телекомунікаційних мереж.'
       : 'Novel methods for creating and studying digital communication systems, signal transmission optimization and specialized telecommunication networks.',
   },
   {
-    icon: '🖥️',
+    code: '03 · SPEC',
     title: uk ? 'Суперкомп’ютери та алгебра процесів' : 'Supercomputing & Process Algebra',
     desc: uk
       ? 'Застосування новітніх методів і підходів для створення та аналізу суперкомп’ютерних систем, математичний апарат модифікованих систем алгоритмічних алгебр, алгебра процесів реального часу, генетичні алгоритми, шаблони потоків робіт і кольорові мережі Петрі.'
       : 'Application of novel methods and approaches to the creation and analysis of supercomputer systems, mathematical apparatus of modified systems of algorithmic algebras, real-time process algebra, genetic algorithms, workflow patterns, and coloured Petri nets.',
   },
   {
-    icon: '🧠',
+    code: '04 · AI',
     title: uk ? 'Штучний інтелект і машинне навчання' : 'Artificial Intelligence & Machine Learning',
     desc: uk
       ? 'Нейронні мережі, великі мовні моделі (LLM), комп’ютерна лінгвістика й обробка природної мови (NLP), комп’ютерний зір і цифрова обробка зображень.'
@@ -96,12 +96,12 @@ const CONFERENCES = [
     <div class="wrap rsrc-wrap">
       <!-- Навігаційні швидкі переходи -->
       <nav class="rsrc-nav-ribbon" aria-label={uk ? 'Розділи досліджень' : 'Research sections'}>
-        <a class="rsrc-nav-chip" href="#tracks">{uk ? '⚡ Напрями досліджень' : '⚡ Research tracks'}</a>
-        <a class="rsrc-nav-chip" href="#awards">{uk ? '🏆 Державні нагороди' : '🏆 State awards'}</a>
-        <a class="rsrc-nav-chip" href="#projects">{uk ? '🚀 Проекти кафедри' : '🚀 Projects'}</a>
-        <a class="rsrc-nav-chip" href="#world-tour">{uk ? '🌍 Світова співпраця' : '🌍 Global collaboration'}</a>
-        <a class="rsrc-nav-chip" href="#publications">{uk ? '📚 Видання та ради' : '📚 Publications & Councils'}</a>
-        <a class="rsrc-nav-chip" href="#llm-group">{uk ? '🧠 LLM & Memory Group' : '🧠 LLM Group'}</a>
+        <a class="rsrc-nav-chip" href="#tracks">{uk ? 'Напрями досліджень' : 'Research tracks'}</a>
+        <a class="rsrc-nav-chip" href="#awards">{uk ? 'Державні нагороди' : 'State awards'}</a>
+        <a class="rsrc-nav-chip" href="#projects">{uk ? 'Проекти кафедри' : 'Projects'}</a>
+        <a class="rsrc-nav-chip" href="#world-tour">{uk ? 'Світова співпраця' : 'Global collaboration'}</a>
+        <a class="rsrc-nav-chip" href="#publications">{uk ? 'Видання та ради' : 'Publications & Councils'}</a>
+        <a class="rsrc-nav-chip" href="#llm-group">{uk ? 'LLM & Memory Group' : 'LLM Group'}</a>
       </nav>
 
       <!-- 1. Напрями наукової роботи -->
@@ -115,7 +115,7 @@ const CONFERENCES = [
         <div class="rsrc-tracks-grid">
           {TRACKS.map(tr => (
             <article class="rsrc-track-card">
-              <span class="rsrc-track-card__icon" aria-hidden="true">{tr.icon}</span>
+              <span class="rsrc-track-card__code">{tr.code}</span>
               <h3 class="rsrc-track-card__title">{tr.title}</h3>
               <p class="rsrc-track-card__desc">{tr.desc}</p>
             </article>
@@ -143,7 +143,7 @@ const CONFERENCES = [
                 fit="cover"
                 loading="eager"
               />
-              <span class="rsrc-award-card__badge">{uk ? '🥇 Державна премія України 2018' : '🥇 State Prize of Ukraine 2018'}</span>
+              <span class="rsrc-award-card__badge">{uk ? 'Державна премія України 2018' : 'State Prize of Ukraine 2018'}</span>
             </div>
             <div class="rsrc-award-card__body">
               <h3 class="rsrc-award-card__title">{uk ? 'Державна премія України в галузі науки і техніки 2018 року' : 'State Prize of Ukraine in Science and Technology (2018)'}</h3>
@@ -156,7 +156,7 @@ const CONFERENCES = [
           <!-- Премія Президента -->
           <article class="rsrc-award-card rsrc-award-card--pres">
             <div class="rsrc-award-card__body">
-              <span class="rsrc-award-card__badge" style="align-self: flex-start; position: static;">{uk ? '🎖️ Премія Президента України 2018' : '🎖️ Presidential Prize 2018'}</span>
+              <span class="rsrc-award-card__badge" style="align-self: flex-start; position: static;">{uk ? 'Премія Президента України 2018' : 'Presidential Prize 2018'}</span>
               <h3 class="rsrc-award-card__title">{uk ? 'Премія Президента України для молодих вчених 2018 року' : 'President of Ukraine’s Prize for Young Scientists (2018)'}</h3>
               <p class="rsrc-award-card__laureates">{uk ? 'Лауреати: асистенти А. О. Сальніков, Є. А. Слюсар' : 'Laureates: Assist. Profs. A. O. Salnikov, Ye. A. Sliusar'}</p>
               <p class="rsrc-award-card__topic">{uk ? 'За участь у наукових дослідженнях «Створення високопродуктивної інфраструктури в грід для досліджень конформаційних змін біополімерів».' : 'For participation in research "Creation of a High-Performance Grid Infrastructure for Studying Conformational Changes of Biopolymers".'}</p>
@@ -194,10 +194,10 @@ const CONFERENCES = [
         <div class="rsrc-tour-card">
           <!-- Вкладки туру -->
           <div class="rsrc-tour-tabs" role="tablist" aria-label={uk ? 'Осередки світової співпраці' : 'International hubs'}>
-            <button type="button" class="rsrc-tour-btn is-active" role="tab" id="tab-coia" aria-selected="true" aria-controls="pane-coia" data-target="pane-coia">{uk ? '🇦🇿 Баку & Стенфорд (COIA)' : '🇦🇿 Baku & Stanford (COIA)'}</button>
-            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-uib" aria-selected="false" aria-controls="pane-uib" data-target="pane-uib">{uk ? '🇪🇸 Іспанія (UIB)' : '🇪🇸 Spain (UIB)'}</button>
-            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-nord" aria-selected="false" aria-controls="pane-nord" data-target="pane-nord">{uk ? '🇨🇭 🇸🇰 🇸🇪 NorduGrid' : '🇨🇭 🇸🇰 🇸🇪 NorduGrid'}</button>
-            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-tele" aria-selected="false" aria-controls="pane-tele" data-target="pane-tele">{uk ? '📡 Спецзв’язок' : '📡 Special Telecom'}</button>
+            <button type="button" class="rsrc-tour-btn is-active" role="tab" id="tab-coia" aria-selected="true" aria-controls="pane-coia" data-target="pane-coia">{uk ? 'Баку та Стенфорд (COIA)' : 'Baku & Stanford (COIA)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-uib" aria-selected="false" aria-controls="pane-uib" data-target="pane-uib">{uk ? 'Іспанія (UIB)' : 'Spain (UIB)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-nord" aria-selected="false" aria-controls="pane-nord" data-target="pane-nord">{uk ? 'NorduGrid (Швейцарія, Словаччина, Швеція)' : 'NorduGrid (Switzerland, Slovakia, Sweden)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-tele" aria-selected="false" aria-controls="pane-tele" data-target="pane-tele">{uk ? 'Телекомунікаційні системи' : 'Special Telecom Systems'}</button>
           </div>
 
           <!-- Панель 1: COIA & Stanford -->

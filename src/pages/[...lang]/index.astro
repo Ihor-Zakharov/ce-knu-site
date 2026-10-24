@@ -35,8 +35,8 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
         <h1>{(uk ? ['Кафедра', 'комп’ютерної', 'інженерії'] : ['Department', 'of Computer', 'Engineering']).map((w, i) => <><span class="w"><span style={`--i:${i}`}>{i === 1 ? <em>{w}</em> : w}</span></span> </>)}</h1>
         <p class="lead">{c.hero_lead}</p>
         <div class="cta">
-          <a class="btn btn--hero-primary" href={url(lang, '/entrant/')}>{c.hero_cta_primary} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn--line btn--hero-secondary" href={url(lang, '/stateholders/')}>{c.hero_cta_secondary}</a>
+          <a class="btn" href={url(lang, '/entrant/')}>{c.hero_cta_primary} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--line" href={url(lang, '/stateholders/')}>{c.hero_cta_secondary}</a>
         </div>
       </div>
       <div class="inst-wrap" data-dockable>

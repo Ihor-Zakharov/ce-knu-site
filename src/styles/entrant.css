@@ -100,3 +100,4 @@
 
 .why p { white-space: pre-line; }   /* «Кар’єри випускників»: одна професія — один рядок */
 .ent__facts b { font-variant-numeric: normal; }   /* без перекреслених нулів Fixel */
+@media (max-width: 900px) { .cyc__list li:last-child { border-bottom: 0; } }   /* без подвійної лінії над наступним розділом */

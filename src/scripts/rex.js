@@ -80,7 +80,8 @@ export function perch(box) {
   let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
   let hello = box.dataset.hello || '', helloT = 2.4;           // привітання після появи (поява Рекса — 0,9–1,9 с): рушає на 2-й с, говорить на 2,4-й
   if (hello) pause = 2;
-  let side = '', drop = 0, failed = false, sayTimer = 0;        // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
+  let side = '', drop = 0, failed = false, sayTimer = 0, memoAt = -1;
+  const memo = () => { const B = bits >> 3; return uk ? (B >= 32 ? '256 біт. Без переповнення' : B >= 8 ? '64 біти. Апетит росте' : 'Перший байт. Смакує') : (B >= 32 ? '256 bits. Room for more' : B >= 8 ? '64 bits. Still hungry' : 'First byte. Acquired taste'); };        // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
   const stick = box.closest('.page__inst'), hd = document.querySelector('.hd');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
 
@@ -196,7 +197,11 @@ export function perch(box) {
     const was = asleep; wake();
     if (!REDUCED && jump === 0) { vy = -420; jump = -.01; }   // ≈80 px угору — у стрибку перекриває шапку, але не тікає за край екрана
     if (was) speak(uk ? 'Виходжу з режиму сну' : 'Leaving sleep mode');
-    else if (lines.length) speak(lines[li++ % lines.length]);
+    else if (lines.length) {
+      // після повного кола реплік — інколи згадка про зібрані байти (лише якщо є хоч один)
+      if (li && li % lines.length === 0 && memoAt !== li && bits >= 8) { memoAt = li; speak(memo()); }
+      else speak(lines[li++ % lines.length]);
+    }
     render();
   });
   // курсор поруч — зупиняється й дивиться на нього; будить
@@ -207,12 +212,16 @@ export function perch(box) {
   }, { passive: true });
   // наведення на ціль із data-rex-say — підбігає під неї й коментує
   const scope = box.closest('[data-rex-scope]') || box.parentElement;
-  scope.querySelectorAll('[data-rex-say]').forEach(el => el.addEventListener('pointerenter', () => {
-    if (!raf || bit) return;
+  // і з клавіатури (Tab): та сама репліка; без руху — відповідає з місця
+  const comment = el => {
+    if (bit) return;
+    if (REDUCED) { speak(el.dataset.rexSay, 2.6); return; }
+    if (!raf) return;
     wake();
     const r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
     goTo(r.left + Math.min(r.width / 2, 70) - b.left, true, () => { dir = 1; speak(el.dataset.rexSay, 2.6); });
-  }));
+  };
+  scope.querySelectorAll('[data-rex-say]').forEach(el => { el.addEventListener('pointerenter', () => comment(el)); el.addEventListener('focus', () => comment(el)); });
   document.addEventListener('themechange', () => {
     const dark = document.documentElement.dataset.theme === 'dark';
     if (seen) { wake(); speak(dark ? (uk ? 'Темно. Час кодити' : 'Lights down. Time to code') : (uk ? 'Додаємо світла' : 'Turning up the light'), 2.2); }

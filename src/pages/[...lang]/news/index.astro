@@ -1,44 +1,56 @@
 ---
+// Новини: роки — якорями зверху, у кожному році — рядки «дата · заголовок і стислий зміст · кадр».
+// Порожні описи з чинного сайту («.») не показуємо; без фото — заставка-графікон NewsArt.
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
-import { T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
+import { T, url, langOf, langParams, isoDate } from '../../../lib/i18n';
 import { news, slugOf, photo } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
 import NewsArt from '../../../components/NewsArt.astro';
+import '../../../styles/lists.css';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
+const uk = lang === 'uk';
 const list = await news(lang);
 const years = [...new Set(list.map(n => n.data.date.getUTCFullYear()))];
-const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
+const msgs = [uk ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
+const day = (d: Date) => d.toLocaleDateString(uk ? 'uk-UA' : 'en-GB', { day: 'numeric', timeZone: 'UTC' });
+const mon = (d: Date) => d.toLocaleDateString(uk ? 'uk-UA' : 'en-GB', { month: 'short', timeZone: 'UTC' }).replace('.', '');
+const real = (s: string) => (s ?? '').trim().length > 3;   // «.» і «-» з чинного сайту — не опис
 ---
 <Base lang={lang} title={t.news} description={HEROES.news.lead[lang]} og="news" crumbs={[]}>
   <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs) }}
     meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`, `${years.at(-1)}–${years[0]}`, `<a href="${url(lang, '/rss.xml')}">RSS</a>`]} />
-  <section class="section">
-    <div class="wrap page">
-      <div class="page__main">
-      <nav class="years" aria-label={t.year}>
+  <section class="section nl">
+    <div class="wrap">
+      <nav class="years nl-years" aria-label={t.year}>
         {years.map(y => <a class="chip" href={`#y${y}`}>{y} <span class="n">{list.filter(n => n.data.date.getUTCFullYear() === y).length}</span></a>)}
       </nav>
-      {years.map(y => (
-        <section aria-labelledby={`y${y}`}>
-          <h2 class="year-h" id={`y${y}`}>{y}</h2>
-          <div>
-            {list.filter(n => n.data.date.getUTCFullYear() === y).map(n => (
-              <a class="newsrow" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
-                <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
-                <div><h3>{n.data.title}</h3><p>{n.data.summary}</p></div>
-                <span class="thumb">{photo(n) ? <Image src={photo(n)!} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} small />}</span>
-                <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))}
-      </div>
+      {years.map(y => {
+        const items = list.filter(n => n.data.date.getUTCFullYear() === y);
+        return (
+          <section class="nl-year" aria-labelledby={`y${y}`}>
+            <header class="nl-year__h"><h2 id={`y${y}`}>{y}</h2><span>{t.newsCount(items.length)}</span></header>
+            <ol class="nl-list" role="list">
+              {items.map(n => (
+                <li>
+                  <a class="nl-item" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
+                    <time class="nl-date" datetime={isoDate(n.data.date)}><b>{day(n.data.date)}</b><span>{mon(n.data.date)}</span></time>
+                    <span class="nl-body">
+                      <span class="nl-t">{n.data.title}</span>
+                      {real(n.data.summary) && <span class="nl-s">{n.data.summary}</span>}
+                    </span>
+                    <span class="nl-thumb">{photo(n) ? <Image src={photo(n)!} alt="" width={240} height={180} fit="cover" /> : <NewsArt slug={slugOf(n.id)} small />}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        );
+      })}
     </div>
   </section>
 </Base>

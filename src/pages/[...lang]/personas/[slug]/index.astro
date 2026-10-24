@@ -5,6 +5,7 @@ import { getCollection, render } from 'astro:content';
 import { T, url, langOf, type Lang } from '../../../../lib/i18n';
 import { slugOf } from '../../../../lib/content';
 import { personLd } from '../../../../lib/seo';
+import '../../../../styles/lists.css';
 
 export async function getStaticPaths() {
   const all = await getCollection('people', p => !!p.data.legacy);
@@ -16,7 +17,10 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
-const { Content } = await render(entry);
+const { headings } = await render(entry);
+// текст людини — розділи h2 зі змістом збоку; двокрапку наприкінці заголовків із чинного сайту прибираємо
+const html = (entry.rendered?.html ?? '').replace(/:\s*<\/h([23])>/g, '</h$1>');
+const toc = headings.filter(h => h.depth === 2).map(h => ({ ...h, text: h.text.replace(/:\s*$/, '') }));
 // «підпис» людини — фігура Ліссажу з частот, виведених з імені
 const slug = slugOf(entry.id);
 let h = 0; for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
@@ -27,29 +31,34 @@ const words = entry.data.name.split(/\s+/);
 const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: `/personas/${slug}/`, image: entry.data.photo?.src, site: Astro.site! });
 ---
 <Base lang={lang} title={entry.data.name} description={`${entry.data.name}. ${entry.data.role}`} og={`personas/${slug}`} ogFallback="personas" type="profile" crumbs={[{ name: t.people, path: '/personas/' }]} jsonld={[ld]}>
-  <section class="ph">
+  <section class="ph pp-hd">
     <div class="wrap">
       <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
         <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li><a href={url(lang, '/personas/')}>{t.people}</a></li><li aria-current="page">{entry.data.name}</li></ol>
       </nav>
-      <div class="profile-hero mt-m">
-        <div class="profile-hero__ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[200, 400]} sizes="200px" loading="eager" />}</div>
-        <div>
-          <p class="ph__eyebrow"><b>CH 07</b>{entry.data.group}</p>
+      <div class="pp-profile">
+        <div class="pp-ph">{entry.data.photo && <Image src={entry.data.photo} alt={entry.data.name} widths={[240, 480]} sizes="240px" loading="eager" />}</div>
+        <div class="pp-id">
+          <p class="ph__eyebrow"><b>{lang === 'uk' ? 'Персоналії' : 'People'}</b><span>· {entry.data.group}</span></p>
           <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{' '}</>)}</h1>
-          {entry.data.role && <p class="role">{entry.data.role}</p>}
-          <div class="row mt-s" style="align-items:center;gap:14px">
-            <svg class="profile-hero__sig" viewBox="0 0 100 100" aria-hidden="true"><path d={d} pathLength="1"/></svg>
-            <span class="cap">{lang === 'uk' ? 'Фігура Ліссажу' : 'Lissajous figure'} · <b>{a}:{b}</b></span>
-          </div>
+          {entry.data.role && <p class="pp-role">{entry.data.role}</p>}
+          <p class="pp-sig"><svg viewBox="0 0 100 100" aria-hidden="true"><path d={d} pathLength="1"/></svg><span class="cap">{lang === 'uk' ? 'Фігура Ліссажу' : 'Lissajous figure'} · <b>{a}:{b}</b></span></p>
         </div>
       </div>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap page">
-      <article class="prose"><Content /></article>
-      <a class="btn btn--line btn--sm mt-l" href={url(lang, '/personas/')}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg>{lang === 'uk' ? 'Усі персоналії' : 'All people'}</a>
+  <section class="section pp-body">
+    <div class="wrap pp-grid">
+      {toc.length > 1 && (
+        <nav class="pp-toc" aria-label={lang === 'uk' ? 'Розділи' : 'Sections'}>
+          <p class="eyebrow">{lang === 'uk' ? 'Розділи' : 'Sections'}</p>
+          <ol>{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </nav>
+      )}
+      <div class="pp-main">
+        <article class="prose pp-prose" set:html={html} />
+        <a class="arrow-link pp-back" href={url(lang, '/personas/')}><svg width="16" height="16" aria-hidden="true"><use href="#i-left"/></svg>{lang === 'uk' ? 'Усі персоналії' : 'All people'}</a>
+      </div>
     </div>
   </section>
 </Base>

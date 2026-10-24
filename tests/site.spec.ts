@@ -7,7 +7,7 @@ const NAV = ['/news/', '/research/', '/medu-guide/', '/entrant/', '/documents/',
 const both = (p: string) => [p, '/en' + p];
 async function firstPost(page: Page, lang = '') {
   await page.goto(lang + '/news/');
-  return (await page.locator('a.newsrow').first().getAttribute('href'))!;
+  return (await page.locator('a.nl-item').first().getAttribute('href'))!;
 }
 
 test.describe('навігація', () => {
@@ -55,9 +55,9 @@ test.describe('мови', () => {
   }
   test('у кожної новини є переклад', async ({ page }) => {
     await page.goto('/news/');
-    const uk = await page.locator('a.newsrow').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname));
+    const uk = await page.locator('a.nl-item').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname));
     await page.goto('/en/news/');
-    const en = await page.locator('a.newsrow').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname.replace(/^\/en/, '')));
+    const en = await page.locator('a.nl-item').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname.replace(/^\/en/, '')));
     expect(en.sort()).toEqual(uk.sort());
   });
 });
@@ -131,7 +131,7 @@ test.describe('доступність (axe)', () => {
 test.describe('персоналії', () => {
   test('усі люди видно одразу, літера веде до людини', async ({ page }) => {
     await page.goto('/personas/');
-    const cards = page.locator('.pcard');
+    const cards = page.locator('.pl-card');
     expect(await cards.count()).toBeGreaterThanOrEqual(19);
     for (const c of await cards.all()) await expect(c).toBeAttached();
     const letter = page.locator('.az-bar a').first();

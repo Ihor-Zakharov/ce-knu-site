@@ -217,12 +217,24 @@ if (!FINE.matches) $$('.inst__hud span').forEach(s => { if (/MOVE CURSOR/.test(s
 const dock = $('[data-inst-dock]'), dockable = $('[data-dockable]');
 if (dock && dockable) {
   const home = document.createComment('inst'); dockable.before(home);
-  // на головній осцилограф стає в текст «Про кафедру» — після абзацу про лабораторії й академії Huawei, Cisco
-  const labs = [...document.querySelectorAll('#h-about ~ * .prose > p, [aria-labelledby="h-about"] .prose > p')].find(p => /Huawei, Cisco/.test(p.textContent));
-  if (labs && dock.classList.contains('inst-dock--home')) labs.after(dock);
   const place = mq => { if (mq.matches) { dock.hidden = false; dock.append(dockable); } else { home.after(dockable); dock.hidden = true; } };
   const mq = matchMedia('(max-width: 900px)'); place(mq); mq.addEventListener('change', place);
 }
+
+/* ── Стрічки з гортанням (випускники): стрілки ‹ › — на ширину картки; на телефоні — свайп ── */
+$$('[data-rail]').forEach(rail => {
+  const nav = rail.parentElement.querySelector('[data-rail-nav]');
+  if (!nav) return;
+  const prev = nav.querySelector('[data-rail-prev]'), next = nav.querySelector('[data-rail-next]');
+  const upd = () => {
+    const max = rail.scrollWidth - rail.clientWidth - 2;
+    nav.hidden = max <= 0;
+    prev.disabled = rail.scrollLeft <= 2; next.disabled = rail.scrollLeft >= max;
+  };
+  const by = d => rail.scrollBy({ left: d * (rail.firstElementChild?.getBoundingClientRect().width || rail.clientWidth), behavior: REDUCED ? 'auto' : 'smooth' });
+  prev.addEventListener('click', () => by(-1)); next.addEventListener('click', () => by(1));
+  rail.addEventListener('scroll', upd, { passive: true }); new ResizeObserver(upd).observe(rail); upd();
+});
 
 /* ── Головна: вітрина — одна машина, п'ять поглядів ── */
 const sc = $('.showcase');

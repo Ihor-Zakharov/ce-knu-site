@@ -145,14 +145,6 @@ html.menu-open { overflow: hidden; }
 .scope-rex { position: absolute; left: 0; top: 0; width: 66px; height: 54px; image-rendering: pixelated; pointer-events: none; will-change: transform; }
 @media (max-width: 900px) { .hero-home .cta .btn { flex: 1; } }
 
-/* ключові цифри */
-.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); }
-.figures > div { padding: 20px 24px 4px 0; }
-.figures > div + div { padding-left: 24px; border-left: 1px solid var(--line); }
-.figures b { display: block; font: 300 clamp(38px, 4.2vw, 56px)/1 var(--font-sans); letter-spacing: -.04em; font-variant-numeric: lining-nums proportional-nums; }
-.figures b small { font-size: .42em; letter-spacing: -.01em; color: var(--ink-3); margin-left: 4px; }
-.figures span { display: block; margin-top: 10px; color: var(--ink-3); font-size: 14px; max-width: 24ch; }
-@media (max-width: 860px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figures > div:nth-child(3) { padding-left: 0; border-left: 0; } .figures > div:nth-child(n+3) { border-top: 1px solid var(--line); } }
 
 /* ── Розділи сторінок ─────────────────────────────────────── */
 .section { padding-block: clamp(40px, 5vw, 72px); border-top: 1px solid var(--line); }
@@ -347,14 +339,11 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
   .ph + .section { padding-top: 24px; }
   .hero-home h1 { font-size: clamp(2.375rem, 1.7rem + 3vw, 3rem); }
   .hero-home .cta { margin-top: 22px; }
-  .hero-home .figures-wrap { margin-top: 84px !important; }
-  .inst-dock--home { padding-block: 80px 24px; border-top: 0; }
   .years { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
   .year-h { font-size: 40px; margin: 36px 0 8px; }
 }
 
-/* КІ-Рекс гуляє по лінії над ключовими цифрами */
-.figures-wrap { position: relative; }
+/* КІ-Рекс гуляє по лінії над випускниками */
 .perch--line { bottom: calc(100% - 3px); }
 
 /* ілюстрація маскота з чинного сайту — компактний підпис після тексту */
@@ -374,11 +363,8 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 .prog:hover .prog__title { color: var(--action); }
 .prog__title { transition: color var(--hover) var(--ease-out); }
 
-/* хронологія й партнери */
-.history { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+/* заголовки розділів головної */
 .sec-h2 { font-size: var(--fs-h2); font-weight: 300; letter-spacing: -.025em; max-width: 18ch; }
-.history .timeline time { font-family: var(--font-mono); font-size: 13px; letter-spacing: .04em; }
-@media (max-width: 860px) { .history { grid-template-columns: 1fr; } }
 
 
 
@@ -397,7 +383,6 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 /* КІ-Рекс з'являється м'яко, коли герой уже зібрався */
 .perch canvas { animation: rex-in 1s var(--spring) .9s both; }
 @keyframes rex-in { from { opacity: 0; translate: 0 14px; } }
-.hero-home .figures-wrap { margin-top: clamp(88px, 8vw, 112px) !important; }
 
 /* біт, що падає згори, і сон КІ-Рекса */
 .perch__bit { position: absolute; bottom: 4px; left: 0; z-index: 2; font: 600 13px/1 var(--font-mono); color: var(--phosphor); text-shadow: 0 0 8px color-mix(in oklab, var(--phosphor) 70%, transparent); translate: -50% -130px; opacity: 0; pointer-events: none; transition: translate 900ms cubic-bezier(.5, 0, .75, 0), opacity 300ms var(--ease-out); }
@@ -429,19 +414,25 @@ a:hover .news-art { animation: none; }
 .post-cover--art .plate__f { --ar: 21 / 6; }
 @media (max-width: 760px) { .post-cover--art .plate__f { --ar: 21 / 9; } }
 
-/* ── Де працюють випускники: ряд словесних знаків під ключовими цифрами (рішення арт-директора) ── */
-.alum { padding-block: clamp(44px, 4.6vw, 72px) clamp(28px, 3vw, 44px); }
-.alum__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+/* ── Де працюють випускники: одразу під героєм; КІ-Рекс гуляє по верхній лінії ──
+   Ряд — стрічка: три записи стоять сіткою на всю ширину, більше — гортаються (стрілки ‹ › у шапці, на телефоні — свайп) */
+.alum { padding-block: clamp(84px, 7.5vw, 112px) clamp(36px, 4vw, 64px); }
+.alum__frame { position: relative; }
+.alum__head { display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line-strong); }
+.alum__head .eyebrow { margin-right: auto; }
 .alum__head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
-.alum__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); border-top: 1px solid var(--line-strong); }
+.alum__nav { display: flex; gap: 8px; }
+.alum__nav[hidden] { display: none; }
+.alum__row { --gap: clamp(24px, 3vw, 48px); list-style: none; margin: 0 -4px; padding: 0 4px; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); column-gap: var(--gap); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 4px; overscroll-behavior-x: contain; scrollbar-width: none; }
+.alum__row::-webkit-scrollbar { display: none; }
+.alum__row > li { min-width: 0; scroll-snap-align: start; }
 .alum__item { display: grid; gap: 12px; align-content: start; padding: 22px 0 8px; text-decoration: none; color: inherit; }
 .alum__mark { position: relative; display: inline-block; width: max-content; max-width: 100%; font: 500 clamp(2.25rem, 4.2vw, 5rem)/1 var(--font-sans); letter-spacing: -.035em; white-space: nowrap; color: var(--action); filter: var(--phosphor-glow); transition: color var(--hover) var(--ease-out); }
 .alum__mark small { font-size: .42em; letter-spacing: -.01em; color: var(--ink-3); margin-left: 2px; }
 .alum__mark::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.08em; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform var(--hover-move) var(--ease-out); }
-.alum__who { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; max-width: 36ch; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
+.alum__who { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
 .alum__who b { display: block; font-weight: 500; color: var(--ink-2); }
 .alum__role { display: block; margin-top: 2px; }
-@media (min-width: 1100px) { .alum__who { max-width: none; } .alum__role { white-space: nowrap; } }   /* посада — одним рядком під ім’ям */
 .alum__ph { position: relative; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--surface-2); }
 .alum__ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 10%, transparent); }
 .alum__ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; scale: 1.1; filter: var(--grade); transition: filter var(--hover) var(--ease-out), scale var(--hover-move) var(--spring); }   /* лиця — у природних кольорах */
@@ -449,12 +440,13 @@ a:hover .news-art { animation: none; }
 .alum__item:hover .alum__mark::after, .alum__item:focus-visible .alum__mark::after { transform: scaleX(1); }
 .alum__item:hover .alum__ph img, .alum__item:focus-visible .alum__ph img { filter: none; scale: 1.18; }
 @media (max-width: 860px) {
-  .alum { padding-block: 36px 20px; }
-  .alum__row { grid-template-columns: 1fr; }
-  .alum__item { padding: 14px 0; gap: 10px; }
-  .alum__row li + li .alum__item { border-top: 1px solid var(--line); }
-  .alum__mark { font-size: clamp(2.5rem, 11vw, 3rem); }
-  .alum__who { max-width: none; grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
+  .alum { padding-block: 84px 32px; }
+  .alum__row { --gap: 0px; grid-auto-columns: 80%; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+  .alum__row > li + li { border-left: 1px solid var(--line); padding-left: 18px; }
+  .alum__row > li { padding-right: 18px; }
+  .alum__item { padding: 18px 0 6px; gap: 12px; }
+  .alum__mark { font-size: clamp(2.5rem, 12vw, 3.25rem); }
+  .alum__who { grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
   .alum__ph { width: 36px; height: 36px; }
 }
 
@@ -519,8 +511,6 @@ a:hover .news-art { animation: none; }
 /* на телефоні ілюстрацію КІ-Рекса з чинного сайту не показуємо — зміст важливіший */
 @media (max-width: 760px) { .rex-sign { display: none !important; } }
 
-/* осцилограф усередині тексту «Про кафедру» на телефоні */
-.prose > .inst-dock--home { padding: 8px 0 0; margin-block: 1.6em; border: 0; }
 
 /* головна: ключові цифри з підписами видно одразу при відкритті (навіть на 1366×768) */
 @media (min-width: 901px) {
@@ -530,10 +520,6 @@ a:hover .news-art { animation: none; }
   .hero-home .cta { margin-top: 22px; }
   .hero-home .scope__screen { aspect-ratio: 16 / 9; }
   .hero-home .ph__grid > .inst-wrap { margin-top: 0; }
-  .hero-home .figures-wrap { margin-top: 76px !important; }
-  .hero-home .figures > div { padding-top: 14px; }
-  .hero-home .figures b { font-size: clamp(34px, 3.4vw, 52px); }
-  .hero-home .figures span { margin-top: 6px; }
 }
 
 /* вітрина головної */
@@ -544,15 +530,128 @@ a:hover .news-art { animation: none; }
 .showcase .key--auto[hidden] { display: none; }
 @keyframes sc-auto-in { from { opacity: 0; transform: translateX(10px) scale(.92); } }
 .showcase .scope__hud { transition: none; will-change: opacity; }
-/* ряд клавіш за шириною самої картки: один рядок → «АВТО» лише значком → сітка 3×2 і стовпчик керування */
+/* ряд клавіш: шість експонатів — окремою стрічкою; на вузькій картці (телефон) вона гортається пальцем,
+   обрана клавіша доїжджає до середини (showcase.js), «АВТО» й «Пауза» стоять праворуч поза стрічкою */
 .showcase { container-type: inline-size; }
-@container (max-width: 560px) { .showcase .scope__keys { gap: 5px; } .showcase .key--auto { padding-inline: 11px; } .showcase .key--auto .t { display: none; } }
-@container (max-width: 480px) {
-  .showcase .scope__keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 6px; }
-  .showcase .scope__keys .sp { display: none; }
-  .showcase [data-view] { height: 38px; padding: 0 4px; font-size: 10px; letter-spacing: .04em; }
-  .showcase [data-sc-play], .showcase .key--auto { grid-column: 4; height: 38px; padding: 0 11px; }
-  .showcase [data-sc-play] { grid-row: 1; }
-  .showcase .key--auto { grid-row: 2; }
+.showcase .scope__keys { flex-wrap: nowrap; }
+.sc-rail { position: relative; display: flex; gap: 6px; min-width: 0; flex: 0 1 auto; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; padding: 2px; margin: -2px; }
+.sc-rail::-webkit-scrollbar { display: none; }
+.sc-rail .key { flex: none; scroll-snap-align: center; }
+.showcase .scope__screen canvas { touch-action: pan-y; }
+@container (max-width: 560px) {
+  .showcase .scope__keys { gap: 6px; }
+  .showcase .key--auto { padding-inline: 11px; }
+  .showcase .key--auto .t { display: none; }
+  .showcase [data-sc-play], .showcase .key--auto { flex: none; }
+  .sc-rail { --fl: 0px; --fr: 0px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent); mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent); }
+  .sc-rail[data-l] { --fl: 28px; } .sc-rail[data-r] { --fr: 28px; }
 }
 @media (prefers-reduced-motion: reduce) { .showcase .key--auto { animation: none; } }
+
+/* ── Головна для вступників і роботодавців ─────────────────────────────── */
+/* телефон: вітрина — частина героя, одразу під кнопками (на внутрішніх сторінках прилад і далі їде після змісту) */
+@media (max-width: 900px) {
+  .ph.hero-home .ph__grid > .inst-wrap { display: block; }
+  .hero-home .ph__grid { gap: 28px; }
+}
+@media (max-width: 600px) { .hero-home .scope__screen { aspect-ratio: 4 / 3; } .hero-home .scope { padding: 8px 8px 6px; } }
+@media (min-width: 601px) and (max-width: 900px) { .hero-home .scope__screen { aspect-ratio: 16 / 10; } }
+
+.hm-head { max-width: 760px; margin-bottom: clamp(28px, 3.5vw, 48px); }
+.hm-head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
+.hm-head--row { max-width: none; display: flex; justify-content: space-between; align-items: end; gap: 16px 24px; flex-wrap: wrap; }
+.tags { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tags li { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); font: 500 13px/1.25 var(--font-sans); color: var(--ink-2); }
+.tags--lg li { min-height: 40px; padding: 6px 16px; font-size: 14.5px; }
+
+/* два профілі над спільною шкалою «транзистор → ШІ»: ліва половина шкали — апаратні платформи, права — програмні */
+.prof { --gap: clamp(24px, 3vw, 48px); display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: var(--gap); }
+.prof__stack { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-strong); }
+.prof__stack li { position: relative; padding-top: 16px; font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.prof__stack li::before { content: ""; position: absolute; left: 0; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--action); }
+.prof__stack li.sw::before { background: var(--gold); }
+.prof__card { grid-column: span 4; padding-top: 32px; }
+.prof__card::before { content: ""; display: block; height: 2px; margin-bottom: 28px; background: var(--action); transform-origin: left; scale: 0 1; transition: scale 1.4s var(--ease-lux) .25s; }
+.prof__card--sw::before { background: var(--gold); transition-delay: .45s; }
+.prof.in .prof__card::before, html:not(.js) .prof__card::before { scale: 1 1; }
+.prof__card h3 { font-size: clamp(1.625rem, 1.2rem + 1.3vw, 2.375rem); font-weight: 300; letter-spacing: -.025em; line-height: 1.1; }
+.prof__card > p:not(.prof__n) { margin-top: 12px; max-width: 44ch; color: var(--ink-2); font-size: var(--fs-lead); line-height: 1.5; }
+.prof__n { font: 500 var(--fs-mono)/1 var(--font-mono); letter-spacing: var(--track-mono); color: var(--gold-ink); margin-bottom: 12px; }
+.prof__mini { display: none; }
+@media (max-width: 760px) {
+  .prof { grid-template-columns: minmax(0, 1fr); row-gap: 36px; }
+  .prof__stack { display: none; }
+  .prof__card { grid-column: 1; padding-top: 0; }
+  .prof__card::before { display: none; }
+  .prof__mini { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0 0 22px; padding: 0; border-top: 2px solid var(--action); font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+  .prof__card--sw .prof__mini { border-top-color: var(--gold); }
+  .prof__mini li { position: relative; padding-top: 14px; overflow-wrap: anywhere; }
+  .prof__mini li::before { content: ""; position: absolute; left: 0; top: -5px; width: 8px; height: 8px; border-radius: 50%; background: var(--action); }
+  .prof__card--sw .prof__mini li::before { background: var(--gold); }
+}
+
+/* лабораторії: чотири кадри; на телефоні — стрічка зі свайпом */
+.labs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2vw, 28px); }
+.lab__ph { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-lg); overflow: hidden; background: var(--surface-2); }
+.lab__ph img { width: 100%; height: 100%; object-fit: cover; filter: var(--grade); transition: scale 1.2s var(--ease-out), filter 700ms var(--ease-out); }
+.lab:hover .lab__ph img { scale: 1.04; filter: none; }
+.lab h3 { margin-top: 16px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
+.lab p { margin-top: 6px; color: var(--ink-3); font-size: 14.5px; line-height: 1.5; }
+.labs__partners { margin-top: clamp(32px, 4vw, 56px); padding-top: 20px; border-top: 1px solid var(--line); }
+@media (max-width: 1100px) { .labs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; } }
+@media (max-width: 700px) {
+  .labs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 80%; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+  .labs::-webkit-scrollbar { display: none; }
+  .lab { scroll-snap-align: start; }
+}
+
+/* програми: роки — великим числом, місця — дрібно */
+.progs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); }
+.progs__i { display: grid; gap: 10px; align-content: start; padding-top: 18px; border-top: 1px solid var(--line-strong); }
+.progs__lvl { font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--gold-ink); }
+.progs__n { font: 300 clamp(56px, 6vw, 96px)/.95 var(--font-sans); letter-spacing: -.045em; font-variant-numeric: lining-nums; }
+.progs__n small { margin-left: 10px; font-size: max(14px, .2em); font-weight: 400; letter-spacing: 0; color: var(--ink-3); }
+.progs__t { font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.35; max-width: 28ch; }
+.progs__pl { color: var(--ink-3); font-size: 14.5px; }
+.progs__pl b { color: var(--ink); font-weight: 500; }
+@media (max-width: 760px) {
+  .progs { grid-template-columns: minmax(0, 1fr); }
+  .progs__i { grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "n lvl" "n t" "n pl"; column-gap: 16px; row-gap: 4px; padding-block: 16px 18px; }
+  .progs__n { grid-area: n; font-size: 60px; }
+  .progs__n small { display: block; margin: 6px 0 0; font-size: 13px; }
+  .progs__lvl { grid-area: lvl; } .progs__t { grid-area: t; font-size: 16.5px; } .progs__pl { grid-area: pl; }
+}
+
+/* роботодавцям: панель-прилад */
+.emp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 96px); align-items: center; padding: clamp(24px, 4vw, 56px); border-radius: 16px; background: var(--bezel); border: 1px solid var(--line); box-shadow: var(--bezel-shadow); }
+.emp__cta { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
+.emp .tags { margin: 0; }
+@media (max-width: 900px) { .emp { grid-template-columns: minmax(0, 1fr); } }
+
+/* повний опис кафедри — згорнутий */
+.more { border-bottom: 1px solid var(--line); }
+.more summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "e i" "h i"; align-items: center; gap: 6px 16px; padding: 22px 0; -webkit-tap-highlight-color: transparent; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary .eyebrow { grid-area: e; }
+.more summary h2 { grid-area: h; font-size: clamp(1.375rem, 1.1rem + .9vw, 1.875rem); font-weight: 400; letter-spacing: -.02em; line-height: 1.2; }
+.more__ico { grid-area: i; position: relative; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); transition: border-color var(--hover) var(--ease-out), rotate 600ms var(--spring); }
+.more__ico::before, .more__ico::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 1.5px; background: var(--ink); translate: -50% -50%; }
+.more__ico::after { rotate: 90deg; transition: rotate 600ms var(--spring); }
+.more[open] .more__ico::after { rotate: 0deg; }
+.more summary:hover .more__ico { border-color: var(--ink-2); }
+.more__body { padding: 8px 0 40px; }
+
+/* хронологія — одна лінія з вісьмома точками; на телефоні гортається */
+.tl { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.tl li { position: relative; padding: 18px 20px 0 0; border-top: 1px solid var(--line-strong); }
+.tl li::before { content: ""; position: absolute; left: 0; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--action); scale: 0; transition: scale 700ms var(--spring); transition-delay: calc(var(--i) * 80ms + 300ms); }
+.tl.in li::before, html:not(.js) .tl li::before { scale: 1; }
+.tl time { display: block; font: 500 13px/1 var(--font-mono); letter-spacing: .04em; color: var(--gold-ink); }
+.tl b { display: block; margin-top: 8px; font-size: 15px; font-weight: 500; line-height: 1.35; }
+@media (max-width: 900px) {
+  .tl { grid-auto-columns: 44%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 0; scroll-padding-inline: var(--gutter); }
+  .tl::-webkit-scrollbar { display: none; }
+  .tl li { scroll-snap-align: start; }
+}
+/* стрічки, що гортаються, доступні з клавіатури (стрілками) — видимий фокус */
+.labs:focus-visible, .tl:focus-visible { outline: 2px solid var(--focus); outline-offset: 6px; border-radius: var(--r-md); }

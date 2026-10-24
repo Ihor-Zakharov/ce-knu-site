@@ -24,7 +24,7 @@ const isDark = () => (root.dataset.theme ? root.dataset.theme === 'dark' : match
 export function showcase(figure) {
   const cv = figure.querySelector('canvas'), c = cv.getContext('2d');
   const keys = [...figure.querySelectorAll('[data-view]')], names = keys.map(k => k.dataset.name || k.textContent.trim()), n = keys.length;
-  const play = figure.querySelector('[data-sc-play]'), autoBtn = figure.querySelector('[data-sc-auto]');
+  const play = figure.querySelector('[data-sc-play]'), autoBtn = figure.querySelector('[data-sc-auto]'), rail = figure.querySelector('.sc-rail');
   const huds = [...figure.querySelectorAll('.scope__hud')], hudEl = Object.fromEntries(['tl', 'tr', 'bl', 'br'].map(k => [k, figure.querySelector(`[data-sc-${k}]`)]));
   const L = root.lang === 'en' ? 'en' : 'uk';
   const env = { m: machine(), col: {}, L, gen: 0 };
@@ -105,8 +105,14 @@ export function showcase(figure) {
     tr = playing ? 0 : T; if (tr >= T) prev = -1;
     safe(cur, () => ex[cur].enter?.(t));
     keys.forEach((k, j) => k.setAttribute('aria-pressed', String(j === cur)));
+    reveal(keys[cur]);
     progress();
     if (!raf) draw();
+  }
+  /* вузька картка (телефон): клавіші — один ряд із гортанням; обрана клавіша доїжджає до середини ряду, сторінка не зсувається */
+  function reveal(k) {
+    if (!rail || rail.scrollWidth <= rail.clientWidth + 1) return;
+    rail.scrollTo({ left: k.offsetLeft - (rail.clientWidth - k.offsetWidth) / 2, behavior: REDUCED ? 'auto' : 'smooth' });
   }
 
   function frame(now) {
@@ -128,7 +134,22 @@ export function showcase(figure) {
     const j = (keys.indexOf(e.target) + (e.key === 'ArrowRight' ? 1 : -1) + n) % n; go(j, true); keys[j].focus();
   });
   autoBtn?.addEventListener('click', () => { setAuto(true); keys[cur].focus(); });
+  // краї стрічки клавіш тануть лише там, куди ще можна гортати
+  if (rail) {
+    const edges = () => { rail.toggleAttribute('data-l', rail.scrollLeft > 2); rail.toggleAttribute('data-r', rail.scrollLeft < rail.scrollWidth - rail.clientWidth - 2); };
+    rail.addEventListener('scroll', edges, { passive: true }); new ResizeObserver(edges).observe(rail); edges();
+  }
+  // свайп по екрану пальцем — сусідній експонат (вертикальне гортання сторінки лишається за браузером: touch-action: pan-y)
+  let sx = 0, sy = 0, sid = -1, swiped = false;
+  cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { sid = e.pointerId; sx = e.clientX; sy = e.clientY; swiped = false; } });
+  cv.addEventListener('pointerup', e => {
+    if (e.pointerId !== sid) return; sid = -1;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) { swiped = true; go(cur + (dx < 0 ? 1 : -1), true); }
+  });
+  cv.addEventListener('pointercancel', () => { sid = -1; });
   cv.addEventListener('click', e => {                               // клік по екрану — «торкнутися» експоната
+    if (swiped) { swiped = false; return; }
     const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * st.W / r.width, y = (e.clientY - r.top) * st.H / r.height;
     if (ex[cur].poke) safe(cur, () => ex[cur].poke(x, y, t)); else { const ev = env.m.tick(); ex.forEach((v, i) => safe(i, () => v.tick?.(ev, t))); }
     if (!raf) draw();

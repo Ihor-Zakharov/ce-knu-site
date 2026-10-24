@@ -5,6 +5,7 @@ import PageHero from '../../../../components/PageHero.astro';
 import { getCollection, getEntry, render } from 'astro:content';
 import { langOf, url, type Lang } from '../../../../lib/i18n';
 import { slugOf } from '../../../../lib/content';
+import '../../../../styles/pages.css';
 
 export async function getStaticPaths() {
   const all = await getCollection('pages', p => slugOf(p.id).includes('/'));
@@ -21,6 +22,6 @@ const { Content } = await render(entry);
 <Base lang={lang} title={entry.data.title} description={entry.data.description} og={Astro.params.page} crumbs={parent ? [{ name: parent.data.title, path: `/${Astro.params.page}/` }] : []}>
   <PageHero lang={lang} title={entry.data.title} kind={Astro.params.page!} crumbs={parent ? [{ href: url(lang, `/${Astro.params.page}/`), label: parent.data.title }] : []} />
   <section class="section">
-    <div class="wrap page"><article class="prose"><Content /></article></div>
+    <div class="wrap page"><article class="prose pg-prose"><Content /></article></div>
   </section>
 </Base>

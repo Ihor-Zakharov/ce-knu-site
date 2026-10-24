@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/huawei_ict_competition_europe_2023-2024.jpg"
 coverAlt: "The first stage of the Huawei ICT Competition."
 legacy: "/posts/Huawei-p2/"
 source: "posts/29-huawei-p2.rst"
+tags: [partners, awards]
 ---
 
 ![Photo: The first stage of the Huawei ICT Competition](../../../assets/images/news/huawei_ict_competition_europe_2023-2024.jpg)

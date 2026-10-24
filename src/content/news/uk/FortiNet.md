@@ -4,6 +4,7 @@ date: "2024-03-15"
 summary: "."
 legacy: "/posts/FortiNet/"
 source: "posts/27-fortinet.rst"
+tags: [partners]
 ---
 
 .

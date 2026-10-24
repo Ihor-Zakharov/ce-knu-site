@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Study format from 17 October to 1 November 2026"
 legacy: "/posts/format-navchannia-zhovten-2026/"
 source: "posts/format-navchannia-zhovten-2026.rst"
+tags: [study]
 ---
 
 In accordance with Order No. 1165-32 of Taras Shevchenko National University of Kyiv dated 14 October 2026, the [study format for the period from 17 October to 1 November 2026 inclusive](https://knu.ua/news/14174) has been set as follows:

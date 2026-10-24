@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Department meeting on 7 October 2026"
 legacy: "/posts/zasidannia-kafedry-2026-10-07/"
 source: "posts/zasidannia-kafedry-2026-10-07.rst"
+tags: [department]
 ---
 
 On 7 October 2026, a meeting of the Department of Computer Engineering was held, chaired by the Head of the Department, Associate Professor [Yu. V. Boiko](/personas/boiko/). The meeting took place online.

@@ -1,18 +1,20 @@
 ---
-import { Image } from 'astro:assets';
-import emblem from '../assets/emblem.webp';
 import { NAV, T, url, type Lang } from '../lib/i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = T[lang];
 const year = new Date().getFullYear();
+const brand = `${import.meta.env.BASE_URL}brand/`;
 ---
 <footer class="footer">
   <svg class="smith footer__smith" aria-hidden="true"></svg>
   <div class="wrap">
     <div class="footer__grid">
       <div>
-        <Image src={emblem} width={192} height={192} alt={lang === 'uk' ? 'Емблема кафедри комп’ютерної інженерії' : 'Emblem of the Department of Computer Engineering'} loading="lazy" />
+        <picture>
+          <source media="(max-width: 860px)" srcset={brand + 'seal-compact.svg'} />
+          <img src={brand + 'seal.svg'} width="144" height="144" alt={lang === 'uk' ? 'Герб кафедри комп’ютерної інженерії' : 'Seal of the Department of Computer Engineering'} loading="lazy" />
+        </picture>
         <p class="footer__about">{t.footNote.split(' · ')[0]}<span class="footer__aff">{t.footNote.split(' · ').slice(1).join(' · ')}</span>{t.uni}</p>
       </div>
       <nav class="footer__nav" aria-label={t.sections}>

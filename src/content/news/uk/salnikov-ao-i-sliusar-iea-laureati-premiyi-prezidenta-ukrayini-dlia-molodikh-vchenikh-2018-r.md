@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg"
 coverAlt: "Сальніков А.О. і Слюсар Є.А. – лауреати премії Президента України для молодих вчених 2018 р."
 legacy: "/posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r/"
 source: "posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r.rst"
+tags: [awards, science]
 ---
 
 ![Фото: Сальніков А.О. і Слюсар Є.А. – лауреати премії Президента України для молодих вчених 2018 р](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)

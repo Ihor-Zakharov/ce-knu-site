@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg"
 coverAlt: "Погорілий С.Д. і Бойко Ю.В. – лауреати Державної премії України в галузі науки і техніки 2018 р."
 legacy: "/posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r/"
 source: "posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r.rst"
+tags: [awards, science]
 ---
 
 ![Фото: Погорілий С.Д. і Бойко Ю.В. – лауреати Державної премії України в галузі науки і техніки 2018 р](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)

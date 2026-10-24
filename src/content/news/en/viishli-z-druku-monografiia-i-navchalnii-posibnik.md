@@ -4,6 +4,7 @@ date: "2014-12-14"
 summary: "."
 legacy: "/posts/viishli-z-druku-monografiia-i-navchalnii-posibnik/"
 source: "posts/viishli-z-druku-monografiia-i-navchalnii-posibnik.rst"
+tags: [science]
 ---
 
 .

@@ -4,6 +4,7 @@ date: "2024-02-05"
 summary: "."
 legacy: "/posts/Huawei-p1/"
 source: "posts/26-huawei.rst"
+tags: [partners, awards]
 ---
 
 .

@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg"
 coverAlt: "A. O. Salnikov and Ye. A. Sliusar: Laureates of the 2018 President of Ukraine's Prize for Young Scientists"
 legacy: "/posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r/"
 source: "posts/salnikov-ao-i-sliusar-iea-laureati-premiyi-prezidenta-ukrayini-dlia-molodikh-vchenikh-2018-r.rst"
+tags: [awards, science]
 ---
 
 ![Photo: A. O. Salnikov and Ye. A. Sliusar: Laureates of the 2018 President of Ukraine's Prize for Young Scientists](../../../assets/images/news/fc1da7257992fc36032e11db3df7a664_L.jpg)

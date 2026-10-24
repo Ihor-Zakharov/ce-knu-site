@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg"
 coverAlt: "S. D. Pohorilyi and Yu. V. Boiko: Laureates of the 2018 State Prize of Ukraine in Science and Technology"
 legacy: "/posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r/"
 source: "posts/pogorilii-sd-i-boiko-iuv-laureati-derzhavnoyi-premiyi-ukrayini-v-galuzi-nauki-i-tekhniki-2018-r.rst"
+tags: [awards, science]
 ---
 
 ![Photo: S. D. Pohorilyi and Yu. V. Boiko: Laureates of the 2018 State Prize of Ukraine in Science and Technology](../../../assets/images/news/c9b002fe1bb0320831a8ae78670fdb6f_L.jpg)

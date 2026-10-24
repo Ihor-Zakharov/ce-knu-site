@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/184b7cb84d7b456c96a0bdfbbeaa5f14_L.jpg"
 coverAlt: "Захист дисертації"
 legacy: "/posts/zakhist-disertatsiyi/"
 source: "posts/zakhist-disertatsiyi.rst"
+tags: [science]
 ---
 
 ![Фото: Захист дисертації](../../../assets/images/news/184b7cb84d7b456c96a0bdfbbeaa5f14_L.jpg)

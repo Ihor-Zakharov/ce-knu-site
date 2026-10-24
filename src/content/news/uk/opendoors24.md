@@ -4,6 +4,7 @@ date: "2023-12-19"
 summary: "."
 legacy: "/posts/opendoors24/"
 source: "posts/25-opendoors24.rst"
+tags: [admission]
 ---
 
 .

@@ -14,17 +14,6 @@ export async function people(lang: Lang) {
   return all.sort((a, b) => a.data.order - b.data.order);
 }
 export type News = CollectionEntry<'news'>;
-/** Справжнє фото новини: на чинному сайті частина оголошень має «обкладинкою» емблему — це заглушка, не фото */
-export const photo = (n: News) => (n.data.cover && !/\/emblem\./.test(n.data.cover.src) ? n.data.cover : undefined);
+/** Справжнє фото новини: на чинному сайті частина оголошень має «обкладинкою» емблему — це заглушка, не фото; логотип чи таблиця (coverFit: contain) — теж не фото */
+export const photo = (n: News) => (n.data.cover && n.data.coverFit === 'cover' && !/\/emblem\./.test(n.data.cover.src) ? n.data.cover : undefined);
 export type Person = CollectionEntry<'people'>;
-
-/** Перша літера прізвища для алфавітного покажчика: «Бойко Юрій» → Б; «Yurii Boiko» → B */
-export function initial(name: string, lang: Lang) {
-  const parts = name.trim().split(/\s+/);
-  const surname = lang === 'uk' ? parts[0] : parts[parts.length - 1];
-  return surname[0].toLocaleUpperCase(lang);
-}
-export const ALPHABET = {
-  uk: 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ'.split(''),
-  en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-};

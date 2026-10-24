@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/phd2026-teaser.jpg"
 coverAlt: "Successful thesis defence by Bohdan Semonov"
 legacy: "/posts/zakhyst-phd-semonov/"
 source: "posts/zakhyst-phd-semonov.rst"
+tags: [science]
 ---
 
 On 25 August 2026, **Bohdan Semonov**, a PhD student of the Department of Computer Engineering, successfully defended his thesis "Design and Application of Neural Networks for Creating Methods for Quality Assessment and Generation of Commit Messages in Version Control Systems", submitted for the degree of Doctor of Philosophy (PhD) in speciality 123 "Computer Engineering". Supervisor: Doctor of Science in Engineering (D.Sc.), Professor [S. D. Pohorilyi](/personas/pohorilyi/).

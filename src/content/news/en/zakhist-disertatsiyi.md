@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/184b7cb84d7b456c96a0bdfbbeaa5f14_L.jpg"
 coverAlt: "Thesis defence"
 legacy: "/posts/zakhist-disertatsiyi/"
 source: "posts/zakhist-disertatsiyi.rst"
+tags: [science]
 ---
 
 ![Photo: Thesis defence](../../../assets/images/news/184b7cb84d7b456c96a0bdfbbeaa5f14_L.jpg)

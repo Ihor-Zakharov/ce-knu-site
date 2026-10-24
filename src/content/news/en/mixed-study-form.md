@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/greeting-tuv.jpg"
 coverAlt: "Blended learning"
 legacy: "/posts/mixed-study-form/"
 source: "posts/mixed-study-form.rst"
+tags: [study]
 ---
 
 ![Photo: Blended Learning](../../../assets/images/news/greeting-tuv.jpg)

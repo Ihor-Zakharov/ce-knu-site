@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/firstcource-2023.jpg"
 coverAlt: "Урочиста зустріч з першокурсниками!"
 legacy: "/posts/firstcource-2023/"
 source: "posts/23-firstcource23.rst"
+tags: [admission]
 ---
 
 ![Фото: Урочиста зустріч з першокурсниками](../../../assets/images/news/firstcource-2023.jpg)

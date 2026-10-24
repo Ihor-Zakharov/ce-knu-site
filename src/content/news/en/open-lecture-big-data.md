@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/open-lecture-big-data.jpg"
 coverAlt: "Open lecture \"Core Tools of a Big Data Engineer\""
 legacy: "/posts/open-lecture-big-data/"
 source: "posts/open-lecture-big-data.rst"
+tags: [events]
 ---
 
 ![Photo: Open lecture "Core Tools of a Big Data Engineer"](../../../assets/images/news/open-lecture-big-data.jpg)

@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Засідання кафедри 30 вересня 2026 року"
 legacy: "/posts/zasidannia-kafedry-2026-09-30/"
 source: "posts/zasidannia-kafedry-2026-09-30.rst"
+tags: [department]
 ---
 
 30 вересня 2026 року відбулося засідання кафедри комп'ютерної інженерії під головуванням завідувача кафедри доцента [Ю. В. Бойка](/personas/boiko/). Засідання пройшло онлайн.

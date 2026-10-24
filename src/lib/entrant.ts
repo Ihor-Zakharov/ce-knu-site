@@ -4,6 +4,7 @@
 import type { Lang } from './i18n';
 
 export const RULES = 'https://vstup.knu.ua/rules';
+export const CABINET = 'https://cabinet.edbo.gov.ua/login';   // електронний кабінет вступника: тут ставлять пріоритети
 export const PLAN = 'https://rex.knu.ua/wp/wp-content/uploads/2023/04/123_BAK_PLAN-2019.pdf';
 
 /** 40 дисциплін бакалаврату в 7 циклах — кількість і кілька назв для огляду; повний перелік — у спойлері */
@@ -58,7 +59,7 @@ export const COPY = {
     spoiler_courses: 'Усі 40 дисциплін за циклами',
     spoiler_life: 'Життя в КНУ поза парами',
     band_title: 'Оберіть нас першим пріоритетом',
-    band_cta: 'Як вступити',
+    band_cta: 'Кабінет вступника',
   },
   en: {
     meta_description: 'Computer engineering at Taras Shevchenko National University of Kyiv: 40 courses in 4 years, FPGA, Huawei and Cisco labs, Ukraine’s first supercomputer.',
@@ -88,6 +89,6 @@ export const COPY = {
     spoiler_courses: 'All 40 courses by cycle',
     spoiler_life: 'Life at KNU beyond lectures',
     band_title: 'Put us down as priority 1',
-    band_cta: 'How to apply',
+    band_cta: 'Applicant portal',
   },
 } as const;

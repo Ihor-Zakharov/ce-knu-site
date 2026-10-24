@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/stud-sci-works-2023.jpg"
 coverAlt: "Нагородження переможців Всеукраїнського конкурсу студентських наукових робіт та їх керівників"
 legacy: "/posts/stud-sci-works-2023/"
 source: "posts/20-stud-sci-works.rst"
+tags: [awards, science]
 ---
 
 ![Фото: Нагородження переможців Всеукраїнського конкурсу студентських наукових робіт та їх керівників](../../../assets/images/news/stud-sci-works-2023.jpg)

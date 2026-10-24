@@ -17,13 +17,13 @@ export const HEROES: Record<string, Hero> = {
     ch: 'CH 01 · NEWS', inst: 'ticker', acc: 'postcap+bag+letter',
     lead: { uk: 'Відкриті лекції, конкурси та захисти дисертацій.', en: 'Open lectures, competitions and thesis defences.' },
     hud: { top: ['LED 5×7 · MSG <b data-hud="msg">1/2</b>', 'DAILY BYTE'], bot: ['KI-REX NEWS', 'RX ●'] },
-    lines: { uk: ['Байт свіжих подій', 'Тримаю в полі зору', 'Є сигнал для новини'], en: ['A byte of news', 'Keeping news in focus', 'Picking up a news signal'] },
+    lines: { uk: ['Байт свіжих подій', 'Пошта прийшла. Без спаму', 'Є сигнал для новини'], en: ['A byte of news', 'Mail’s in. Zero spam', 'Picking up a news signal'] },
   },
   research: {
     ch: 'CH 02 · RSRC', inst: 'lorenz', acc: 'tube',
     lead: { uk: 'Високопродуктивні обчислення, цифровий зв’язок і штучний інтелект.', en: 'High-performance computing, digital communications and artificial intelligence.' },
     hud: { top: ['σ 10 · ρ 28 · β 8/3', 'z = <b data-hud="z">0</b>'], bot: ['LORENZ ATTRACTOR', 'MOVE CURSOR'] },
-    lines: { uk: ['Хаос, але детермінований', 'Одне крило, потім друге', 'Атрактор притягує', 'Звіряю з експериментом'], en: ['Chaos, but deterministic', 'One wing, then the other', 'Strangely attracted', 'Checking the experiment'] },
+    lines: { uk: ['Хаос, але детермінований', 'Одне крило, потім друге', 'Атрактор притягує', 'Ефект динозавра'], en: ['Chaos, but deterministic', 'One wing, then the other', 'Strangely attracted', 'The dinosaur effect'] },
   },
   'medu-guide': {
     ch: 'CH 03 · EDU', inst: 'fourier', acc: 'book',
@@ -65,6 +65,6 @@ export const HEROES: Record<string, Hero> = {
     ch: 'CH 09 · STUD', inst: 'spectrum', acc: 'laptop',
     lead: { uk: 'Навчальні плани, робочі програми та розклад занять.', en: 'Curricula, course syllabi and class timetables.' },
     hud: { top: ['RBW 30 kHz', 'SPAN 5 GHz'], bot: ['SPECTRUM ANALYZER', 'PEAK HOLD'] },
-    lines: { uk: ['Компілюю розклад', 'Лабораторна на горизонті', 'Сесія на піку'], en: ['Compiling the timetable', 'A lab on the horizon', 'Exams at their peak'] },
+    lines: { uk: ['Компілюю розклад', 'Знання з утриманням піку', 'Сесія на піку'], en: ['Compiling the timetable', 'Knowledge on peak hold', 'Exams at their peak'] },
   },
 };

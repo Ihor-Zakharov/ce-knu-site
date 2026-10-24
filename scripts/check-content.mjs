@@ -17,7 +17,7 @@ const CANDIDATES = [process.argv[2], 'current-site/ce', '../current-site/ce', '.
 const OLD = resolve(ROOT, CANDIDATES.find(c => existsSync(resolve(ROOT, c, 'conf.py'))) ?? CANDIDATES[0]);
 const DIST = join(ROOT, 'dist');
 const CONTENT = join(ROOT, 'src/content');
-const BASE = (process.env.BASE_PATH || '/').replace(/\/$/, '');
+const BASE = (process.env.BASE_PATH || process.env.ASTRO_BASE || '/').replace(/\/$/, '');
 const problems = [];
 const ok = { pages: 0, files: 0, images: 0, translations: 0, links: 0 };
 const fail = (kind, msg) => problems.push(`[${kind}] ${msg}`);

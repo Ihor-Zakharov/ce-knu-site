@@ -61,8 +61,8 @@ export function paintStatic(cv) {
 /* Рекс, що гуляє по краю (верх приладу, лінія над цифрами). Поведінка:
    • ходить між випадковими точками, зупиняється, озирається, кліпає;
    • курсор поруч — зупиняється й дивиться на нього; клік — стрибок (над шапкою) і репліка;
-   • згори часом падає світний біт — Рекс біжить і з'їдає його; біти складаються в ASCII імені KI-REX
-     (лічильник у браузері: 8 біт = байт, 6 байтів — ім’я зібрано, лічильник з нуля);
+   • лише там, де data-bits (головна): згори часом падає світний біт — Рекс біжить і мовчки з'їдає його;
+     біти складаються в ASCII імені KI-REX (лічильник у браузері; 6 байтів — ім’я зібрано, лічильник з нуля);
    • часті кліки поспіль — «брязкіт контактів», півтори секунди Рекс не реагує;
    • наведення на елемент з data-rex-say (на головній — цифри) — підбігає під нього й коментує;
    • довго ніхто не чіпає — засинає; зміна теми — коментує.
@@ -84,9 +84,9 @@ export function perch(box) {
   let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = (+store.get('ki-bits') || 0) % (NAME.length * 8);
   let hello = box.dataset.hello || '', helloT = 2.4;           // привітання після появи (поява Рекса — 0,9–1,9 с): рушає на 2-й с, говорить на 2,4-й
   if (hello) pause = 2;
-  let side = '', drop = 0, failed = false, sayTimer = 0, memoAt = -1;   // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
+  let side = '', drop = 0, failed = false, sayTimer = 0;
+  const feeds = 'bits' in box.dataset;                          // біти падають лише тут (головна)   // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
   let clicks = [], deaf = 0;                                     // часті кліки поспіль — «брязкіт контактів»
-  const memo = () => (uk ? `Уже зібрав «${NAME.slice(0, bits >> 3)}»` : `Collected «${NAME.slice(0, bits >> 3)}» so far`);
   const stick = box.closest('.page__inst'), hd = document.querySelector('.hd');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
 
@@ -163,12 +163,8 @@ export function perch(box) {
     if (!bit) return;
     bit.el.classList.add('eaten'); const el = bit.el; setTimeout(() => el.remove(), 500); bit = null;
     bits++;
-    const n = bits % 8, B = bits >> 3, done = B === NAME.length;
-    if (!REDUCED) { vy = -170; jump = -.01; }
-    speak(n ? (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`)
-      : done ? (uk ? 'Зібрав ім’я: KI-REX' : 'Assembled my name: KI-REX')
-      : (uk ? `+1 байт «${NAME[B - 1]}» · ${B}/${NAME.length}` : `+1 byte «${NAME[B - 1]}» · ${B}/${NAME.length}`), done ? 3.2 : 2.2);
-    if (done) bits = 0;                                          // ім’я зібрано — лічильник з нуля, без нескінченного накопичення
+    if (!REDUCED) { vy = -170; jump = -.01; }                   // мовчки: лише підскок
+    if (bits >= NAME.length * 8) bits = 0;                       // ім’я зібрано — лічильник з нуля, без нескінченного накопичення
     store.set('ki-bits', bits);
   }
   function step(dt) {
@@ -192,7 +188,7 @@ export function perch(box) {
     blinkT -= dt; if (blinkT <= 0) { blinking = .13; blinkT = 2.2 + Math.random() * 3.5; }
     if (blinking > 0) blinking -= dt;
     if (sayT > 0) { sayT -= dt; if (sayT <= 0) say.classList.remove('on'); }
-    bitT -= dt; if (bitT <= 0 && !bit) { dropBit(); bitT = 14 + Math.random() * 16; }
+    if (feeds) { bitT -= dt; if (bitT <= 0 && !bit) { dropBit(); bitT = 14 + Math.random() * 16; } }
   }
   function loop(now) {
     raf = requestAnimationFrame(loop);                         // наступний кадр — першим: збій не зупиняє Рекса
@@ -210,11 +206,7 @@ export function perch(box) {
     const was = asleep; wake();
     if (!REDUCED && jump === 0) { vy = -420; jump = -.01; }   // ≈80 px угору — у стрибку перекриває шапку, але не тікає за край екрана
     if (was) speak(uk ? 'Виходжу з режиму сну' : 'Leaving sleep mode');
-    else if (lines.length) {
-      // після повного кола реплік — інколи згадка про зібрані байти (лише якщо є хоч один)
-      if (li && li % lines.length === 0 && memoAt !== li && bits >= 8) { memoAt = li; speak(memo()); }
-      else speak(lines[li++ % lines.length]);
-    }
+    else if (lines.length) speak(lines[li++ % lines.length]);
     render();
   });
   // курсор поруч — зупиняється й дивиться на нього; будить

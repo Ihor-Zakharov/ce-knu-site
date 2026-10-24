@@ -1,4 +1,4 @@
-const V = 'mvmmvogm', BASE = '/ce-knu-site/pr-preview/pr-6/', OFFLINE = BASE + 'offline/';
+const V = 'mvmn9lal', BASE = '/ce-knu-site/pr-preview/pr-6/', OFFLINE = BASE + 'offline/';
 const SHELL = 'ki-shell-' + V, PAGES = 'ki-pages-' + V, ASSETS = 'ki-assets-' + V;
 self.addEventListener('install', e => e.waitUntil((async () => {
   try {

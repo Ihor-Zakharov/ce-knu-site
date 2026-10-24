@@ -741,9 +741,9 @@ a:hover .news-art { animation: none; }
 .progs { grid-template-rows: repeat(4, auto); }
 .progs__i { grid-row: span 4; grid-template-rows: subgrid; }
 @media (max-width: 760px) { .progs { grid-template-rows: none; } .progs__i { grid-row: auto; grid-template-rows: none; } }
-/* хронологія: лінія закінчується на останній точці */
+/* хронологія: після останньої події лінія йде далі й тане — історія триває, нової точки немає */
 .tl li:last-child { border-top-color: transparent; }
-.tl li:last-child::after { content: ""; position: absolute; left: 0; top: -1px; width: 4px; height: 1px; background: var(--line-strong); }
+.tl li:last-child::after { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
 /* повний опис: позначка як у інших розділах */
 .more summary .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
 /* поява: швидко й тихо, без розмиття; розмиття — лише знакам випускників */

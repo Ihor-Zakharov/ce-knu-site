@@ -1,108 +1,175 @@
-/* Внутрішні сторінки (дослідження, НМЗ, документи, випускники, навчання): структура над повним текстом і структурована проза.
-   Мова оформлення — як на головній: легкі картки з волосяною межею, золоті позначки, моно-надписи, рівний вертикальний ритм. Лише токени. */
+/* Внутрішні сторінки (дослідження, НМЗ, документи, випускники, навчання) — як видання кафедри:
+   зміст ліворуч, текст у читабельну міру, маргіналії праворуч; реєстри (документи, публікації) — рядками на всю ширину.
+   Назви блоків — звичайним текстом, без моно-капітелі; моно лише для значень. Лише токени. */
 
-.pg-eyebrow { display: inline-flex; align-items: center; gap: 10px; }
-.pg-eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
-.pg-intro { padding-block: clamp(20px, 2.4vw, 32px) clamp(24px, 2.6vw, 40px); }
-.ph + .pg-intro { border-top-color: transparent; }
-.pg-intro + .pg-body { padding-top: clamp(24px, 2.6vw, 40px); }
+.pg { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); column-gap: clamp(32px, 3.6vw, 64px); align-items: start; }
+.pg:not(:has(> .pg-side)) { grid-template-columns: minmax(0, 1fr); }
+.pg--research { grid-template-columns: minmax(0, 13rem) minmax(0, 68ch) minmax(15rem, 22rem); }
+.pg-side { grid-column: 1; grid-row: 1 / span 3; position: sticky; top: 104px; display: grid; gap: 28px; }
+.pg > .pg-prose { grid-column: -2 / -1; grid-row: 1; min-width: 0; }
+.pg--research > .pg-prose { grid-column: 2; }
+.pg-margin { grid-column: 3; grid-row: 1; position: sticky; top: 104px; display: grid; gap: 28px; }
+.pg-toc-m { display: none; }
+.pg-label { margin: 0 0 10px; font-size: 13px; line-height: 1.4; color: var(--ink-3); }
+.pg-toc .toc { max-height: calc(100dvh - 200px); overflow: auto; }
+.pg-toc .toc a { font-size: 14.5px; line-height: 1.35; padding-block: 8px; }
 
-/* досягнення: чотири картки */
-.pg-facts { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.pg-facts li { display: grid; align-content: start; gap: 8px; padding: 18px 20px 20px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
-.pg-facts b { font: 300 clamp(1.625rem, 1.15rem + 1.2vw, 2.25rem)/1.05 var(--font-sans); letter-spacing: -.03em; color: var(--ink); }
-.pg-facts span { font-size: 14.5px; line-height: 1.45; color: var(--ink-3); }
+/* текст: міра рядка, спокійні списки, без штучного курсиву (у Fixel немає курсивного накреслення) */
+.prose.pg-prose { font-size: clamp(16.5px, .25vw + 13.4px, 18px); line-height: 1.65; }
+.prose.pg-prose:is(.prose--research, .prose--people, .prose--read) { max-width: 68ch; }
+.pg-prose em { font-style: normal; font-weight: 500; }
+.pg-prose li::marker { color: var(--ink-3); }
+.pg-prose ul { padding-left: 1.15em; }
+.pg-prose h2 { font-size: clamp(1.375rem, 1rem + .8vw, 1.75rem); font-weight: 400; line-height: 1.2; letter-spacing: -.015em; margin-top: clamp(32px, 3vw, 44px); padding-top: 20px; border-top: 1px solid var(--line); scroll-margin-top: 104px; }
+.pg-prose > h2:first-child, .pg-prose > .sec:first-child > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.pg-prose h3 { font-size: 1.125rem; font-weight: 500; line-height: 1.35; margin-top: 1.8em; }
+.pg-prose .fig figcaption { font: 400 14px/1.45 var(--font-sans); letter-spacing: 0; }
+.pg-prose .fig figcaption::before { content: none; }
+.pg-prose .gallery .fig figcaption { font-size: 13px; }
+.pg-prose blockquote { margin: 0; padding-left: 20px; border-left: 1px solid var(--gold); font-size: clamp(1.25rem, 1rem + .6vw, 1.5rem); font-weight: 300; line-height: 1.4; letter-spacing: -.01em; color: var(--ink); }
+.pg-prose blockquote p { margin: 0; }
 
-/* напрями + дослідницька група */
-.pg-split { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(20px, 3vw, 48px); align-items: start; margin-top: clamp(28px, 3vw, 44px); }
-.pg-dirs { list-style: none; margin: 10px 0 0; padding: 0; }
-.pg-dirs li { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 17px; line-height: 1.4; }
-.pg-dirs li:first-child { border-top: 1px solid var(--line-strong); }
-.pg-dirs__n { font: 500 12px/1 var(--font-mono); letter-spacing: .06em; color: var(--gold-ink); }
-.pg-group { display: grid; gap: 10px; align-content: start; padding: 20px 22px 22px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: inherit; transition: border-color var(--hover) var(--ease-out); }
+/* згорнутий розділ: заголовок + кількість + дія; уміст у HTML, якір і друк його розгортають */
+.fold { border-top: 1px solid var(--line); }
+.pg-prose > .fold { margin-top: clamp(32px, 3vw, 44px); }
+.pg-prose > .fold + .fold { margin-top: 0; }
+.fold > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; min-height: 56px; padding: 16px 0; -webkit-tap-highlight-color: transparent; }
+.fold > summary > :first-child { min-width: 0; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary > h2 { margin: 0; padding: 0; border: 0; }
+.fold__t { font-size: 17px; font-weight: 500; }
+.fold__m { font-size: 14px; color: var(--ink-3); }
+.fold > summary::after { content: "Розгорнути"; margin-left: auto; font-size: 14px; font-weight: 500; color: var(--link); text-decoration: underline; text-decoration-color: var(--link-line); text-underline-offset: 3px; }
+.fold[open] > summary::after { content: "Згорнути"; }
+:lang(en) .fold > summary::after { content: "Expand"; }
+:lang(en) .fold[open] > summary::after { content: "Collapse"; }
+.fold > summary:hover::after { text-decoration-color: currentColor; }
+.fold > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--r-sm); }
+.fold__body { padding: 0 0 clamp(20px, 2vw, 28px); }
+.fold__body > * + * { margin-top: 1.05em; }
+.fold__body > h3:first-child { margin-top: .4em; }
+
+/* дослідження: дослідницька група й відзнаки в полях */
+.pg-group { display: grid; gap: 6px; padding: 20px 22px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: inherit; transition: border-color var(--hover) var(--ease-out); }
 .pg-group:hover { border-color: var(--line-strong); }
-.pg-group b { font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.01em; }
+.pg-group .pg-label { margin: 0; }
+.pg-group b { font-size: 18px; font-weight: 500; line-height: 1.3; letter-spacing: -.01em; }
+.pg-group__more { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 14.5px; font-weight: 500; color: var(--link); }
+.pg-awards dl { margin: 0; }
+.pg-awards dl > div { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); column-gap: 12px; border-top: 1px solid var(--line-strong); }
+.pg-awards dt { grid-row: 1 / span 9; padding-top: 12px; font-size: 15px; font-weight: 500; }
+.pg-awards dd { grid-column: 2; margin: 0; padding: 12px 0; display: grid; gap: 2px; }
+.pg-awards dd + dd { border-top: 1px solid var(--line); }
+.pg-awards dd b { font-size: 15px; font-weight: 500; line-height: 1.35; }
+.pg-awards dd span { font-size: 13.5px; line-height: 1.4; color: var(--ink-3); }
 
-/* випускники: картки-профілі з переходом до історії */
-.pg-alumni { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.pg-alum { display: grid; grid-template-columns: 72px minmax(0, 1fr); grid-template-areas: "ph mark" "ph name" "ph role" "go go"; column-gap: 16px; row-gap: 2px; align-items: start; height: 100%; padding: 20px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; color: inherit; transition: border-color var(--hover) var(--ease-out); }
-.pg-alum:hover { border-color: var(--line-strong); }
-.pg-alum__ph { grid-area: ph; width: 72px; height: 72px; border-radius: 50%; overflow: hidden; background: var(--surface-2); }
-.pg-alum__ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-.pg-alum__mark { grid-area: mark; font: 500 26px/1.1 var(--font-sans); letter-spacing: -.03em; color: var(--action); }
-.pg-alum b { grid-area: name; margin-top: 6px; font-size: 16px; font-weight: 500; }
-.pg-alum__role { grid-area: role; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
-.pg-alum__go { grid-area: go; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 15px; }
-.pg-down { rotate: 90deg; }
+/* випускники: історія починається з людини — портрет, ім'я, посада, одна цитата; розповідь згорнута */
+.prose--people .sec { display: grid; grid-template-columns: 9rem minmax(0, 1fr); column-gap: clamp(20px, 2.4vw, 32px); align-content: start; padding-block: clamp(28px, 3vw, 40px); border-top: 1px solid var(--line-strong); }
+.prose--people .sec:first-child { padding-top: 0; border-top: 0; }
+.prose--people .sec > * { grid-column: 2; margin: 0; }
+.prose--people .sec > p:has(> img) { grid-column: 1; grid-row: 1 / span 4; align-self: start; }
+.prose--people .sec > p > img { width: 100%; aspect-ratio: 4 / 5; height: auto; object-fit: cover; object-position: 50% 22%; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line); background: var(--surface-2); }
+.prose--people .sec > h2 { margin: 0; padding: 0; border: 0; font-size: clamp(1.5rem, 1.1rem + .9vw, 1.875rem); font-weight: 400; letter-spacing: -.02em; }
+.prose--people .sec > p:has(> em:only-child) { margin-top: 6px; color: var(--ink-2); font-size: 1.0625rem; line-height: 1.5; }
+.prose--people .sec > p > em:only-child { font-weight: 400; }
+.prose--people .sec > blockquote { margin-top: 20px; }
+.prose--people .sec > .fold { grid-column: 2; margin-top: 24px; }
 
-/* структурована проза: розділи з лінією, читабельна міра */
-.pg-prose { max-width: 72ch; }
-.pg-full { margin-bottom: 4px; }
-.pg-prose h2 { padding-top: 20px; border-top: 1px solid var(--line-strong); margin-top: 2em; }
-.pg-prose > h2:first-child, .pg-full + h2 { margin-top: .6em; }
-.pg-prose h3 { font-size: 19px; }
-.pg-prose ul { list-style: none; padding-left: 0; }
-.pg-prose ul > li { position: relative; padding-left: 20px; }
-.pg-prose ul > li::before { content: ""; position: absolute; left: 2px; top: .7em; width: 6px; height: 6px; border-radius: 1.5px; background: var(--gold); }
+/* документи: реєстр — назва ліворуч, тип і джерело праворуч; уся стрічка — посилання */
+.prose--files { max-width: 76rem; }
+.prose--files .sec + .sec { margin-top: clamp(32px, 3vw, 44px); }
+.prose--files h2 { margin: 0; padding: 0 0 10px; border: 0; border-bottom: 1px solid var(--line-strong); font-size: 1.25rem; font-weight: 500; letter-spacing: -.01em; }
+.prose--files .sec:first-child > h2 { padding-bottom: 10px; border-bottom: 1px solid var(--line-strong); }
+.prose--files ul { list-style: none; margin: 0; padding: 0; }
+.prose--files li { margin: 0; border-bottom: 1px solid var(--line); font-size: 16px; line-height: 1.45; }
+.prose--files li > a:only-child { display: grid; grid-template-columns: minmax(0, 1fr) 11rem; column-gap: 24px; align-items: baseline; padding: 13px 0; color: var(--ink); text-decoration: none; }
+.prose--files li > a:only-child:hover { color: var(--link); }
+.prose.prose--files li > a:only-child::after { content: attr(data-meta); display: block; margin: 0; padding: 0; box-shadow: none; border-radius: 0; font: 400 13px/1.4 var(--font-sans); letter-spacing: 0; color: var(--ink-3); text-align: right; vertical-align: baseline; }
+.prose--files li:not(:has(> a:only-child)) { padding: 13px 0; }
+.prose--files .fold { border-top: 0; }
+.prose--files .fold > summary { padding: 8px 0 10px; border-bottom: 1px solid var(--line-strong); min-height: 48px; }
+.prose--files .fold > summary > h2 { border: 0; padding: 0; }
+.prose--files .fold[open] > summary { border-bottom-color: var(--line-strong); }
+.prose--files .fold__body { padding: 0; }
 
-/* документи: кожен документ — рядок із межею, тип файлу праворуч */
-.prose--files ul > li { padding: 12px 0 12px 22px; border-bottom: 1px solid var(--line); margin: 0; line-height: 1.45; font-size: 16px; }
-.prose--files ul > li::before { top: 1.15em; }
-.prose--files ul { margin-top: 0; }
-.prose--files ul + ul > li:first-child, .prose--files p + ul > li:first-child { border-top: 1px solid var(--line-strong); }
-.prose--files a { text-decoration-color: transparent; }
-.prose--files a:hover { text-decoration-color: currentColor; }
-.prose--files > p:first-child strong { font: 500 var(--fs-mono)/1.4 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); }
+/* НМЗ: рік ліворуч, бібліографічні записи з висячим відступом праворуч; найновіші вгорі */
+.prose--books .sec { display: grid; grid-template-columns: 4.5rem minmax(0, 78ch); column-gap: 24px; padding-top: 14px; border-top: 1px solid var(--line-strong); }
+.prose--books .sec + .sec { margin-top: 28px; }
+.prose--books h2 { margin: 0; padding: 0; border: 0; font-size: 1.375rem; font-weight: 400; line-height: 1.2; }
+.prose--books ul { list-style: none; margin: 0; padding: 0; }
+.prose--books li { margin: 0; padding: 0 0 14px 20px; text-indent: -20px; font-size: 16px; line-height: 1.5; }
+.prose--books li + li { padding-top: 14px; border-top: 1px solid var(--line); }
+.prose--books li:last-child { padding-bottom: 0; }
+.prose--books li a::after { text-indent: 0; }
 
-/* НМЗ: рік ліворуч, видання праворуч */
-.prose--books { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: 24px; max-width: 86ch; }
-.prose--books > * + * { margin-top: 0; }
-.prose--books > h2 { grid-column: 1; margin: 0; padding-top: 16px; border-top: 1px solid var(--line-strong); font: 500 20px/1.2 var(--font-mono); letter-spacing: .02em; color: var(--gold-ink); }
-.prose--books > ul { grid-column: 2; margin: 0 0 28px; padding-top: 4px; border-top: 1px solid var(--line-strong); }
-.prose--books > ul > li { padding: 12px 0 12px 22px; border-bottom: 1px solid var(--line); margin: 0; font-size: 16px; line-height: 1.5; }
-.prose--books > ul > li::before { top: 1.25em; }
+/* навчання: розклад і сесія — плашками-посиланнями, далі реєстр програм і планів */
+.prose--plan { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.prose--plan > * + * { margin-top: 0; }
+.prose--plan .sec:nth-of-type(-n + 2) { display: grid; align-content: start; gap: 10px; padding: 22px 24px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+.prose--plan .sec:nth-of-type(-n + 2) h2 { margin: 0; padding: 0; border: 0; font-size: 1.25rem; font-weight: 500; letter-spacing: -.01em; }
+.prose--plan .sec:nth-of-type(-n + 2) ul { list-style: none; margin: 0; padding: 0; color: var(--ink-2); }
+.prose--plan .sec:nth-of-type(n + 3) { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); column-gap: clamp(32px, 3.6vw, 64px); border-top: 1px solid var(--line-strong); }   /* колонки — як зміст і текст на інших сторінках */
+.prose--plan .sec:nth-of-type(3) { margin-top: clamp(24px, 2.6vw, 36px); }
+.prose--plan .sec:nth-of-type(n + 3) h2 { margin: 0; padding: 14px 0; border: 0; font-size: 1rem; font-weight: 500; line-height: 1.45; letter-spacing: 0; }
+.prose--plan .sec:nth-of-type(n + 3) ul { list-style: none; margin: 0; padding: 0; }
+.prose--plan .sec:nth-of-type(n + 3) li { margin: 0; padding: 14px 0; line-height: 1.5; }
+.prose--plan .sec:nth-of-type(n + 3) li + li { border-top: 1px solid var(--line); }
+.prose--plan a { text-decoration-color: transparent; }
+.prose--plan a:hover { text-decoration-color: currentColor; }
 
-/* випускники: портрет праворуч від тексту історії */
-.prose--people > p:has(> img) { float: right; width: min(220px, 34%); margin: 8px 0 16px 28px; }
-.prose--people > p:has(> img) img { width: 100%; border-radius: 12px; }
-.prose--people > h2 { clear: both; font-size: clamp(24px, 2.2vw, 32px); }
-.prose--people > p:has(> em:only-child) { font-size: 1.05em; color: var(--ink-2); }
+/* пошук у реєстрі (документи, НМЗ) */
+.reg { display: grid; gap: 14px; }
+.reg__f { display: grid; gap: 6px; font-size: 13px; color: var(--ink-3); }
+.reg__f :is(input, select) { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--surface); color: var(--ink); font: 400 15px/1.2 var(--font-sans); }
+.reg__f :is(input, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.reg__n { margin: 0; font-size: 13.5px; color: var(--ink-3); }
+.reg__reset { min-height: 44px; margin-left: 4px; padding: 0 4px; border: 0; background: none; font: 500 14px/1 var(--font-sans); color: var(--link); text-decoration: underline; text-decoration-color: var(--link-line); text-underline-offset: 3px; cursor: pointer; }
+.reg__empty { margin-top: 24px; color: var(--ink-2); }
+.is-filtered .sec:not(:has(li:not([hidden]))) { display: none; }
 
-/* навчання: групи посилань картками */
-.pg-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.pg-card { padding: 20px 22px 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
-.pg-card__t { font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
-.pg-card__body { margin-top: 10px; font-size: 16px; line-height: 1.55; }
-.pg-card__body ul { list-style: none; margin: 0; padding: 0; }
-.pg-card__body li { position: relative; padding: 8px 0 8px 20px; border-top: 1px solid var(--line); }
-.pg-card__body li::before { content: ""; position: absolute; left: 2px; top: 1.05em; width: 6px; height: 6px; border-radius: 1.5px; background: var(--gold); }
-
-/* зміст розділу на телефоні й планшеті — рядок посилань-міток над текстом */
-.pg-chips { display: none; }
+/* планшет і телефон: одна колонка; зміст — розгортним рядком над текстом, група — перед текстом */
 @media (max-width: 1100px) {
-  .pg-chips { display: block; margin-bottom: 20px; }
-  .pg-chips ul { list-style: none; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-  .pg-chips ul::-webkit-scrollbar { display: none; }
-  .pg-chips a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--line-strong); color: var(--ink-2); font-size: 14px; white-space: nowrap; text-decoration: none; }
-  .pg-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pg-split { grid-template-columns: minmax(0, 1fr); }
-  .pg-alumni { grid-template-columns: minmax(0, 1fr); }
+  .pg, .pg--research { grid-template-columns: minmax(0, 1fr); }
+  .pg > * { grid-column: 1 !important; grid-row: auto !important; }
+  .pg-side { position: static; }
+  .pg-toc { display: none; }
+  .pg-toc-m { display: block; order: -2; margin-bottom: 20px; border-block: 1px solid var(--line); }
+  .pg-toc-m > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 15px; font-weight: 500; }
+  .pg-toc-m > summary::-webkit-details-marker { display: none; }
+  .pg-toc-m > summary::after { content: ""; width: 7px; height: 7px; margin-left: auto; border-right: 1.5px solid var(--ink-3); border-bottom: 1.5px solid var(--ink-3); rotate: 45deg; translate: 0 -2px; }
+  .pg-toc-m[open] > summary::after { rotate: 225deg; translate: 0 2px; }
+  .pg-toc-m__n { font-size: 13px; font-weight: 400; color: var(--ink-3); }
+  .pg-toc-m ul { list-style: none; margin: 0; padding: 0 0 8px; }
+  .pg-toc-m a { display: flex; align-items: center; min-height: 44px; border-top: 1px solid var(--line); color: var(--ink-2); text-decoration: none; font-size: 15px; }
+  .pg-margin { order: -1; position: static; margin-bottom: 28px; }
+  .pg-awards { display: none; }
+  .pg-side:has(.reg) { margin-bottom: 24px; }
+  .reg { grid-template-columns: minmax(0, 1fr) minmax(0, 11rem); align-items: end; column-gap: 12px; }
+  .reg:not(:has(select)) { grid-template-columns: minmax(0, 1fr); }
+  .reg__n { grid-column: 1 / -1; }
 }
-@media (max-width: 600px) {
-  .pg-facts { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .pg-facts li { grid-template-columns: 112px minmax(0, 1fr); align-items: baseline; gap: 12px; padding: 14px 16px; }
-  .pg-facts b { white-space: nowrap; }
-  .pg-facts b { font-size: 1.375rem; }
-  .pg-alum { padding: 16px; grid-template-columns: 56px minmax(0, 1fr); }
-  .pg-alum__ph { width: 56px; height: 56px; }
-  .pg-alum__mark { font-size: 22px; }
-  .pg-groups { grid-template-columns: minmax(0, 1fr); }
-  .pg-card { padding: 16px; }
-  .prose--books { grid-template-columns: minmax(0, 1fr); }
-  .prose--books > h2, .prose--books > ul { grid-column: 1; }
-  .prose--books > h2 { padding-top: 14px; }
-  .prose--books > ul { border-top: 0; margin-bottom: 18px; }
-  .prose--people > p:has(> img) { width: 120px; margin: 4px 0 12px 16px; }
-  .pg-dirs li { font-size: 16px; }
+@media (max-width: 700px) {
+  .prose--people .sec { grid-template-columns: 5rem minmax(0, 1fr); column-gap: 16px; }
+  .prose--people .sec > p:has(> img) { grid-row: 1 / span 2; }
+  .prose--people .sec > :is(blockquote, .fold) { grid-column: 1 / -1; }
+  .prose--people .sec > p:has(> em:only-child) { font-size: 1rem; }
+  .prose--files li > a:only-child { grid-template-columns: minmax(0, 1fr); row-gap: 4px; padding: 12px 0; }
+  .prose.prose--files li > a:only-child::after { text-align: left; font-size: 12.5px; }
+  .prose--books .sec { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
+  .prose--plan { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .prose--plan .sec:nth-of-type(-n + 2) { padding: 18px 16px; }
+  .prose--plan .sec:nth-of-type(n + 3) { grid-template-columns: minmax(0, 1fr); }
+  .prose--plan .sec:nth-of-type(n + 3) h2 { padding: 14px 0 0; }
+  .prose--plan .sec:nth-of-type(n + 3) li + li { border-top: 1px solid var(--line); }
+  .fold > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; row-gap: 2px; align-items: baseline; }
+  .fold > summary > :first-child { grid-column: 1; }
+  .fold__m { grid-column: 1; grid-row: 2; }
+  .fold > summary::after { grid-column: 2; grid-row: 1; font-size: 13.5px; }
+  .reg { grid-template-columns: minmax(0, 1fr) 7.5rem; }
 }
-.pg-groups > :last-child:nth-child(odd) { grid-column: 1 / -1; }   /* непарна остання картка — на всю ширину, без «дірки» */
+/* прилад розділу на телефоні — після тексту, скромного розміру */
+@media (max-width: 900px) {
+  .inst-dock .ph__inst { max-width: 320px; }
+  .inst-dock .ph__inst .inst__screen { aspect-ratio: 2 / 1; }
+}
+@media print { .pg-side, .pg-toc-m, .fold > summary::after { display: none; } }

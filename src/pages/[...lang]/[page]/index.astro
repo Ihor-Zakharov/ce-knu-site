@@ -1,20 +1,14 @@
 ---
 // Звичайні сторінки чинного сайту: дослідження, НМЗ, документи, випускники, навчання.
-// Над повним текстом — короткі структуровані блоки (досягнення й напрями, картки випускників, групи посилань);
-// сам текст — структурована проза: розділи з лініями, рядки-файли, роки публікацій. Зміст сторінок не змінюється.
+// Сторінка — це сам текст, зверстаний як видання кафедри: зміст ліворуч, текст у читабельну міру, маргіналії праворуч.
+// Структуру задає Markdown: розділи ##, <!-- sections --> і <!-- fold --> (див. lib/rehype-site.mjs). Зміст сторінок не змінюється.
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
-import Mascot from '../../../components/Mascot.astro';
-import { Image } from 'astro:assets';
 import { getCollection, getEntry, render } from 'astro:content';
 import { langOf, url, type Lang } from '../../../lib/i18n';
 import { slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
-import { ALUMNI } from '../../../lib/home';
-import { UI, RESEARCH_FACTS, RESEARCH_DIRS } from '../../../lib/pages';
-import kalyta from '../../../assets/images/abiturient/d_kalita.jpg';
-import kramov from '../../../assets/images/abiturient/a_kramov.jpg';
-import slynko from '../../../assets/images/abiturient/m_slynko.png';
+import { UI, RESEARCH_AWARDS } from '../../../lib/pages';
 import '../../../styles/pages.css';
 
 export async function getStaticPaths() {
@@ -30,99 +24,75 @@ const lang = langOf(Astro.params.lang);
 const kind = Astro.params.page as string;
 const u = UI[lang];
 const { Content, headings } = await render(entry);
-const toc = headings.filter(h => h.depth === 2);
-const docText = entry.data.title + ' · ' + toc.map(h => h.text).join(' · ');
-const PHOTOS = { d_kalita: kalyta, a_kramov: kramov, m_slynko: slynko } as const;
-const mark = (c: string) => c.replace(/\s+(Inc\.|LLC|Ltd\.?)$/, '');
-
-// «Навчання»: кожна група посилань (жирний підпис + список) — окрема картка
-const groups = kind === 'studying'
-  ? (entry.rendered?.html ?? '').split(/(?=<p><strong>)/).map(s => s.trim()).filter(Boolean).map(s => {
-      const m = s.match(/^<p><strong>([\s\S]*?)<\/strong>\s*<\/p>([\s\S]*)$/);
-      return m ? { title: m[1].replace(/:\s*$/, ''), body: m[2] } : { title: '', body: s };
-    })
-  : [];
+const h2 = headings.filter(h => h.depth === 2);
+const docText = entry.data.title + ' · ' + h2.map(h => h.text).join(' · ');
+// зміст ліворуч — там, де розділи мають назви; у НМЗ роки вже стоять колонкою, тож замість змісту — пошук
+const reg = kind === 'documents' || kind === 'medu-guide';
+const toc = kind === 'medu-guide' || kind === 'studying' ? [] : h2;
+const years = kind === 'medu-guide' ? h2.map(h => h.text) : [];
 // дослідницька група — вкладена сторінка розділу «Дослідження»
 const group = kind === 'research' ? await getEntry('pages', `${lang}/research/llm-memory-group`) : undefined;
-const proseKind = { documents: 'prose--files', 'medu-guide': 'prose--books', graduates: 'prose--people' }[kind] ?? '';
+const awards = Object.entries(Object.groupBy(RESEARCH_AWARDS[lang], a => a.year));
+const proseKind = { documents: 'prose--files', 'medu-guide': 'prose--books', graduates: 'prose--people', studying: 'prose--plan', research: 'prose--research' }[kind] ?? '';
 ---
 <Base lang={lang} title={entry.data.title} description={HEROES[kind]?.lead[lang] ?? entry.data.description} og={kind} crumbs={[]}>
   <PageHero lang={lang} title={entry.data.title} kind={kind} text={docText} />
 
-  {kind === 'research' && (
-    <section class="section pg-intro" aria-labelledby="pg-facts">
-      <div class="wrap">
-        <p class="eyebrow pg-eyebrow" id="pg-facts">{u.facts}</p>
-        <ul class="pg-facts" role="list">
-          {RESEARCH_FACTS[lang].map(f => <li><b>{f.value}</b><span>{f.label}</span></li>)}
-        </ul>
-        <div class="pg-split">
-          <div>
-            <p class="eyebrow pg-eyebrow">{u.dirs}</p>
-            <ol class="pg-dirs" role="list">{RESEARCH_DIRS[lang].map((d, i) => <li><span class="pg-dirs__n">{String(i + 1).padStart(2, '0')}</span>{d}</li>)}</ol>
-          </div>
-          {group && (
-            <a class="pg-group" href={url(lang, '/research/llm-memory-group/')}>
-              <span class="eyebrow pg-eyebrow">{u.group}</span>
-              <b>{group.data.title}</b>
-              <span class="arrow-link">{u.groupMore} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></span>
-            </a>
+  <section class="section pg-body">
+    <div class={`wrap pg pg--${kind}`} data-pg>
+      {(toc.length > 0 || reg) && (
+        <div class="pg-side">
+          {reg && (
+            <form class="reg" data-reg hidden role="search" aria-label={u.find} data-shown={u.shown} onsubmit="return false">
+              <label class="reg__f"><span>{u.find}</span><input type="search" data-reg-q autocomplete="off" placeholder={kind === 'documents' ? u.findDocs : u.findBooks} /></label>
+              {years.length > 0 && (
+                <label class="reg__f"><span>{u.year}</span>
+                  <select data-reg-y><option value="">{u.allYears}</option>{years.map(y => <option value={y}>{y}</option>)}</select>
+                </label>
+              )}
+              <p class="reg__n" aria-live="polite"><span data-reg-n></span> <button type="button" class="reg__reset" data-reg-reset hidden>{u.reset}</button></p>
+            </form>
+          )}
+          {toc.length > 0 && (
+            <nav class="pg-toc" aria-label={u.toc}>
+              <p class="pg-label">{u.toc}</p>
+              <ul class="toc" role="list">{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+            </nav>
           )}
         </div>
-      </div>
-    </section>
-  )}
-
-  {kind === 'graduates' && (
-    <section class="section pg-intro" aria-labelledby="pg-alumni">
-      <div class="wrap">
-        <p class="eyebrow pg-eyebrow" id="pg-alumni">{u.alumni}</p>
-        <ul class="pg-alumni" role="list">
-          {ALUMNI[lang].map(a => { const ph = a.photo && PHOTOS[a.photo as keyof typeof PHOTOS]; return (
-            <li>
-              <a class="pg-alum" href={a.anchor ? `#${a.anchor}` : undefined}>
-                {ph && <span class="pg-alum__ph"><Image src={ph} width={160} alt="" loading="lazy" /></span>}
-                <span class="pg-alum__mark">{mark(a.company)}</span>
-                <b>{a.who}</b>
-                <span class="pg-alum__role">{a.role}</span>
-                <span class="arrow-link pg-alum__go">{u.story} <svg class="pg-down" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></span>
-              </a>
-            </li>
-          ); })}
-        </ul>
-      </div>
-    </section>
-  )}
-
-  <section class="section pg-body">
-    {toc.length > 2 && (
-      <nav class="wrap pg-chips" aria-label={u.toc}>
-        <ul role="list">{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
-      </nav>
-    )}
-    <div class="wrap page">
-      {kind === 'studying' ? (
-        <div class="pg-groups">
-          {groups.map(g => (
-            <article class="pg-card">
-              {g.title && <h2 class="pg-card__t">{g.title}</h2>}
-              <div class="prose pg-card__body" set:html={g.body} />
-            </article>
-          ))}
-        </div>
-      ) : (
-        <article class={`prose pg-prose ${proseKind}`}>
-          {(kind === 'research' || kind === 'graduates') && <p class="eyebrow pg-eyebrow pg-full">{u.full}</p>}
-          <Content />
-        </article>
       )}
-      {toc.length > 2 && (
-        <nav class="page__toc" aria-label={u.toc}>
-          <p class="eyebrow">{u.toc}</p>
-          <ul class="toc mt-s">{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
-        </nav>
+      {toc.length > 0 && (
+        <details class="pg-toc-m">
+          <summary>{u.toc}<span class="pg-toc-m__n">{toc.length}</span></summary>
+          <ul role="list">{toc.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+        </details>
       )}
-      <aside class="page__aside"><Mascot src={entry.data.mascot} alt={entry.data.mascotAlt} /></aside>
+      <article class={`prose pg-prose ${proseKind}`} data-reg-list={reg ? '' : undefined}>
+        <Content />
+        {reg && <p class="reg__empty" data-reg-empty hidden>{u.empty} <button type="button" class="reg__reset" data-reg-reset>{u.reset}</button></p>}
+      </article>
+      {kind === 'research' && (
+        <aside class="pg-margin">
+          {group && (
+            <a class="pg-group" href={url(lang, '/research/llm-memory-group/')}>
+              <span class="pg-label">{u.group}</span>
+              <b>{group.data.title}</b>
+              <span class="pg-group__more">{u.groupMore} <svg width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+            </a>
+          )}
+          <div class="pg-awards">
+            <p class="pg-label">{u.awards}</p>
+            <dl>
+              {awards.map(([year, list]) => <div><dt>{year}</dt>{list!.map(a => <dd><b>{a.title}</b><span>{a.who}</span></dd>)}</div>)}
+            </dl>
+          </div>
+        </aside>
+      )}
     </div>
   </section>
 </Base>
+
+<script>
+  import { pages } from '../../../scripts/pages.js';
+  pages();
+</script>

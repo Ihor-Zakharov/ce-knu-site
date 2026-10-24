@@ -1,13 +1,12 @@
 ---
-// Герой розділу — компактний: ланцюжок, назва, що піднімається по словах, один рядок підзаголовка.
-// Прилад з КІ-Рексом — окремо (Instrument.astro), у правій колонці поруч зі змістом.
+// Герой розділу — компактний службовий заголовок: ланцюжок, назва, один рядок підзаголовка.
+// Код каналу («CH 02 · RSRC») живе лише в приладі з КІ-Рексом (Instrument.astro), у правій колонці.
 import { HEROES } from '../lib/heroes';
 import { T, url, type Lang } from '../lib/i18n';
 import Instrument from './Instrument.astro';
 interface Props { lang: Lang; title: string; kind: string; crumbs?: { href: string; label: string }[]; meta?: string[]; text?: string; data?: Record<string, string> }
 const { lang, title, kind, crumbs = [], meta = [], text = '', data = {} } = Astro.props;
 const h = HEROES[kind];
-const words = title.split(/\s+/);
 ---
 <section class="ph ph--compact">
   <div class="wrap ph__grid">
@@ -19,8 +18,7 @@ const words = title.split(/\s+/);
           <li aria-current="page">{title.length > 48 ? title.slice(0, title.lastIndexOf(' ', 46)) + '…' : title}</li>
         </ol>
       </nav>
-      <p class="ph__eyebrow"><b>{h.ch.split(' · ')[0]}</b>{h.ch.split(' · ')[1]}</p>
-      <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>
+      <h1>{title}</h1>
       <p class="lead">{h.lead[lang]}</p>
       {meta.length > 0 && <p class="ph__meta">{meta.map(m => <span class="cap" set:html={m} />)}</p>}
     </div>

@@ -26,7 +26,7 @@ export default defineConfig({
   },
   image: { responsiveStyles: false },
   integrations: [
-    sitemap({ i18n: { defaultLocale: 'uk', locales: { uk: 'uk-UA', en: 'en-US' } } }),
+    sitemap({ i18n: { defaultLocale: 'uk', locales: { uk: 'uk-UA', en: 'en-US' } }, filter: page => !/\/offline\/$/.test(page) }),   // сторінка «без зв'язку» — лише для service worker
   ],
   devToolbar: { enabled: false },
 });

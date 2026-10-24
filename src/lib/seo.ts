@@ -1,5 +1,6 @@
 // Структуровані дані schema.org (JSON-LD) для пошуковиків.
 import { T, url, type Lang } from './i18n';
+import { ALUMNI, PROGRAMS, SKILLS } from './home';
 
 const abs = (path: string, site: URL) => new URL(path, site).href;
 const BASE = import.meta.env.BASE_URL;
@@ -19,6 +20,8 @@ export function orgLd(lang: Lang, site: URL) {
         '@type': 'EducationalOrganization', name: t.faculty, url: 'https://rex.knu.ua/',
         parentOrganization: { '@type': 'CollegeOrUniversity', name: t.uni, url: 'https://knu.ua/' },
       },
+      knowsAbout: SKILLS[lang].flatMap(g => g.items),
+      alumni: alumniLd(lang, site),
     },
     {
       '@context': 'https://schema.org', '@type': 'WebSite', '@id': home + '#website', url: home, name: t.dept,
@@ -53,4 +56,33 @@ export function personLd(o: { lang: Lang; name: string; role: string; path: stri
     url: abs(url(o.lang, o.path), o.site), image: o.image ? abs(o.image, o.site) : undefined,
     worksFor: { '@type': 'EducationalOrganization', '@id': orgId(o.site), name: T[o.lang].dept },
   };
+}
+
+/** Випускники зі сторінки «Наші випускники»: посада з роками — минула (лише опис), без років — поточна (jobTitle + worksFor) */
+function alumniLd(lang: Lang, site: URL) {
+  const page = abs(url(lang, '/graduates/'), site);
+  return ALUMNI[lang].filter(a => a.who).map(a => {
+    const past = /\d{4}\s*[–-]\s*\d{4}/.test(a.role ?? '');
+    const brand = a.company.replace(/\s+(Inc\.|LLC|Ltd\.?)$/, '');
+    const title = (a.role ?? '').split(/,\s*/).filter(x => x !== brand).join(', ');
+    return {
+      '@type': 'Person', name: a.who, url: a.anchor ? `${page}#${a.anchor}` : page,
+      ...(past ? { description: a.role } : { jobTitle: title, worksFor: { '@type': 'Organization', name: a.company } }),
+    };
+  });
+}
+
+/** Три освітні програми спеціальності F7: рівень, тривалість, ліцензований обсяг набору */
+export function programsLd(lang: Lang, site: URL) {
+  const page = abs(url(lang, '/entrant/'), site);
+  const credential = { uk: ['Бакалавр', 'Магістр', 'Доктор філософії'], en: ['Bachelor’s degree', 'Master’s degree', 'Doctor of Philosophy (PhD)'] }[lang];
+  return PROGRAMS[lang].map((p, i) => ({
+    '@context': 'https://schema.org', '@type': 'EducationalOccupationalProgram',
+    name: `${p.title} (${p.level})`, url: page,
+    educationalCredentialAwarded: credential[i],
+    timeToComplete: `P${parseInt(p.years, 10)}Y`,
+    maximumEnrollment: parseInt(p.places.replace(/\D+/g, ''), 10),
+    occupationalCategory: lang === 'uk' ? 'F7 Комп’ютерна інженерія' : 'F7 Computer Engineering',
+    provider: { '@type': 'EducationalOrganization', '@id': orgId(site), name: T[lang].dept },
+  }));
 }

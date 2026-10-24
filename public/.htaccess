@@ -4,6 +4,8 @@ Options -Indexes
 AddDefaultCharset utf-8
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
+AddType application/manifest+json .webmanifest
+AddType text/plain .txt
 
 
 <IfModule mod_headers.c>
@@ -13,6 +15,10 @@ ErrorDocument 404 /404.html
   <If "%{REQUEST_URI} =~ m#^/_astro/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
+  # service worker перевіряється на оновлення щоразу — новий деплой підхоплюється одразу
+  <Files "sw.js">
+    Header set Cache-Control "no-cache"
+  </Files>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

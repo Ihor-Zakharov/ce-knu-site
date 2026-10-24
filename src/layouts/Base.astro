@@ -2,6 +2,8 @@
 import '../styles/tokens.css';
 import '../styles/kit.css';
 import '../styles/site.css';
+import '../styles/native.css';
+import '../styles/webapi.css';
 import fixel from '../assets/fonts/FixelVariable.woff2?url';
 import Icons from '../components/Icons.astro';
 import Header from '../components/Header.astro';
@@ -9,7 +11,7 @@ import Footer from '../components/Footer.astro';
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { T, url, stripLang, type Lang } from '../lib/i18n';
-import { orgLd, breadcrumbLd } from '../lib/seo';
+import { orgLd, breadcrumbLd, programsLd } from '../lib/seo';
 
 interface Props {
   lang: Lang; title: string; description?: string;
@@ -29,7 +31,9 @@ const alt = path.startsWith('/404') ? (other === 'uk' ? url('uk', '/404.html') :
 const canonical = new URL(url(lang, path), Astro.site).href;
 const full = title === t.dept ? `${t.dept} · ${t.uniShort}` : `${title} · ${t.dept}`;
 const base = import.meta.env.BASE_URL;
-const desc = (description || t.footNote).replace(/\s+/g, ' ').trim();
+// опис без жодного слова (у частини англійських новин summary = «.») — замінюємо назвою сторінки й підписом кафедри
+const raw = description.replace(/\s+/g, ' ').trim();
+const desc = /\p{L}{3}/u.test(raw) ? raw : title === t.dept ? t.footNote : `${title} · ${t.footNote}`;
 const metaDesc = desc.length > 160 ? desc.slice(0, desc.lastIndexOf(' ', 157)) + '…' : desc;
 const ogSrc = image
   ? (await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 })).src
@@ -38,12 +42,16 @@ const ogImage = new URL(ogSrc, Astro.site).href;
 const ld: Record<string, unknown>[] = [...jsonld];
 if (crumbs) ld.push(breadcrumbLd(lang, [...crumbs, { name: title, path }], Astro.site!));
 if (path === '/') ld.push(...orgLd(lang, Astro.site!));
+if (path === '/' || path === '/entrant/') ld.push(...programsLd(lang, Astro.site!));
+// «Поділитися» — на новинах і сторінках для вступників і роботодавців (кнопку додає webapi.js)
+// миттєві переходи: браузер заздалегідь готує сторінку, на яку навели (Speculation Rules; де не підтримується — просто ігнорується)
+const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches: `${base}*` }, { not: { href_matches: ['*.pdf', '*.xml', '*.txt', `${base}files/*`] } }, { not: { selector_matches: '[download], [target=_blank], [rel~=external]' } }] }, eagerness: 'moderate' }] });
 ---
 <!doctype html>
 <html lang={lang} data-base={base}>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{full}</title>
   <meta name="description" content={metaDesc} />
   <link rel="canonical" href={canonical} />
@@ -72,6 +80,11 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
   <meta name="theme-color" content="#F6F2EA" />
   <link rel="icon" href={`${base}favicon.png`} type="image/png" />
   <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+  <link rel="manifest" href={`${base}${lang === 'en' ? 'en/' : ''}manifest.webmanifest`} />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content={lang === 'uk' ? 'КІ КНУ' : 'KNU CE'} />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <script type="speculationrules" set:html={speculation} />
   <link rel="preload" href={fixel} as="font" type="font/woff2" crossorigin />
   <script is:inline>
     // тема до першого кадру — без спалаху; ?theme=dark|light для перевірок
@@ -79,13 +92,17 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
       var q = new URLSearchParams(location.search).get('theme'), s = null;
       try { s = localStorage.getItem('ki-theme'); } catch (e) {}
       var v = q === 'dark' || q === 'light' ? q : s;
-      if (v === 'dark' || v === 'light') document.documentElement.dataset.theme = v;
       var dark = v ? v === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';   // і системна тема — через data-theme: усі правила [data-theme] діють
       document.querySelector('meta[name="theme-color"]').content = dark ? '#141211' : '#F6F2EA';
+      // «js» — до першого кадру: блоки з появою (.rv) малюються вже у вихідному стані й з'являються з рухом;
+      // якщо скрипт сайту так і не запустився — повертаємо все видимим
+      var r = document.documentElement; r.classList.add('js');
+      setTimeout(function () { if (!r.hasAttribute('data-ready')) r.classList.remove('js'); }, 4000);
     })();
   </script>
 </head>
-<body>
+<body data-pagefind-ignore={noindex ? 'all' : undefined}>
   <a class="skip" href="#main">{t.skip}</a>
   <Icons />
   <Header lang={lang} path={path} alt={alt} />
@@ -119,5 +136,6 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
     </div>
   </dialog>
   <script>import '../scripts/site.js';</script>
+  <script>import '../scripts/webapi.js';</script>
 </body>
 </html>

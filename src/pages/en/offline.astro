@@ -1,0 +1,25 @@
+---
+// Англійська пара сторінки «Немає зв'язку» (щоб перемикач мов не вів у нікуди); service worker віддає українську, двомовну.
+import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/i18n';
+---
+<Base lang="en" title="You are offline" description="No network connection. Pages of the department site you have already opened work offline." noindex>
+  <section class="ph nf">
+    <div class="wrap">
+      <p class="ph__eyebrow"><b>OFFLINE</b>NO SIGNAL</p>
+      <h1>You are offline</h1>
+      <p class="lead">Pages you have already opened still work. Play with KI-Rex while the connection comes back.</p>
+      <p class="lead" lang="uk" style="font-size:15px">Немає зв’язку. Сторінки, які ви вже відкривали, доступні й без мережі.</p>
+      <div class="runner" id="runner" tabindex="0" role="application" aria-label="KI-Rex game. Space or tap to jump, P to pause">
+        <canvas aria-hidden="true"></canvas>
+        <span class="sr-only" data-runner-live aria-live="polite"></span>
+      </div>
+      <div class="row mt-m"><a class="btn" href={url('en', '/')}>Home</a><button type="button" class="btn btn--line" onclick="location.reload()">Try again</button></div>
+    </div>
+  </section>
+  <script>
+    import { runner } from '../../scripts/rex.js';
+    const el = document.getElementById('runner');
+    if (el) runner(el, { start: 'Game started', idle: 'SPACE / TAP TO START', again: 'LINE BROKEN · SPACE TO RETRY', paused: 'PAUSED · SPACE TO RESUME', over: (s: number, b: number) => `Line broken. Score ${s}, best ${b}. Press Space to retry` });
+  </script>
+</Base>

@@ -1,0 +1,112 @@
+---
+// «Вступникам»: на першому екрані — усе головне (місця, роки, дисципліни, гуртожиток, військова кафедра, спорт) і прилад з КІ-Рексом,
+// далі — сім циклів дисциплін і повний текст чинної сторінки під спойлерами (вміст і посилання лишаються на сторінці).
+import Base from '../../../layouts/Base.astro';
+import { page } from '../../../lib/content';
+import { T, url, langOf, langParams } from '../../../lib/i18n';
+import { COPY, CYCLES, RULES, PLAN } from '../../../lib/entrant';
+import Instrument from '../../../components/Instrument.astro';
+import '../../../styles/entrant.css';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const uk = lang === 'uk';
+const t = T[lang];
+const c = COPY[lang];
+const entry = (await page(lang, 'entrant'))!;
+
+// текст чинної сторінки: три розділи h2 → три спойлери; заголовки всередині — на рівень нижче (h2 — у спойлері)
+const html = entry.rendered?.html ?? '';
+const parts = html.split(/(?=<h2[\s>])/).filter(p => p.trimStart().startsWith('<h2'));
+const demote = (s: string) => s.replace(/<(\/?)h3([\s>])/g, '<$1h4$2').replace(/<(\/?)h2([\s>])/g, '<$1h3$2');
+const [courses = '', steps = '', life = ''] = parts.map(demote);
+const SPOILERS = [['steps', c.spoiler_steps, steps], ['courses', c.spoiler_courses, courses], ['life', c.spoiler_life, life]] as const;
+
+const words = c.h1.split(' ');
+const sum = CYCLES[lang].reduce((s, x) => s + x.n, 0);
+---
+<Base lang={lang} title={uk ? 'Вступникам' : 'Admission'} description={c.meta_description} og="entrant" crumbs={[]}>
+  <section class="ph ent">
+    <div class="wrap ent__grid">
+      <div class="ent__text">
+        <nav aria-label={uk ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
+          <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li aria-current="page">{uk ? 'Вступникам' : 'Admission'}</li></ol>
+        </nav>
+        <p class="ph__eyebrow"><b>{c.eyebrow}</b></p>
+        <h1>{words.map((wd, i) => <><span class="w"><span style={`--i:${i}`}>{wd}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>
+        <p class="lead">{c.lead}</p>
+        <div class="ent__cta" id="hero-cta">
+          <a class="btn" href={RULES} target="_blank" rel="noopener">{c.cta_rules} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--line" href={PLAN} target="_blank" rel="noopener">{c.cta_plan} <span class="ent__pdf">PDF</span></a>
+        </div>
+      </div>
+
+      <ul class="ent__facts" role="list">
+        {c.facts.map((f, i) => <li style={`--i:${i}`}><b>{f.value}</b><span>{f.label}</span></li>)}
+      </ul>
+
+      <div class="ent__inst"><Instrument lang={lang} kind="entrant" /></div>
+    </div>
+  </section>
+
+  <section class="section hm" aria-labelledby="h-study">
+    <div class="wrap">
+      <header class="hm-head hm-head--row rv">
+        <div>
+          <p class="eyebrow">{uk ? 'Навчальний план' : 'Curriculum'}</p>
+          <h2 class="sec-h2 mt-s" id="h-study">{c.study_title}</h2>
+          <p class="lead">{c.study_lead}</p>
+        </div>
+        <a class="arrow-link" href={PLAN} target="_blank" rel="noopener">{c.cta_plan} · PDF <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </header>
+      <div class="cyc rv">
+        <div class="cyc__bar" aria-hidden="true">{CYCLES[lang].map((x, i) => <i class={`k${i}`} style={`flex-grow:${x.n}`}></i>)}</div>
+        <ol class="cyc__list" role="list">
+          {CYCLES[lang].map((x, i) => (
+            <li style={`--i:${i}`}>
+              <span class="cyc__n"><i class={`k${i}`} aria-hidden="true"></i>{x.n}<span class="sr-only"> {uk ? 'з' : 'of'} {sum}</span></span>
+              <b>{c.cycles[i]}</b>
+              <span class="cyc__some">{x.some.join(' · ')}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hm" aria-labelledby="h-why">
+    <div class="wrap">
+      <header class="hm-head rv"><p class="eyebrow">{uk ? 'Кафедра' : 'Department'}</p><h2 class="sec-h2 mt-s" id="h-why">{c.why_title}</h2></header>
+      <ol class="why" role="list">
+        {c.why.map((x, i) => <li class="rv" style={`--i:${i}`}><span class="why__n">0{i + 1}</span><h3>{x.title}</h3><p>{x.text}</p></li>)}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight hm" aria-label={uk ? 'Повна інформація' : 'Full information'}>
+    <div class="wrap ent__more">
+      {SPOILERS.map(([k, label, body]) => (
+        <details class="more" id={`more-${k}`}>
+          <summary><span class="eyebrow">{uk ? 'Детально' : 'In detail'}</span><h2>{label}</h2><span class="more__ico" aria-hidden="true"></span></summary>
+          <div class="more__body"><div class="prose" set:html={body} /></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <div class="wrap inst-dock" data-inst-dock hidden></div>
+
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="band rv">
+        <div>
+          <p class="eyebrow">F7 · {t.deptShort}</p>
+          <h3>{c.band_title}</h3>
+        </div>
+        <a class="btn" href={RULES} target="_blank" rel="noopener">{c.band_cta} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+  </section>
+  <div class="dock-cta" data-dock-cta="#hero-cta" data-dock-end=".band" aria-hidden="true"><a class="btn" href={RULES} target="_blank" rel="noopener" tabindex="-1">{c.cta_rules} <svg class="arr" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+</Base>
+

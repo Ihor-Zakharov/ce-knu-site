@@ -1,0 +1,25 @@
+---
+// Сторінка без зв'язку: її віддає service worker, коли мережі немає, а сторінки ще не відвідували. Двомовна, з грою КІ-Рекса.
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/i18n';
+---
+<Base lang="uk" title="Немає зв’язку" description="Немає з’єднання з мережею. Відвідані сторінки сайту кафедри доступні й без зв’язку." noindex>
+  <section class="ph nf">
+    <div class="wrap">
+      <p class="ph__eyebrow"><b>OFFLINE</b>NO SIGNAL</p>
+      <h1>Немає зв’язку</h1>
+      <p class="lead">Сторінки, які ви вже відкривали, доступні й без мережі. Поки зв’язок повертається, пограйте з КІ-Рексом.</p>
+      <p class="lead" lang="en" style="font-size:15px">You are offline. Pages you have already opened still work. Play with KI-Rex while the connection comes back.</p>
+      <div class="runner" id="runner" tabindex="0" role="application" aria-label="КІ-Рекс: гра. Пробіл або дотик — стрибок, P — пауза">
+        <canvas aria-hidden="true"></canvas>
+        <span class="sr-only" data-runner-live aria-live="polite"></span>
+      </div>
+      <div class="row mt-m"><a class="btn" href={url('uk', '/')}>На головну</a><button type="button" class="btn btn--line" onclick="location.reload()">Спробувати ще раз</button></div>
+    </div>
+  </section>
+  <script>
+    import { runner } from '../scripts/rex.js';
+    const el = document.getElementById('runner');
+    if (el) runner(el, { start: 'Гра почалася', idle: 'ПРОБІЛ / ТАП — СТАРТ', again: 'ОБРИВ ЛІНІЇ · ПРОБІЛ — ЩЕ РАЗ', paused: 'ПАУЗА · ПРОБІЛ — ДАЛІ', over: (s: number, b: number) => `Обрив лінії. Рахунок ${s}, рекорд ${b}. Пробіл — ще раз` });
+  </script>
+</Base>

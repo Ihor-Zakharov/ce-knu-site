@@ -145,14 +145,6 @@ html.menu-open { overflow: hidden; }
 .scope-rex { position: absolute; left: 0; top: 0; width: 66px; height: 54px; image-rendering: pixelated; pointer-events: none; will-change: transform; }
 @media (max-width: 900px) { .hero-home .cta .btn { flex: 1; } }
 
-/* ключові цифри */
-.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); }
-.figures > div { padding: 20px 24px 4px 0; }
-.figures > div + div { padding-left: 24px; border-left: 1px solid var(--line); }
-.figures b { display: block; font: 300 clamp(38px, 4.2vw, 56px)/1 var(--font-sans); letter-spacing: -.04em; font-variant-numeric: lining-nums proportional-nums; }
-.figures b small { font-size: .42em; letter-spacing: -.01em; color: var(--ink-3); margin-left: 4px; }
-.figures span { display: block; margin-top: 10px; color: var(--ink-3); font-size: 14px; max-width: 24ch; }
-@media (max-width: 860px) { .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figures > div:nth-child(3) { padding-left: 0; border-left: 0; } .figures > div:nth-child(n+3) { border-top: 1px solid var(--line); } }
 
 /* ── Розділи сторінок ─────────────────────────────────────── */
 .section { padding-block: clamp(40px, 5vw, 72px); border-top: 1px solid var(--line); }
@@ -347,14 +339,11 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
   .ph + .section { padding-top: 24px; }
   .hero-home h1 { font-size: clamp(2.375rem, 1.7rem + 3vw, 3rem); }
   .hero-home .cta { margin-top: 22px; }
-  .hero-home .figures-wrap { margin-top: 84px !important; }
-  .inst-dock--home { padding-block: 80px 24px; border-top: 0; }
   .years { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
   .year-h { font-size: 40px; margin: 36px 0 8px; }
 }
 
-/* КІ-Рекс гуляє по лінії над ключовими цифрами */
-.figures-wrap { position: relative; }
+/* КІ-Рекс гуляє по лінії над випускниками */
 .perch--line { bottom: calc(100% - 3px); }
 
 /* ілюстрація маскота з чинного сайту — компактний підпис після тексту */
@@ -374,11 +363,8 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 .prog:hover .prog__title { color: var(--action); }
 .prog__title { transition: color var(--hover) var(--ease-out); }
 
-/* хронологія й партнери */
-.history { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+/* заголовки розділів головної */
 .sec-h2 { font-size: var(--fs-h2); font-weight: 300; letter-spacing: -.025em; max-width: 18ch; }
-.history .timeline time { font-family: var(--font-mono); font-size: 13px; letter-spacing: .04em; }
-@media (max-width: 860px) { .history { grid-template-columns: 1fr; } }
 
 
 
@@ -397,7 +383,6 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 /* КІ-Рекс з'являється м'яко, коли герой уже зібрався */
 .perch canvas { animation: rex-in 1s var(--spring) .9s both; }
 @keyframes rex-in { from { opacity: 0; translate: 0 14px; } }
-.hero-home .figures-wrap { margin-top: clamp(88px, 8vw, 112px) !important; }
 
 /* біт, що падає згори, і сон КІ-Рекса */
 .perch__bit { position: absolute; bottom: 4px; left: 0; z-index: 2; font: 600 13px/1 var(--font-mono); color: var(--phosphor); text-shadow: 0 0 8px color-mix(in oklab, var(--phosphor) 70%, transparent); translate: -50% -130px; opacity: 0; pointer-events: none; transition: translate 900ms cubic-bezier(.5, 0, .75, 0), opacity 300ms var(--ease-out); }
@@ -429,19 +414,29 @@ a:hover .news-art { animation: none; }
 .post-cover--art .plate__f { --ar: 21 / 6; }
 @media (max-width: 760px) { .post-cover--art .plate__f { --ar: 21 / 9; } }
 
-/* ── Де працюють випускники: ряд словесних знаків під ключовими цифрами (рішення арт-директора) ── */
-.alum { padding-block: clamp(44px, 4.6vw, 72px) clamp(28px, 3vw, 44px); }
-.alum__head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+/* ── Де працюють випускники: одразу під героєм; КІ-Рекс гуляє по верхній лінії ──
+   Ряд — стрічка: три записи стоять сіткою на всю ширину, більше — гортаються (стрілки ‹ › у шапці, на телефоні — свайп) */
+.alum { padding-block: clamp(84px, 7.5vw, 112px) clamp(36px, 4vw, 64px); }
+.alum__frame { position: relative; }
+.alum__head { position: relative; display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding-top: 14px; }
+/* поява: лінія прокреслюється зліва, знаки компаній піднімаються з розмиття один за одним, КІ-Рекс стрибає на лінію */
+.alum__head::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line-strong); transform-origin: left; scale: 0 1; transition: scale 1.3s var(--ease-lux) .15s; }
+.alum__frame.in .alum__head::before, html:not(.js) .alum__head::before { scale: 1 1; }
+.alum__row .rv { transition-delay: calc(350ms + var(--i) * 130ms); }
+.alum__head .eyebrow { margin-right: auto; }
 .alum__head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
-.alum__row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); border-top: 1px solid var(--line-strong); }
+.alum__nav { display: flex; gap: 8px; }
+.alum__nav[hidden] { display: none; }
+.alum__row { --gap: clamp(24px, 3vw, 48px); list-style: none; margin: 0 -4px; padding: 0 4px; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * var(--gap)) / 3); column-gap: var(--gap); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 4px; overscroll-behavior-x: contain; scrollbar-width: none; }
+.alum__row::-webkit-scrollbar { display: none; }
+.alum__row > li { min-width: 0; scroll-snap-align: start; }
 .alum__item { display: grid; gap: 12px; align-content: start; padding: 22px 0 8px; text-decoration: none; color: inherit; }
 .alum__mark { position: relative; display: inline-block; width: max-content; max-width: 100%; font: 500 clamp(2.25rem, 4.2vw, 5rem)/1 var(--font-sans); letter-spacing: -.035em; white-space: nowrap; color: var(--action); filter: var(--phosphor-glow); transition: color var(--hover) var(--ease-out); }
 .alum__mark small { font-size: .42em; letter-spacing: -.01em; color: var(--ink-3); margin-left: 2px; }
 .alum__mark::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.08em; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform var(--hover-move) var(--ease-out); }
-.alum__who { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; max-width: 36ch; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
+.alum__who { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 14px; line-height: 1.4; color: var(--ink-3); }
 .alum__who b { display: block; font-weight: 500; color: var(--ink-2); }
 .alum__role { display: block; margin-top: 2px; }
-@media (min-width: 1100px) { .alum__who { max-width: none; } .alum__role { white-space: nowrap; } }   /* посада — одним рядком під ім’ям */
 .alum__ph { position: relative; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--surface-2); }
 .alum__ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 10%, transparent); }
 .alum__ph img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; scale: 1.1; filter: var(--grade); transition: filter var(--hover) var(--ease-out), scale var(--hover-move) var(--spring); }   /* лиця — у природних кольорах */
@@ -449,14 +444,16 @@ a:hover .news-art { animation: none; }
 .alum__item:hover .alum__mark::after, .alum__item:focus-visible .alum__mark::after { transform: scaleX(1); }
 .alum__item:hover .alum__ph img, .alum__item:focus-visible .alum__ph img { filter: none; scale: 1.18; }
 @media (max-width: 860px) {
-  .alum { padding-block: 36px 20px; }
-  .alum__row { grid-template-columns: 1fr; }
-  .alum__item { padding: 14px 0; gap: 10px; }
-  .alum__row li + li .alum__item { border-top: 1px solid var(--line); }
-  .alum__mark { font-size: clamp(2.5rem, 11vw, 3rem); }
-  .alum__who { max-width: none; grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
+  .alum { padding-block: 84px 32px; }
+  .alum__row { --gap: 0px; grid-auto-columns: 80%; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+  .alum__row > li + li { border-left: 1px solid var(--line); padding-left: 18px; }
+  .alum__row > li { padding-right: 18px; }
+  .alum__item { padding: 18px 0 6px; gap: 12px; }
+  .alum__mark { font-size: clamp(2.5rem, 12vw, 3.25rem); }
+  .alum__who { grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
   .alum__ph { width: 36px; height: 36px; }
 }
+@media (min-width: 561px) and (max-width: 860px) { .alum__row { grid-auto-columns: 46%; } }
 
 /* перегляд фото: стрілки й хрестик на сталих місцях, підпис — окремим рядком під фото */
 .lightbox__in { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; place-items: center; gap: 16px; padding: 64px clamp(72px, 8vw, 120px) 28px; }
@@ -519,8 +516,6 @@ a:hover .news-art { animation: none; }
 /* на телефоні ілюстрацію КІ-Рекса з чинного сайту не показуємо — зміст важливіший */
 @media (max-width: 760px) { .rex-sign { display: none !important; } }
 
-/* осцилограф усередині тексту «Про кафедру» на телефоні */
-.prose > .inst-dock--home { padding: 8px 0 0; margin-block: 1.6em; border: 0; }
 
 /* головна: ключові цифри з підписами видно одразу при відкритті (навіть на 1366×768) */
 @media (min-width: 901px) {
@@ -530,8 +525,370 @@ a:hover .news-art { animation: none; }
   .hero-home .cta { margin-top: 22px; }
   .hero-home .scope__screen { aspect-ratio: 16 / 9; }
   .hero-home .ph__grid > .inst-wrap { margin-top: 0; }
-  .hero-home .figures-wrap { margin-top: 76px !important; }
-  .hero-home .figures > div { padding-top: 14px; }
-  .hero-home .figures b { font-size: clamp(34px, 3.4vw, 52px); }
-  .hero-home .figures span { margin-top: 6px; }
 }
+
+/* вітрина головної */
+.showcase .scope__screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.showcase .scope__hud b { color: var(--gold-ink); }
+.showcase .scope__screen { cursor: pointer; }
+.showcase .key--auto { display: inline-flex; align-items: center; gap: 6px; color: var(--gold-ink); animation: sc-auto-in .5s var(--spring) both; }
+.showcase .key--auto[hidden] { display: none; }
+@keyframes sc-auto-in { from { opacity: 0; transform: translateX(10px) scale(.92); } }
+.showcase .scope__hud { transition: none; will-change: opacity; }
+/* ряд клавіш: шість експонатів — окремою стрічкою; на вузькій картці (телефон) вона гортається пальцем,
+   обрана клавіша доїжджає до середини (showcase.js), «АВТО» й «Пауза» стоять праворуч поза стрічкою */
+.showcase { container-type: inline-size; }
+.showcase .scope__keys { flex-wrap: nowrap; }
+.sc-rail { position: relative; display: flex; gap: 6px; min-width: 0; flex: 0 1 auto; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; padding: 2px; margin: -2px; }
+.sc-rail::-webkit-scrollbar { display: none; }
+.sc-rail .key { flex: none; scroll-snap-align: center; }
+.showcase .scope__screen canvas { touch-action: pan-y; }
+@container (max-width: 560px) {
+  .showcase .scope__keys { gap: 6px; }
+  .showcase .key--auto { padding-inline: 11px; }
+  .showcase .key--auto .t { display: none; }
+  .showcase [data-sc-play], .showcase .key--auto { flex: none; }
+  .sc-rail { --fl: 0px; --fr: 0px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent); mask-image: linear-gradient(90deg, transparent, #000 var(--fl), #000 calc(100% - var(--fr)), transparent); }
+  .sc-rail[data-l] { --fl: 28px; } .sc-rail[data-r] { --fr: 28px; }
+}
+@media (prefers-reduced-motion: reduce) { .showcase .key--auto { animation: none; } }
+
+/* ── Головна для вступників і роботодавців ─────────────────────────────── */
+/* телефон: вітрина — частина героя, одразу під кнопками (на внутрішніх сторінках прилад і далі їде після змісту) */
+@media (max-width: 900px) {
+  .ph.hero-home .ph__grid > .inst-wrap { display: block; }
+  .hero-home .ph__grid { gap: 28px; }
+}
+@media (max-width: 600px) { .hero-home .scope__screen { aspect-ratio: 4 / 3; } .hero-home .scope { padding: 8px 8px 6px; } }
+@media (min-width: 601px) and (max-width: 900px) { .hero-home .scope__screen { aspect-ratio: 16 / 10; } }
+
+.hm-head { max-width: 760px; margin-bottom: clamp(28px, 3.5vw, 48px); }
+.hm-head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
+.hm-head--row { max-width: none; display: flex; justify-content: space-between; align-items: end; gap: 16px 24px; flex-wrap: wrap; }
+.tags { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tags li { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); font: 500 13px/1.25 var(--font-sans); color: var(--ink-2); }
+.tags--lg li { min-height: 40px; padding: 6px 16px; font-size: 14.5px; }
+
+/* два профілі: шкала «транзистор → ШІ» розрізана навпіл — ліва половина лежить на смузі апаратних платформ, права — програмних.
+   Картки стоять на спільних рядках (subgrid): шкала, номер, заголовок, текст і теги обох профілів — на одній висоті */
+.prof { --gap: clamp(24px, 3vw, 48px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(5, auto); column-gap: var(--gap); }
+.prof__card { grid-row: span 5; display: grid; grid-template-rows: subgrid; align-content: start; }
+.prof__card > * { min-width: 0; }
+.prof__mini { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0 0 28px; padding: 0; font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); --c: var(--action); }
+.prof__card--sw .prof__mini { --c: var(--gold); }
+.prof__mini::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--c); transform-origin: left; scale: 0 1; transition: scale 1.4s var(--ease-lux) .2s; }
+.prof__card--sw .prof__mini::before { transition-delay: .4s; }
+.prof.in .prof__mini::before, html:not(.js) .prof__mini::before { scale: 1 1; }
+.prof__mini li { position: relative; padding: 16px 8px 0 0; overflow-wrap: anywhere; }
+.prof__mini li::before { content: ""; position: absolute; left: 0; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--bg); }
+.prof__n { font: 500 var(--fs-mono)/1 var(--font-mono); letter-spacing: var(--track-mono); color: var(--gold-ink); margin-bottom: 12px; }
+.prof__card h3 { font-size: clamp(1.625rem, 1.2rem + 1.3vw, 2.375rem); font-weight: 300; letter-spacing: -.025em; line-height: 1.1; }
+.prof__card > p:not(.prof__n) { margin-top: 12px; max-width: 60ch; color: var(--ink-2); font-size: var(--fs-lead); line-height: 1.5; }
+.prof__card .tags { align-self: start; }
+@media (max-width: 760px) {
+  .prof { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 40px; }
+  .prof__card { grid-row: auto; display: block; }
+  .prof__mini { margin-bottom: 22px; font-size: 10.5px; letter-spacing: .04em; }
+}
+
+/* лабораторії: п'ять кадрів в один ряд; вужче — стрічка зі свайпом (рівні картки на будь-якій ширині) */
+.labs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(16px, 1.6vw, 28px); }
+.lab { min-width: 0; }
+.lab__ph { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-lg); overflow: hidden; background: var(--surface-2); }
+.lab__ph img { width: 100%; height: 100%; object-fit: cover; filter: var(--grade); transition: scale 1.2s var(--ease-out), filter 700ms var(--ease-out); }
+.lab:hover .lab__ph img { scale: 1.04; filter: none; }
+.lab__brand { margin-top: 16px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .1em; color: var(--gold-ink); }
+.lab h3 { margin-top: 6px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
+.lab__t { margin-top: 6px; color: var(--ink-3); font-size: 14.5px; line-height: 1.5; }
+/* партнери — одним рядком під заголовком лабораторій */
+.partners { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 0; font: 500 11.5px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.partners li + li::before { content: ""; display: inline-block; width: 3px; height: 3px; margin: 0 12px; border-radius: 50%; background: var(--gold); vertical-align: middle; }
+@media (max-width: 1199px) {
+  .labs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * 20px) / 2.4); gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+  .labs::-webkit-scrollbar { display: none; }
+  .lab { scroll-snap-align: start; }
+}
+@media (max-width: 700px) { .labs { grid-auto-columns: 80%; gap: 14px; } }
+
+/* програми: роки — великим числом, місця — дрібно */
+.progs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); }
+.progs__i { display: grid; gap: 10px; align-content: start; padding-top: 18px; border-top: 1px solid var(--line-strong); }
+.progs__lvl { font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--gold-ink); }
+.progs__n { font: 300 clamp(56px, 6vw, 96px)/.95 var(--font-sans); letter-spacing: -.045em; font-variant-numeric: lining-nums; }
+.progs__n small { margin-left: 10px; font-size: max(14px, .2em); font-weight: 400; letter-spacing: 0; color: var(--ink-3); }
+.progs__t { font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.35; max-width: 28ch; }
+.progs__pl { color: var(--ink-3); font-size: 14.5px; }
+.progs__pl b { color: var(--ink); font-weight: 500; }
+@media (max-width: 760px) {
+  .progs { grid-template-columns: minmax(0, 1fr); }
+  .progs__i { grid-template-columns: 84px minmax(0, 1fr); grid-template-areas: "n lvl" "n t" "n pl"; column-gap: 16px; row-gap: 4px; padding-block: 16px 18px; }
+  .progs__n { grid-area: n; font-size: 60px; }
+  .progs__n small { display: block; margin: 6px 0 0; font-size: 13px; }
+  .progs__lvl { grid-area: lvl; } .progs__t { grid-area: t; font-size: 16.5px; } .progs__pl { grid-area: pl; }
+}
+
+/* роботодавцям (рішення арт-директорів): твердження «вчать» одразу під заголовком із навчальним планом як доказом;
+   чотири легкі картки — знак і назва групи, шість навичок із зеленою позначкою; рядки спільні (subgrid) — картки рівні */
+.skp__claim { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; max-width: 62ch; font-size: clamp(1.125rem, 1rem + .45vw, 1.375rem); line-height: 1.45; color: var(--ink); }
+.skp__claim svg { flex: none; margin-top: .2em; color: var(--ok); }
+.skp__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto auto; gap: 16px; }
+.skc { grid-row: span 2; display: grid; grid-template-rows: subgrid; row-gap: 14px; align-content: start; padding: 22px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.skc__t { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 500; letter-spacing: -.012em; line-height: 1.25; color: var(--ink); }
+.skc__ico { flex: none; width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.skc__list { list-style: none; margin: 0; padding: 0; display: grid; }
+.skc__list li { display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 15.5px; line-height: 1.3; color: var(--ink); overflow-wrap: anywhere; }
+.skc__list svg { flex: none; width: 15px; height: 15px; color: var(--ok); }
+.skp__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 20px; }
+.skp__bar .btn { margin-left: auto; }
+@media (max-width: 1099px) { .skp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); } .skc { padding: 20px; } }
+@media (max-width: 600px) {
+  .skp__grid { gap: 10px; }
+  .skc { padding: 14px; border-radius: 10px; row-gap: 10px; }
+  .skc__t { font-size: 15.5px; gap: 8px; }
+  .skc__ico { width: 18px; height: 18px; }
+  .skc__list li { min-height: 28px; gap: 7px; font-size: 13.5px; }
+  .skc__list svg { width: 13px; height: 13px; }
+  .skp__bar { flex-direction: column; align-items: stretch; gap: 14px; }
+  .skp__bar .btn { margin-left: 0; width: 100%; }
+  .skp__bar .arrow-link { order: 1; }
+}
+.progs__note { margin-top: 14px; font-size: 13.5px; color: var(--ink-3); }
+
+/* повний опис кафедри — згорнутий */
+.more { border-bottom: 1px solid var(--line); }
+.more summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "e i" "h i"; align-items: center; gap: 6px 16px; padding: 22px 0; -webkit-tap-highlight-color: transparent; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary .eyebrow { grid-area: e; }
+.more summary h2 { grid-area: h; font-size: clamp(1.375rem, 1.1rem + .9vw, 1.875rem); font-weight: 400; letter-spacing: -.02em; line-height: 1.2; }
+.more__ico { grid-area: i; position: relative; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); transition: border-color var(--hover) var(--ease-out), rotate 600ms var(--spring); }
+.more__ico::before, .more__ico::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 1.5px; background: var(--ink); translate: -50% -50%; }
+.more__ico::after { rotate: 90deg; transition: rotate 600ms var(--spring); }
+.more[open] .more__ico::after { rotate: 0deg; }
+.more summary:hover .more__ico { border-color: var(--ink-2); }
+.more__body { padding: 8px 0 40px; }
+
+/* хронологія — одна лінія з вісьмома точками; на телефоні гортається */
+.tl { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.tl li { position: relative; padding: 18px 20px 0 0; border-top: 1px solid var(--line-strong); }
+.tl li::before { content: ""; position: absolute; left: 0; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--action); scale: 0; transition: scale 700ms var(--spring); transition-delay: calc(var(--i) * 80ms + 300ms); }
+.tl.in li::before, html:not(.js) .tl li::before { scale: 1; }
+.tl time { display: block; font: 500 13px/1 var(--font-mono); letter-spacing: .04em; color: var(--gold-ink); }
+.tl b { display: block; margin-top: 8px; font-size: 15px; font-weight: 500; line-height: 1.35; }
+@media (max-width: 900px) {
+  .tl { grid-auto-columns: 44%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding: 4px var(--gutter) 0; scroll-padding-inline: var(--gutter); }
+  .tl::-webkit-scrollbar { display: none; }
+  .tl li { scroll-snap-align: start; }
+}
+/* стрічки, що гортаються, доступні з клавіатури (стрілками) — видимий фокус */
+.labs:focus-visible, .tl:focus-visible { outline: 2px solid var(--focus); outline-offset: 6px; border-radius: var(--r-md); }
+
+/* ── Головна щільніше: менше прокручування, уся суть — швидко ─────────── */
+.hm.section { padding-block: clamp(32px, 3.6vw, 56px); }
+.hm.section--tight { padding-block: clamp(20px, 2.2vw, 32px); }
+.hm-head { margin-bottom: clamp(20px, 2.4vw, 32px); }
+.hm-head .sec-h2 { font-size: clamp(1.75rem, 1.25rem + 1.6vw, 2.75rem); }
+.hm-head .lead { margin-top: 14px; }
+.alum { padding-bottom: clamp(24px, 2.6vw, 40px); }
+.prof__mini { margin-bottom: 20px; }
+.prof__card .tags { margin-top: 16px; }
+@media (max-width: 760px) { .prof { row-gap: 28px; } }
+
+/* ── Головна після рев'ю арт-директорів ─────────────────────────────── */
+/* перший екран — одна композиція: виступ одразу під героєм, надзаголовок коротко */
+.hero-home .ph__eyebrow .long { display: none; }
+@media (min-width: 901px) { .hero-home { padding-bottom: 0; } }
+.alum { padding-top: 72px; }
+@media (max-width: 900px) { .hero-home .ph__grid { gap: 20px; } }
+@media (max-width: 860px) { .alum { padding-top: 72px; } }
+/* вітрина: прогрес автозміни — на кнопці паузи; «1/6» видно й на телефоні */
+.showcase .scope__hud--bot span:last-child { display: inline; }
+/* випускники: без світіння знаків; більші портрети; рівні поля карток у стрічці */
+.alum__mark { filter: none; }
+@media (min-width: 861px) { .alum__who { grid-template-columns: 48px minmax(0, 1fr); } .alum__ph { width: 48px; height: 48px; } }
+@media (max-width: 860px) {
+  .alum__row { column-gap: 32px; }
+  .alum__row > li, .alum__row > li + li { position: relative; padding: 0; border-left: 0; }
+  .alum__row > li + li::before { content: ""; position: absolute; left: -16px; top: 18px; bottom: 6px; width: 1px; background: var(--line); }
+}
+/* стрілки й лічильник стрічок */
+.rail-nav { display: flex; align-items: center; gap: 8px; }
+.rail-nav[hidden] { display: none; }
+.rail-nav__n { min-width: 4.5ch; text-align: center; font: 500 12px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rail-nav .btn { width: 44px; height: 44px; }
+/* шапки розділів: посилання — на рівні низу заголовка; на телефоні — наприкінці розділу */
+.hm-head--row { align-items: end; }
+.hm-act-end { display: none; }
+@media (max-width: 860px) {
+  .hm-head--row .hm-act { display: none; }
+  .hm-act-end { display: inline-flex; margin-top: 20px; }
+  .hm-head--row .rail-nav { margin-left: auto; }
+}
+/* профілі: назва й рядок під шкалою, без номерів і чипів */
+.prof { grid-template-rows: repeat(3, auto); }
+.prof__card { grid-row: span 3; }
+.prof__card > p { margin-top: 10px; }
+:root[data-theme="dark"] .prof__card--hw .prof__mini { --c: var(--ink-2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .prof__card--hw .prof__mini { --c: var(--ink-2); } }
+/* лабораторії: спільні рядки (фото, бренд, назва, текст) — тексти починаються на одній висоті; без збільшення при наведенні */
+.labs { grid-template-rows: repeat(4, auto); }
+.lab { display: grid; grid-template-rows: subgrid; grid-row: span 4; align-content: start; }
+.lab__ph img { object-position: var(--pos, 50% 50%); }
+.lab:hover .lab__ph img { scale: 1; filter: var(--grade); }
+.lab__ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 8%, transparent); pointer-events: none; }
+@media (max-width: 1199px) { .labs { grid-auto-flow: column; } }
+/* програми: спільні рядки — місця на одній лінії */
+.progs { grid-template-rows: repeat(4, auto); }
+.progs__i { grid-row: span 4; grid-template-rows: subgrid; }
+@media (max-width: 760px) { .progs { grid-template-rows: none; } .progs__i { grid-row: auto; grid-template-rows: none; } }
+/* хронологія: після останньої події лінія йде далі й тане — історія триває, нової точки немає */
+.tl li:last-child { border-top-color: transparent; }
+.tl li:last-child::after { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
+/* повний опис: позначка як у інших розділах */
+.more summary .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
+/* поява: швидко й тихо, без розмиття; розмиття — лише знакам випускників */
+.rv { translate: 0 10px; filter: none; transition: opacity 600ms var(--ease-out), translate 700ms var(--spring); transition-delay: calc(var(--i, 0) * 60ms); }
+.alum__row .rv { filter: blur(4px); transition: opacity 600ms var(--ease-out), translate 700ms var(--spring), filter 600ms var(--ease-out); transition-delay: calc(120ms + var(--i) * 70ms); }
+.alum__row .rv.in { filter: none; }
+@media (prefers-reduced-motion: reduce) { .rv, .alum__row .rv { filter: none; } }
+
+/* ── Телефон: раунд трьох дизайнерів (Fable, Opus, Codex; більшість) ─────────────── */
+/* підписи — не дрібніше 12 px; цілі — 44 px без зсуву розкладки */
+.scope__hud, .inst__hud, .inst__bar, .ph__inst .inst__hud, .ph__inst .inst__bar, .lab__brand, .perch__z { font-size: 12px; }
+.prof__mini { font-size: 12px; letter-spacing: .02em; }
+.prof__mini li { padding-right: 4px; white-space: nowrap; overflow-wrap: normal; }
+.arrow-link { min-height: 44px; }
+.crumbs a, .sh-band__mail { display: inline-block; padding-block: 11px; margin-block: -11px; }
+/* стрілки стрічки — під самою стрічкою, поруч із тим, що вони гортають */
+.rail-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
+.rail-foot .rail-nav { order: -1; }
+.rail-foot .hm-act-end { margin-top: 0; }
+@media (min-width: 861px) { .rail-foot .hm-act-end { display: none; } .rail-foot:has(.rail-nav[hidden]) { display: none; } }
+/* окремий розділ вітрини існує лише там, куди її переносить site.js */
+@media (min-width: 901px) { .hm-showcase { display: none; } }
+.hm-showcase .wrap[hidden] { display: none; }
+@media (max-width: 900px) { .hm-showcase .inst-wrap { margin-top: 0; } }
+
+@media (max-width: 600px) {
+  /* герой: текст і дві кнопки одна під одною — випускники видно на першому екрані */
+  .hero-home { padding-block: 16px 16px; }
+  .hero-home h1 { font-size: clamp(2.125rem, 1.4rem + 3.4vw, 2.5rem); margin-top: 10px; }
+  .hero-home .lead { max-width: none; }
+  .hero-home .cta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 18px; }
+  .hero-home .cta .btn { width: 100%; }
+
+  /* випускники: три рядки без стрічки й стрілок */
+  .alum { padding-block: 64px 4px; }
+  .alum__head { padding-top: 10px; }
+  .alum__row { display: grid; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); column-gap: 0; overflow: visible; scroll-snap-type: none; margin-inline: 0; padding-inline: 0; }
+  .alum__row > li, .alum__row > li + li { scroll-snap-align: none; padding: 0; }
+  .alum__row > li + li { border-top: 1px solid var(--line); }
+  .alum__row > li + li::before { display: none; }
+  .alum__item { grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 0; }
+  .alum__mark { font-size: 1.75rem; letter-spacing: -.03em; }
+  .alum__who { grid-template-columns: 40px minmax(0, 1fr); gap: 10px; font-size: 13px; }
+  .alum__who b { font-size: 15px; }
+  .alum__ph { width: 40px; height: 40px; }
+  .alum .hm-act { display: none; }
+  .alum .hm-act-end { display: inline-flex; margin-top: 6px; }
+  .alum .rail-nav { display: none; }
+
+  /* вітрина в окремому розділі: шість клавіш сіткою 3×2, пауза й «авто» — у куті екрана */
+  .hm-showcase .hm-head { margin-bottom: 14px; }
+  .showcase.scope { position: relative; padding: 6px; }
+  .hero-home .showcase .scope__screen, .showcase .scope__screen { aspect-ratio: 3 / 2; }
+  .showcase .scope__hud--top span:last-child { display: none; }
+  .showcase .scope__keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 6px 0 0; }
+  .showcase .sc-rail { display: contents; }
+  .showcase .scope__keys .sp { display: none; }
+  .showcase .key, .showcase .sc-rail .key { height: 44px; padding: 0 8px; font-size: 12px; }
+  /* керування — третім рядом сітки, не поверх екрана: «АВТО» (після ручного вибору) ліворуч, пауза праворуч;
+     під час автозміни пауза на весь ряд, і по ній іде смужка до наступного експоната */
+  .showcase .key--auto { grid-column: 1 / span 2; grid-row: 3; height: 44px; justify-content: center; }
+  .showcase .key--auto .t { display: inline; }
+  .showcase [data-sc-play] { grid-column: 3; grid-row: 3; height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .showcase .key--auto[hidden] + [data-sc-play] { grid-column: 1 / -1; }
+
+  /* лабораторії: картка 82 %, стрілки під стрічкою */
+  .labs { grid-auto-columns: 82%; gap: 12px; }
+  .lab h3 { font-size: 17px; }
+  .lab__t { font-size: 15px; }
+  .rail-foot { margin-top: 14px; }
+
+  /* роботодавцям: одна колонка карток, навички у дві підколонки, 15 px */
+  .skp__claim { font-size: 17px; margin-top: 12px; }
+  .skp__grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 10px; }
+  .skc { grid-row: auto; grid-template-rows: none; row-gap: 8px; padding: 14px; }
+  .skc__t { font-size: 16px; }
+  .skc__list { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 8px; }   /* права колонка ширша: «Мікроконтролери» не рветься */
+  .skc__list li { min-height: 30px; gap: 6px; font-size: 15px; overflow-wrap: normal; }
+  .skc__list svg { width: 14px; height: 14px; }
+
+  /* хронологія: вертикальний список */
+  .tl { position: relative; grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); overflow: visible; scroll-snap-type: none; margin-inline: 0; padding: 0; }
+  .tl::before { content: ""; position: absolute; left: 3px; top: 10px; bottom: 10px; width: 1px; background: var(--line-strong); }
+  .tl li { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 12px; align-items: baseline; padding: 9px 0 9px 20px; border-top: 0; scroll-snap-align: none; }
+  .tl li::before { top: 15px; left: 0; }
+  .tl li:last-child::after { display: none; }
+  .tl b { margin-top: 0; font-size: 15px; }
+
+  /* програми */
+  .progs__i { grid-template-columns: 72px minmax(0, 1fr); }
+  .progs__n { font-size: 52px; }
+  .hm-act-end { margin-top: 14px; }
+
+  /* прилади сторінок, перенесені вниз */
+  .inst-dock { padding-block: 72px 24px; border-top: 0; }
+  .inst-dock .ph__inst { max-width: none; }
+  .inst-dock .inst-wrap { margin-top: 0; }
+  .inst-dock .inst { padding: 6px; }
+  .inst-dock .inst__screen { aspect-ratio: 3 / 2; }
+
+  /* підвал коротший */
+  .footer { padding-block: 44px 24px; }
+  .footer__grid { gap: 28px; }
+  .footer__grid img { width: 64px; height: 64px; }
+  .footer__bot { margin-top: 32px; }
+
+  /* поява розділів на телефоні вимкнена: блоки, що з'являються посеред екрана, читаються як затримка */
+  .rv:not(.alum__row .rv) { opacity: 1; translate: none; filter: none; transition: none; }
+}
+@media (hover: none) { .inst__bar .sp + span { visibility: hidden; position: relative; } .inst__bar .sp + span::after { content: "торкніться Рекса"; visibility: visible; position: absolute; right: 0; white-space: nowrap; } :lang(en) .inst__bar .sp + span::after { content: "tap Rex"; } }
+@media (max-width: 374px) { .skc { padding-inline: 12px; } .skc__list li { font-size: 14.5px; } }   /* 360 px: «Мікроконтролери» цілим словом */
+/* підсітки: зазор між картками не має розсувати рядки всередині картки */
+.lab { row-gap: 0; }
+
+/* ── Вертикальний ритм (заміри порожнечі між блоками): ~75 px на ПК, ~50 px на телефоні — без зайвого прокручування й без тісноти ── */
+.hm.section { padding-block: clamp(24px, 2.6vw, 40px); }
+.hm.section--tight { padding-block: clamp(16px, 1.6vw, 24px); }
+.alum { padding-bottom: clamp(16px, 1.8vw, 28px); }
+.footer { padding-top: clamp(40px, 4vw, 56px); }
+@media (max-width: 600px) {
+  .hm.section { padding-block: 24px; }
+  .hm.section--tight { padding-block: 16px; }
+  .rail-foot { margin-top: 12px; }
+  .hm-act-end { margin-top: 10px; }
+  .skp__bar { margin-top: 14px; }
+  .progs__note { margin-top: 10px; }
+}
+.section--tight:has(> .wrap > .band) { padding-bottom: clamp(20px, 2vw, 32px); }   /* фінальна плашка ближче до підвалу */
+/* скорість на телефоні: вітрина не малюється в герої перед тим, як site.js перенесе її нижче (без зсуву розкладки),
+   а випускники на першому екрані видно одразу (без затримки найбільшого елемента) */
+@media (max-width: 900px) {
+  .js .ph.hero-home .ph__grid > .inst-wrap { display: none; }
+  .alum__row .rv { opacity: 1; translate: none; filter: none; transition: none; }
+}
+
+/* ── Фінальний огляд дизайнерів ── */
+.hm-head .sec-h2, .sh-head .sec-h2 { font-size: clamp(1.75rem, 1.25rem + 1.6vw, 2.75rem); }   /* однакові H2 на трьох сторінках */
+.section--tight:has(> .wrap > .band) { padding-block: 24px 20px; }
+.footer__aff { display: block; }
+.footer__about .footer__aff { white-space: nowrap; }
+@media (max-width: 600px) {
+  .hero-home { padding-bottom: 8px; }
+  .alum { padding-top: 56px; }
+  .section--tight:has(> .wrap > .band) { padding-block: 20px; }
+  .footer__nav a { display: flex; align-items: center; min-height: 44px; }
+  .footer__nav li { margin-bottom: 0; }
+}
+.sec-h2 { max-width: 26ch; text-wrap: balance; }
+.section--tight:has(> .wrap > :is(.band, .sh-band)) { border-top: 0; }   /* без подвійної лінії над фінальною плашкою */

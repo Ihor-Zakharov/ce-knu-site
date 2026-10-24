@@ -40,9 +40,16 @@ jobs:
           export ASTRO_SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/pr-preview/pr-${{ github.event.number }}/"
-          else
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
             export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/"
+          else
+            export ASTRO_BASE="/"
           fi
+          export BASE_PATH="$ASTRO_BASE"
+          export SITE_URL="$ASTRO_SITE"
+          echo "ASTRO_BASE=$ASTRO_BASE" >> "$GITHUB_ENV"
+          echo "BASE_PATH=$BASE_PATH" >> "$GITHUB_ENV"
+          echo "SITE_URL=$SITE_URL" >> "$GITHUB_ENV"
           npm run build
 
       - name: Повнота вмісту й внутрішні посилання

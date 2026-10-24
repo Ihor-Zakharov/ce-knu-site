@@ -82,7 +82,8 @@ const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches
   {published && <meta property="article:published_time" content={published.toISOString()} />}
   {ld.map(o => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
   <meta name="theme-color" content="#F6F2EA" />
-  <link rel="icon" href={`${base}favicon.png`} type="image/png" />
+  <link rel="icon" href={`${base}favicon.png`} type="image/png" sizes="64x64" />
+  <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
   <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
   <link rel="manifest" href={`${base}${lang === 'en' ? 'en/' : ''}manifest.webmanifest`} />
   <meta name="mobile-web-app-capable" content="yes" />

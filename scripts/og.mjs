@@ -12,7 +12,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'public/og');
 mkdirSync(join(OUT, 'posts'), { recursive: true }); mkdirSync(join(OUT, 'personas'), { recursive: true });
 const b64 = f => readFileSync(join(ROOT, f)).toString('base64');
-const fixel = b64('src/assets/fonts/FixelVariable.woff2'), mono = b64('src/assets/fonts/SignalMono-Medium.woff2'), emblem = b64('src/assets/emblem.webp');
+const fixel = b64('src/assets/fonts/FixelVariable.woff2'), mono = b64('src/assets/fonts/SignalMono-Medium.woff2'), emblem = b64('public/brand/seal-mark-round.svg');
 
 const CARDS = {
   home: { ch: 'KNU · FRECS', uk: ['Кафедра', 'комп’ютерної інженерії'], en: ['Department of', 'Computer Engineering'] },
@@ -45,7 +45,7 @@ h1{position:absolute;left:76px;top:${c.h1Top ?? 290}px;font:300 ${c.size ?? (c[l
 .foot{position:absolute;left:80px;bottom:56px;font:400 19px/1 F;color:rgb(243 231 211/.75)}
 </style></head><body><div class="g"></div><div class="glow"></div>
 <svg class="s" viewBox="-1.05 -1.05 2.1 2.1"><defs><clipPath id="c"><circle cx="0" cy="0" r="1"/></clipPath></defs>${smith()}</svg>
-<div class="top"><img src="data:image/webp;base64,${emblem}"><div><b>${lang === 'uk' ? 'Комп’ютерна інженерія' : 'Computer Engineering'}</b><small>ce.knu.ua</small></div></div>
+<div class="top"><img src="data:image/svg+xml;base64,${emblem}"><div><b>${lang === 'uk' ? 'Комп’ютерна інженерія' : 'Computer Engineering'}</b><small>ce.knu.ua</small></div></div>
 <div class="ch">${c.chs?.[lang] ?? c.ch}</div><h1>${c[lang].join('<br>')}</h1>${c.role?.[lang] ? `<div class="role">${c.role[lang]}</div>` : ''}
 <svg class="w" viewBox="0 -30 1200 60" preserveAspectRatio="none"><path d="${wave}"/></svg>
 <div class="foot">${sub[lang]}</div></body></html>`;

@@ -1,11 +1,10 @@
 ---
-import { Image } from 'astro:assets';
-import emblem from '../assets/emblem.webp';
 import ThemeToggle from './ThemeToggle.astro';
 import { NAV, T, url, type Lang } from '../lib/i18n';
 interface Props { lang: Lang; path: string; alt: string }
 const { lang, path, alt } = Astro.props;
 const t = T[lang];
+const seal = `${import.meta.env.BASE_URL}brand/seal-compact.svg`;   // герб кафедри, середній рівень деталізації
 const other: Lang = lang === 'uk' ? 'en' : 'uk';
 const isCur = (p: string) => path === p || path.startsWith(p);
 const MENU = [...NAV, { path: '/studying/', uk: 'Навчання', en: 'Studies', ch: 'STUD' }];
@@ -15,7 +14,7 @@ const wave = 'M0 3 C1.5 0 3.5 0 5 3 S8.5 6 10 3 S13.5 0 15 3 S18.5 6 20 3';
 <header class="hd">
   <div class="wrap hd__in">
     <a class="brand" href={url(lang, '/')}>
-      <Image src={emblem} width={84} height={84} alt="" loading="eager" />
+      <img src={seal} width="42" height="42" alt="" />
       <span class="brand__t"><b>{t.deptShort}</b><small>{lang === 'uk' ? 'КНУ · ФРЕКС · Кафедра' : 'KNU · FRECS · Department'}</small></span>
     </a>
     <nav class="nav" aria-label={lang === 'uk' ? 'Основна навігація' : 'Main navigation'}>
@@ -40,7 +39,7 @@ const wave = 'M0 3 C1.5 0 3.5 0 5 3 S8.5 6 10 3 S13.5 0 15 3 S18.5 6 20 3';
 
 <div class="sheet-menu" id="menu" hidden role="dialog" aria-modal="true" aria-label={t.menu}>
   <div class="wrap sheet-menu__top">
-    <a class="brand" href={url(lang, '/')}><Image src={emblem} width={84} height={84} alt="" /><span class="brand__t"><b>{t.deptShort}</b><small>{t.uniShort}</small></span></a>
+    <a class="brand" href={url(lang, '/')}><img src={seal} width="42" height="42" alt="" /><span class="brand__t"><b>{t.deptShort}</b><small>{t.uniShort}</small></span></a>
     <button type="button" class="menu-btn sheet-menu__close" aria-expanded="true" aria-controls="menu"><span class="menu-btn__t">{t.close}</span><span class="burger" aria-hidden="true"></span></button>
   </div>
   <nav class="wrap" aria-label={lang === 'uk' ? 'Меню розділів' : 'Sections menu'}>

@@ -904,7 +904,7 @@ a:hover .news-art { animation: none; }
 .sec-h2 { max-width: 26ch; text-wrap: balance; }
 .section--tight:has(> .wrap > :is(.band, .sh-band)) { border-top: 0; }   /* без подвійної лінії над фінальною плашкою */
 
-/* ── Підвал компактніший: герб поруч із назвою, розділи в три колонки, щільніші відступи; розробник — золотом праворуч ── */
+/* ── Підвал компактніший: герб поруч із назвою, розділи в три колонки, щільніші відступи; «Розробка сайту» — золотом праворуч ── */
 .footer { padding-block: clamp(32px, 3vw, 44px) 20px; }
 .footer__grid { align-items: start; gap: 28px clamp(24px, 4vw, 64px); }
 .footer__brand { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; }
@@ -916,10 +916,8 @@ a:hover .news-art { animation: none; }
 .footer address { gap: 8px; }
 .footer__bot { margin-top: 28px; padding-top: 16px; align-items: center; }
 .footer__bot a { white-space: nowrap; }
-.footer__credit { display: inline-flex; align-items: center; gap: 10px; }
-.footer .footer__bot .footer__lab { display: inline-flex; align-items: center; gap: 5px; padding: 6px 0 4px; color: var(--brand-gold); opacity: 1; font: 500 16px/1.2 var(--font-sans); letter-spacing: .01em; text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--brand-gold) 40%, transparent); text-underline-offset: 5px; transition: text-decoration-color var(--hover) var(--ease-out); }
-.footer .footer__bot .footer__lab:hover { text-decoration-color: var(--brand-gold); }
-.footer__lab svg { flex: none; translate: 0 -1px; }
+.footer__credit { display: inline-flex; align-items: baseline; gap: 10px; }
+.footer__made { font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--brand-gold); }   /* як заголовки «Розділи», «Контакти» */
 .footer__rex { bottom: 66px; }
 @media (max-width: 600px) {
   .footer { padding-block: 28px calc(16px + env(safe-area-inset-bottom)); }

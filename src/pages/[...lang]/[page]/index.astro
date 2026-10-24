@@ -10,7 +10,7 @@ import { HEROES } from '../../../lib/heroes';
 import AlumniStrip from '../../../components/AlumniStrip.astro';
 
 export async function getStaticPaths() {
-  const SKIP = ['index', 'personas', 'entrant', 'stateholders'];   // мають власні шаблони
+  const SKIP = ['index', 'personas', 'entrant', 'stateholders', 'research'];   // мають власні шаблони
   const all = await getCollection('pages');
   return all.filter(p => !SKIP.includes(slugOf(p.id)) && !slugOf(p.id).includes('/')).map(p => {
     const lang = p.id.split('/')[0] as Lang;

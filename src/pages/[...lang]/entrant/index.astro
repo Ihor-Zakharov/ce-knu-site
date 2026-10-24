@@ -1,10 +1,11 @@
 ---
-// «Вступникам»: на першому екрані — усе головне (бал НМТ, місця, роки, гуртожиток, військова кафедра, спорт),
+// «Вступникам»: на першому екрані — усе головне (місця, роки, дисципліни, гуртожиток, військова кафедра, спорт) і прилад з КІ-Рексом,
 // далі — сім циклів дисциплін і повний текст чинної сторінки під спойлерами (вміст і посилання лишаються на сторінці).
 import Base from '../../../layouts/Base.astro';
 import { page } from '../../../lib/content';
 import { T, url, langOf, langParams } from '../../../lib/i18n';
-import { COPY, CYCLES, NMT, RULES, PLAN } from '../../../lib/entrant';
+import { COPY, CYCLES, RULES, PLAN } from '../../../lib/entrant';
+import Instrument from '../../../components/Instrument.astro';
 import '../../../styles/entrant.css';
 
 export const getStaticPaths = langParams;
@@ -21,9 +22,6 @@ const demote = (s: string) => s.replace(/<(\/?)h3([\s>])/g, '<$1h4$2').replace(/
 const [courses = '', steps = '', life = ''] = parts.map(demote);
 const SPOILERS = [['steps', c.spoiler_steps, steps], ['courses', c.spoiler_courses, courses], ['life', c.spoiler_life, life]] as const;
 
-const fmt = (v: number) => v.toLocaleString(uk ? 'uk-UA' : 'en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const total = NMT.subjects.reduce((s, x) => s + x.w * x.def, 0);
-const w = (x: number) => x.toLocaleString(uk ? 'uk-UA' : 'en-GB');
 const words = c.h1.split(' ');
 const sum = CYCLES[lang].reduce((s, x) => s + x.n, 0);
 ---
@@ -47,22 +45,7 @@ const sum = CYCLES[lang].reduce((s, x) => s + x.n, 0);
         {c.facts.map((f, i) => <li style={`--i:${i}`}><b>{f.value}</b><span>{f.label}</span></li>)}
       </ul>
 
-      <form class="nmt" data-calc data-lang={lang} aria-labelledby="calc-t" novalidate>
-        <p class="nmt__hud"><span id="calc-t">{c.calc_title}</span><span aria-hidden="true">{c.calc_hud}</span></p>
-        <div class="nmt__screen">
-          <output class="nmt__out" for={NMT.subjects.map(s => `n-${s.key}`).join(' ')} aria-live="polite"><span data-calc-out>{fmt(total)}</span><small>/ 200</small></output>
-          <div class="nmt__bar" aria-hidden="true">{NMT.subjects.map((s, i) => <i data-calc-seg class={`s${i}`} style={`width:${(s.w * s.def / 2).toFixed(2)}%`}></i>)}</div>
-          <p class="nmt__warn" data-calc-warn hidden>{c.calc_low}</p>
-        </div>
-        {NMT.subjects.map((s, i) => (
-          <div class={`nmt__row s${i}`}>
-            <label class="nmt__lab" for={`r-${s.key}`}><i class="nmt__dot" aria-hidden="true"></i>{c.calc_subjects[s.key]}<span class="nmt__w">× {w(s.w)}</span></label>
-            <input class="nmt__range" type="range" id={`r-${s.key}`} min={NMT.lo} max={NMT.hi} step="1" value={s.def} data-w={s.w} style={`--p:${s.def - NMT.lo}%`} />
-            <input class="nmt__num" type="number" id={`n-${s.key}`} min={NMT.lo} max={NMT.hi} step="1" value={s.def} inputmode="numeric" aria-label={`${c.calc_subjects[s.key]}, ${uk ? 'бал НМТ' : 'NMT score'}`} />
-          </div>
-        ))}
-        <p class="nmt__note">{c.calc_note}</p>
-      </form>
+      <div class="ent__inst"><Instrument lang={lang} kind="entrant" /></div>
     </div>
   </section>
 
@@ -124,26 +107,3 @@ const sum = CYCLES[lang].reduce((s, x) => s + x.n, 0);
   </section>
 </Base>
 
-<script>
-  // Калькулятор балу НМТ: повзунок і поле числа синхронні; підсумок — сума балів з вагами, без коефіцієнтів КНУ
-  document.querySelectorAll<HTMLFormElement>('[data-calc]').forEach(form => {
-    const uk = form.dataset.lang === 'uk';
-    const out = form.querySelector<HTMLElement>('[data-calc-out]')!, warn = form.querySelector<HTMLElement>('[data-calc-warn]')!;
-    const segs = [...form.querySelectorAll<HTMLElement>('[data-calc-seg]')];
-    const rows = [...form.querySelectorAll<HTMLElement>('.nmt__row')].map(r => ({ range: r.querySelector<HTMLInputElement>('.nmt__range')!, num: r.querySelector<HTMLInputElement>('.nmt__num')! }));
-    const fmt = (v: number) => v.toLocaleString(uk ? 'uk-UA' : 'en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    const clamp = (v: number) => Math.min(200, Math.max(100, Math.round(v)));
-    const upd = () => {
-      let total = 0, low = false;
-      rows.forEach(({ range }, i) => { const v = +range.value, wt = +range.dataset.w!; total += wt * v; low ||= v < 101; segs[i].style.width = `${(wt * v / 2).toFixed(2)}%`; range.style.setProperty('--p', `${v - 100}%`); });
-      out.textContent = fmt(total); warn.hidden = !low; form.classList.toggle('is-low', low);
-    };
-    rows.forEach(({ range, num }) => {
-      range.addEventListener('input', () => { num.value = range.value; upd(); });
-      num.addEventListener('input', () => { if (num.value === '') return; const v = +num.value; if (v >= 100 && v <= 200) { range.value = String(v); upd(); } });
-      num.addEventListener('change', () => { const v = clamp(+num.value || 100); num.value = range.value = String(v); upd(); });
-    });
-    form.addEventListener('submit', e => e.preventDefault());
-    upd();
-  });
-</script>

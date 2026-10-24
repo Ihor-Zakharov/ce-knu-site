@@ -1,17 +1,10 @@
-// Сторінка «Вступникам»: перший екран — головне (бал НМТ, місця, роки, гуртожиток, спорт), далі — цикли дисциплін
+// Сторінка «Вступникам»: перший екран — головне (місця, роки, дисципліни, гуртожиток, спорт), далі — цикли дисциплін
 // і повний текст чинної сторінки (src/content/pages/*/entrant.md) під спойлерами.
 // Факти — лише з entrant.md, index.md і research.md; ключі COPY — як у брифі копірайтерів (entrant.*), щоб підставити голосування.
 import type { Lang } from './i18n';
 
 export const RULES = 'https://vstup.knu.ua/rules';
 export const PLAN = 'https://rex.knu.ua/wp/wp-content/uploads/2023/04/123_BAK_PLAN-2019.pdf';
-
-/** НМТ: вагові коефіцієнти й мінімальний бал (правила прийому 2026, entrant.md) */
-export const NMT = { min: 101, lo: 100, hi: 200, subjects: [
-  { key: 'math', w: 0.5, def: 170 },
-  { key: 'ukr', w: 0.3, def: 165 },
-  { key: 'hist', w: 0.2, def: 160 },
-] } as const;
 
 /** 40 дисциплін бакалаврату в 7 циклах — кількість і кілька назв для огляду; повний перелік — у спойлері */
 export const CYCLES: Record<Lang, { name: string; n: number; some: string[] }[]> = {
@@ -37,16 +30,16 @@ export const CYCLES: Record<Lang, { name: string; n: number; some: string[] }[]>
 
 export const COPY = {
   uk: {
-    meta_description: 'Вступ на F7 «Комп’ютерна інженерія» в КНУ імені Тараса Шевченка: 100 місць, ваги НМТ, 40 дисциплін, гуртожиток. Порахуйте свій бал.',
+    meta_description: 'Вступ на F7 «Комп’ютерна інженерія» в КНУ імені Тараса Шевченка: 100 місць на бакалавраті, 40 дисциплін, лабораторії, гуртожиток.',
     eyebrow: 'F7 · Комп’ютерна інженерія',
     h1: 'Вступ на комп’ютерну інженерію',
-    lead: 'Схеми, процесори, код і мережі в одній програмі. Порахуйте свій бал НМТ просто тут.',
+    lead: 'Схеми, процесори, код і мережі в одній програмі.',
     cta_rules: 'Правила прийому',
     cta_plan: 'Навчальний план',
     facts: [
       { value: '100', label: 'місць на бакалавраті' },
       { value: '4 + 2', label: 'роки бакалаврату й магістратури' },
-      { value: '101', label: 'мінімум з кожного предмета НМТ' },
+      { value: '40', label: 'дисциплін у семи циклах' },
       { value: 'Гуртожиток', label: 'для студентів з інших міст' },
       { value: '2 роки', label: 'у Військовому інституті: звання офіцера запасу' },
       { value: 'Басейн', label: 'стадіон і спортивний корпус університету' },
@@ -66,23 +59,18 @@ export const COPY = {
     band_title: 'Усі деталі вступу в правилах прийому КНУ',
     band_cta: 'Правила прийому',
     // калькулятор
-    calc_title: 'Ваш конкурсний бал',
-    calc_hud: 'НМТ · F7',
-    calc_subjects: { math: 'Математика', ukr: 'Українська мова', hist: 'Історія України' },
-    calc_low: 'Нижче мінімуму 101: заяву не допустять до конкурсу.',
-    calc_note: 'Сума балів НМТ з вагами 0,5, 0,3 і 0,2. Регіональний, галузевий та інші коефіцієнти КНУ не враховано.',
   },
   en: {
-    meta_description: 'Apply to F7 Computer Engineering at Taras Shevchenko National University of Kyiv: 100 places, NMT weights, 40 courses, a dormitory. Work out your score.',
+    meta_description: 'Apply to F7 Computer Engineering at Taras Shevchenko National University of Kyiv: 100 Bachelor’s places, 40 courses, labs, a dormitory.',
     eyebrow: 'F7 · Computer Engineering',
     h1: 'Study Computer Engineering',
-    lead: 'Circuits, processors, code and networks in one programme. Work out your NMT score right here.',
+    lead: 'Circuits, processors, code and networks in one programme.',
     cta_rules: 'Admission rules',
     cta_plan: 'Curriculum',
     facts: [
       { value: '100', label: 'Bachelor’s places' },
       { value: '4 + 2', label: 'years of Bachelor’s and Master’s' },
-      { value: '101', label: 'minimum in each NMT subject' },
+      { value: '40', label: 'courses in seven cycles' },
       { value: 'Dormitory', label: 'for students from other cities' },
       { value: '2 years', label: 'at the Military Institute: reserve officer' },
       { value: 'Pool', label: 'stadium and the university sports building' },
@@ -101,10 +89,5 @@ export const COPY = {
     spoiler_life: 'What else KNU gives its students',
     band_title: 'Every admission detail is in the KNU rules',
     band_cta: 'Admission rules',
-    calc_title: 'Your competitive score',
-    calc_hud: 'NMT · F7',
-    calc_subjects: { math: 'Mathematics', ukr: 'Ukrainian', hist: 'History of Ukraine' },
-    calc_low: 'Below the 101 minimum: the application cannot enter the competition.',
-    calc_note: 'NMT scores weighted 0.5, 0.3 and 0.2. Regional, sector and other KNU coefficients are not included.',
   },
 } as const;

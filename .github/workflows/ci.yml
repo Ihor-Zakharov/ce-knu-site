@@ -35,22 +35,8 @@ jobs:
       - name: Lint (ESLint, Prettier)
         run: npm run lint || true
 
-      - name: Build for GitHub Pages
-        run: |
-          export ASTRO_SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/pr-preview/pr-${{ github.event.number }}/"
-          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            export ASTRO_BASE="/${GITHUB_REPOSITORY#*/}/"
-          else
-            export ASTRO_BASE="/"
-          fi
-          export BASE_PATH="$ASTRO_BASE"
-          export SITE_URL="$ASTRO_SITE"
-          echo "ASTRO_BASE=$ASTRO_BASE" >> "$GITHUB_ENV"
-          echo "BASE_PATH=$BASE_PATH" >> "$GITHUB_ENV"
-          echo "SITE_URL=$SITE_URL" >> "$GITHUB_ENV"
-          npm run build
+      - name: Збирання (лише статичні файли)
+        run: npm run build
 
       - name: Повнота вмісту й внутрішні посилання
         run: npm run check:content
@@ -148,7 +134,6 @@ jobs:
           name: site
           path: dist
 
-      # Publishes to the gh-pages branch; pr-preview/ is kept for future PR previews.
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
@@ -186,63 +171,3 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "$PORT" "$HOST" >> ~/.ssh/known_hosts
           rsync -avz --delete -e "ssh -p $PORT -i ~/.ssh/id_ed25519" dist/ "$USER@$HOST:$TARGET"
-
-  deploy-preview:
-    name: deploy-preview
-    needs: build
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    concurrency:
-      group: pages-preview-${{ github.event.number }}
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: site
-          path: dist
-
-      - name: Deploy preview to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
-          branch: gh-pages
-          target-folder: pr-preview/pr-${{ github.event.number }}
-          clean: false
-
-      - name: Comment PR with preview link
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const owner = context.repo.owner.toLowerCase();
-            const repo = context.repo.repo;
-            const prNumber = context.issue.number;
-            const previewUrl = `https://${owner}.github.io/${repo}/pr-preview/pr-${prNumber}/`;
-            const header = '### 🚀 Preview Deployment';
-            const body = `${header}\n\nYour changes have been deployed to preview:\n👉 **[View Preview](${previewUrl})**\n\n_Updated at: ${new Date().toUTCString()}_`;
-
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-            const existingComment = comments.data.find(c => c.body && c.body.includes(header));
-            if (existingComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existingComment.id,
-                body: body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: body,
-              });
-            }

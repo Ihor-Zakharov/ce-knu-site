@@ -78,6 +78,8 @@ export function perch(box) {
   let x = clamp(+(box.dataset.start || 24)), target = x, dir = 1, walk = 0, jump = 0, vy = 0, speed = 30;
   let blinkT = 2 + Math.random() * 2, blinking = 0, pause = 1.2, curious = 0, raf = 0, last = 0, li = 0, sayT = 0, seen = false;
   let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
+  let hello = box.dataset.hello || '', helloT = 2.4;           // привітання після появи (поява Рекса — 0,9–1,9 с): рушає на 2-й с, говорить на 2,4-й
+  if (hello) pause = 2;
   let side = '', drop = 0, failed = false, sayTimer = 0;        // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
   const stick = box.closest('.page__inst'), hd = document.querySelector('.hd');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
@@ -87,14 +89,25 @@ export function perch(box) {
     if (REDUCED) { clearTimeout(sayTimer); sayTimer = setTimeout(() => say.classList.remove('on'), sec * 1000); }   // без руху цикл не йде — репліку прибирає таймер
   }
   const headerLimit = () => Math.max(0, hd ? hd.getBoundingClientRect().bottom : 0) + 6;
-  /* репліка не ховається під липку шапку: над головою, якщо там є місце; інакше — збоку від Рекса на рівні голови
-     (праворуч або ліворуч, де вміщається); якщо й збоку тісно — опускається рівно під шапку */
+  /* репліка не ховається під липку шапку й не закриває сусідній вміст (кнопки, посилання, текст): над головою, якщо там
+     вільно; інакше — збоку від Рекса на рівні голови (праворуч або ліворуч, де вміщається); якщо й збоку тісно — під шапку */
   const SIDE_R = 84, SIDE_L = 6;                                // відступи від лівого краю полотна до репліки збоку
+  const CONTENT = 'a, button, input, select, textarea, label, h1, h2, h3, h4, p, li, img, figure';
+  function covers(l, t, w, h) {                                 // чи ляже прямокутник на чужий вміст (перевірка в п'яти точках)
+    for (const [fx, fy] of [[.08, .25], [.5, .5], [.92, .25], [.08, .8], [.92, .8]]) {
+      const px = l + w * fx, py = t + h * fy;
+      if (px < 0 || py < 0 || px > innerWidth || py > innerHeight) continue;
+      const el = document.elementsFromPoint(px, py).find(e => !box.contains(e));
+      if (el && !hd?.contains(el) && el.closest(CONTENT)) return true;
+    }
+    return false;
+  }
   function pick() {
     say.classList.remove('is-r', 'is-l'); say.style.maxWidth = ''; side = ''; drop = 0;
-    const w = say.offsetWidth, b = box.getBoundingClientRect();
-    const limit = headerLimit();
-    if (b.bottom - 66 - say.offsetHeight >= limit || b.bottom - 40 < limit) return;   // над головою досить місця — або сам Рекс уже під шапкою (сторінку гортають)
+    const w = say.offsetWidth, h = say.offsetHeight, b = box.getBoundingClientRect();
+    const limit = headerLimit(), upTop = b.bottom - 66 - h, upLeft = b.left + Math.min(Math.max(0, Math.round(x) - 10), Math.max(0, box.clientWidth - w));
+    if (b.bottom - 40 < limit) return;                           // сам Рекс уже під шапкою (сторінку гортають)
+    if (upTop >= limit && !covers(upLeft, upTop, w, h)) return;  // над головою вільно
     // збоку можна в 2–3 рядки: 104 px вистачає з одного боку Рекса в будь-якому місці приладу завширшки від 300 px
     const px = Math.round(x), roomR = box.clientWidth - px - SIDE_R, roomL = px + SIDE_L, need = Math.min(w, 104);
     side = roomR >= w ? 'r' : roomL >= w ? 'l' : Math.max(roomR, roomL) >= need ? (roomR >= roomL ? 'r' : 'l') : '';
@@ -152,6 +165,7 @@ export function perch(box) {
     idle += dt;
     if (!asleep && idle > 28 && !bit && !goal) { asleep = true; zz.classList.add('on'); pause = 1e9; }
     if (asleep) return;
+    if (hello && (helloT -= dt) <= 0) { if (sayT <= 0) speak(hello, 3.2); hello = ''; }
     if (curious > 0) curious -= dt;
     else if (side && sayT > 0) { /* говорить збоку — стоїть на місці, репліка не їде */ }
     else if (pause > 0) {

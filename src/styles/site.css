@@ -428,36 +428,44 @@ html.menu-open { overflow: hidden; }
   -webkit-backdrop-filter: blur(8px);
 }
 .news-badge--awards {
-  background: color-mix(in oklab, var(--gold) 25%, var(--surface));
-  color: var(--gold-ink);
+  background: color-mix(in oklab, var(--gold) 22%, var(--surface));
+  color: #634304;
   border: 1px solid var(--gold);
 }
 .news-badge--tech {
-  background: color-mix(in oklab, #0284c7 20%, var(--surface));
-  color: #0369a1;
+  background: color-mix(in oklab, #0284c7 16%, var(--surface));
+  color: #075985;
   border: 1px solid #38bdf8;
 }
 .news-badge--edu {
-  background: color-mix(in oklab, #16a34a 20%, var(--surface));
-  color: #15803d;
+  background: color-mix(in oklab, #16a34a 16%, var(--surface));
+  color: #14532d;
   border: 1px solid #4ade80;
 }
 .news-badge--general {
   background: var(--surface-2);
-  color: var(--ink-2);
+  color: var(--ink);
   border: 1px solid var(--line-strong);
 }
 :root[data-theme="dark"] .news-badge--tech {
+  background: color-mix(in oklab, #0284c7 25%, var(--surface));
   color: #7dd3fc;
   border-color: #0284c7;
 }
 :root[data-theme="dark"] .news-badge--edu {
+  background: color-mix(in oklab, #16a34a 25%, var(--surface));
   color: #86efac;
   border-color: #16a34a;
 }
 :root[data-theme="dark"] .news-badge--awards {
+  background: color-mix(in oklab, var(--gold) 25%, var(--surface));
   color: #fde047;
   border-color: var(--gold);
+}
+:root[data-theme="dark"] .news-badge--general {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-color: var(--line-strong);
 }
 
 /* ── Головна новина (Hero Featured Card) ── */

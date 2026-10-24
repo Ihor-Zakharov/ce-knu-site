@@ -9,6 +9,8 @@ import Icons from '../components/Icons.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getImage } from 'astro:assets';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import type { ImageMetadata } from 'astro';
 import { T, url, stripLang, type Lang } from '../lib/i18n';
 import { orgLd, breadcrumbLd, programsLd } from '../lib/seo';
@@ -16,13 +18,14 @@ import { orgLd, breadcrumbLd, programsLd } from '../lib/seo';
 interface Props {
   lang: Lang; title: string; description?: string;
   image?: ImageMetadata;           // власна картка (обкладинка новини, фото людини)
-  og?: string;                     // інакше — картка розділу з public/og/<og>-<мова>.jpg
+  og?: string;                     // інакше — фірмова картка з public/og/<og>-<мова>.jpg (розділ, posts/<slug>, personas/<slug>)
+  ogFallback?: string;             // якщо картки ще немає (новина без запуску scripts/og.mjs) — картка розділу
   type?: 'website' | 'article' | 'profile'; noindex?: boolean;
   crumbs?: { name: string; path: string }[];   // для BreadcrumbList; поточна сторінка додається сама
   jsonld?: Record<string, unknown>[];
   published?: Date;
 }
-const { lang, title, description = '', image, og = 'home', type = 'website', noindex = false, crumbs, jsonld = [], published } = Astro.props;
+const { lang, title, description = '', image, og = 'home', ogFallback = 'home', type = 'website', noindex = false, crumbs, jsonld = [], published } = Astro.props;
 const t = T[lang];
 const path = stripLang(Astro.url.pathname);
 const other: Lang = lang === 'uk' ? 'en' : 'uk';
@@ -35,9 +38,10 @@ const base = import.meta.env.BASE_URL;
 const raw = description.replace(/\s+/g, ' ').trim();
 const desc = /\p{L}{3}/u.test(raw) ? raw : title === t.dept ? t.footNote : `${title} · ${t.footNote}`;
 const metaDesc = desc.length > 160 ? desc.slice(0, desc.lastIndexOf(' ', 157)) + '…' : desc;
+const ogKey = existsSync(join(process.cwd(), 'public/og', `${og}-${lang}.jpg`)) ? og : ogFallback;
 const ogSrc = image
   ? (await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 })).src
-  : `${base}og/${og}-${lang}.jpg`;
+  : `${base}og/${ogKey}-${lang}.jpg`;
 const ogImage = new URL(ogSrc, Astro.site).href;
 const ld: Record<string, unknown>[] = [...jsonld];
 if (crumbs) ld.push(breadcrumbLd(lang, [...crumbs, { name: title, path }], Astro.site!));

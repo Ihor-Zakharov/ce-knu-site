@@ -26,7 +26,7 @@ let d = ''; for (let i = 0; i <= 400; i++) { const s = i / 400 * Math.PI * 2; d 
 const words = entry.data.name.split(/\s+/);
 const ld = personLd({ lang, name: entry.data.name, role: entry.data.role, path: `/personas/${slug}/`, image: entry.data.photo?.src, site: Astro.site! });
 ---
-<Base lang={lang} title={entry.data.name} description={`${entry.data.name}. ${entry.data.role}`} og="personas" type="profile" crumbs={[{ name: t.people, path: '/personas/' }]} jsonld={[ld]}>
+<Base lang={lang} title={entry.data.name} description={`${entry.data.name}. ${entry.data.role}`} og={`personas/${slug}`} ogFallback="personas" type="profile" crumbs={[{ name: t.people, path: '/personas/' }]} jsonld={[ld]}>
   <section class="ph">
     <div class="wrap">
       <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>

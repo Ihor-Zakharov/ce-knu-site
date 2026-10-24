@@ -34,6 +34,8 @@ const ACC = {
 };
 
 const OX = 3, OY = 5, GW = 30, GH = 24;   // поле з запасом під аксесуари
+// біти, що падають, — не випадкові: це ASCII-коди імені KI-REX, біт за бітом; 6 байтів — ім’я зібрано
+const NAME = 'KI-REX', bitAt = i => String(NAME.charCodeAt((i >> 3) % NAME.length) >> (7 - (i & 7)) & 1);
 export function rexFrame({ legs = 0, blink = false, acc = null, flip = false } = {}) {
   const accs = (Array.isArray(acc) ? acc : String(acc || '').split('+')).map(a => ACC[a]).filter(Boolean);
   const grid = Array.from({ length: GH }, () => Array(GW).fill(null));
@@ -59,7 +61,9 @@ export function paintStatic(cv) {
 /* Рекс, що гуляє по краю (верх приладу, лінія над цифрами). Поведінка:
    • ходить між випадковими точками, зупиняється, озирається, кліпає;
    • курсор поруч — зупиняється й дивиться на нього; клік — стрибок (над шапкою) і репліка;
-   • згори часом падає світний біт 0/1 — Рекс біжить і з'їдає його (лічильник у браузері: 8 біт = байт);
+   • згори часом падає світний біт — Рекс біжить і з'їдає його; біти складаються в ASCII імені KI-REX
+     (лічильник у браузері: 8 біт = байт, 6 байтів — ім’я зібрано, лічильник з нуля);
+   • часті кліки поспіль — «брязкіт контактів», півтори секунди Рекс не реагує;
    • наведення на елемент з data-rex-say (на головній — цифри) — підбігає під нього й коментує;
    • довго ніхто не чіпає — засинає; зміна теми — коментує.
    Без руху (prefers-reduced-motion) — стоїть і лише відповідає на клік. */
@@ -77,11 +81,12 @@ export function perch(box) {
   const clamp = v => Math.min(maxX(), Math.max(0, v));
   let x = clamp(+(box.dataset.start || 24)), target = x, dir = 1, walk = 0, jump = 0, vy = 0, speed = 30;
   let blinkT = 2 + Math.random() * 2, blinking = 0, pause = 1.2, curious = 0, raf = 0, last = 0, li = 0, sayT = 0, seen = false;
-  let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = +store.get('ki-bits') || 0;
+  let idle = 0, asleep = false, goal = null, bit = null, bitT = 9 + Math.random() * 8, bits = (+store.get('ki-bits') || 0) % (NAME.length * 8);
   let hello = box.dataset.hello || '', helloT = 2.4;           // привітання після появи (поява Рекса — 0,9–1,9 с): рушає на 2-й с, говорить на 2,4-й
   if (hello) pause = 2;
-  let side = '', drop = 0, failed = false, sayTimer = 0, memoAt = -1;
-  const memo = () => { const B = bits >> 3; return uk ? (B >= 32 ? '256 біт. Без переповнення' : B >= 8 ? '64 біти. Апетит росте' : 'Перший байт. Смакує') : (B >= 32 ? '256 bits. Room for more' : B >= 8 ? '64 bits. Still hungry' : 'First byte. Acquired taste'); };        // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
+  let side = '', drop = 0, failed = false, sayTimer = 0, memoAt = -1;   // де репліка: '' — над головою, 'r' / 'l' — збоку; drop — зсув донизу
+  let clicks = [], deaf = 0;                                     // часті кліки поспіль — «брязкіт контактів»
+  const memo = () => (uk ? `Уже зібрав «${NAME.slice(0, bits >> 3)}»` : `Collected «${NAME.slice(0, bits >> 3)}» so far`);
   const stick = box.closest('.page__inst'), hd = document.querySelector('.hd');
   const zz = document.createElement('span'); zz.className = 'perch__z'; zz.textContent = 'z z z'; box.append(zz);
 
@@ -147,7 +152,7 @@ export function perch(box) {
     }
   }
   function dropBit() {
-    const el = document.createElement('i'); el.className = 'perch__bit'; el.textContent = Math.random() < .5 ? '0' : '1';
+    const el = document.createElement('i'); el.className = 'perch__bit'; el.textContent = bitAt(bits);
     const bx = 20 + Math.random() * Math.max(0, box.clientWidth - 40);
     el.style.left = bx + 'px'; box.append(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('down')));
@@ -157,10 +162,14 @@ export function perch(box) {
   function eat() {
     if (!bit) return;
     bit.el.classList.add('eaten'); const el = bit.el; setTimeout(() => el.remove(), 500); bit = null;
-    bits++; store.set('ki-bits', bits);
-    const n = bits % 8;
+    bits++;
+    const n = bits % 8, B = bits >> 3, done = B === NAME.length;
     if (!REDUCED) { vy = -170; jump = -.01; }
-    speak(n === 0 ? (uk ? `+1 байт · разом ${bits / 8}` : `+1 byte · total ${bits / 8}`) : (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`), 2.2);
+    speak(n ? (uk ? `+1 біт · ${n}/8` : `+1 bit · ${n}/8`)
+      : done ? (uk ? 'Зібрав ім’я: KI-REX' : 'Assembled my name: KI-REX')
+      : (uk ? `+1 байт «${NAME[B - 1]}» · ${B}/${NAME.length}` : `+1 byte «${NAME[B - 1]}» · ${B}/${NAME.length}`), done ? 3.2 : 2.2);
+    if (done) bits = 0;                                          // ім’я зібрано — лічильник з нуля, без нескінченного накопичення
+    store.set('ki-bits', bits);
   }
   function step(dt) {
     idle += dt;
@@ -194,6 +203,10 @@ export function perch(box) {
   const stop = () => { cancelAnimationFrame(raf); raf = 0; };
 
   cv.addEventListener('click', () => {
+    const now = performance.now();
+    if (now < deaf) return;
+    clicks = clicks.filter(c => now - c < 2000); clicks.push(now);
+    if (clicks.length >= 4) { clicks = []; deaf = now + 1500; wake(); speak(uk ? 'Брязкіт контактів. Чекаю' : 'Switch bounce. Debouncing', 2); return; }
     const was = asleep; wake();
     if (!REDUCED && jump === 0) { vy = -420; jump = -.01; }   // ≈80 px угору — у стрибку перекриває шапку, але не тікає за край екрана
     if (was) speak(uk ? 'Виходжу з режиму сну' : 'Leaving sleep mode');

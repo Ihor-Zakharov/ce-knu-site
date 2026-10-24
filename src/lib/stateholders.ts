@@ -32,7 +32,7 @@ export const COPY = {
     ways: [
       { title: 'Впливайте на програму', text: 'Питання, пропозиції й рекомендації щодо навчання надсилайте на ce.frecs@knu.ua.' },
       { title: 'Наймайте випускників', text: 'Вони працюють розробниками й QA-інженерами, у вбудованих системах, HPC і мережах.' },
-      { title: 'Спільні лабораторії', text: 'Huawei, Cisco та IBM уже мають тут академії й обладнання. Створімо спільну лабораторію з вами.' },
+      { title: 'Спільні лабораторії', text: 'Спільна лабораторія з IBM за меморандумом 2017 року й мережевий клас Huawei. Створімо таку лабораторію з вами.' },
     ],
     spoiler_letter: 'Повний лист кафедри до роботодавців',
     band_title: 'Опишіть інженера, якого вам бракує',
@@ -57,7 +57,7 @@ export const COPY = {
     ways: [
       { title: 'Shape the curriculum', text: 'Send questions, proposals and recommendations on the curriculum to ce.frecs@knu.ua.' },
       { title: 'Hire our graduates', text: 'They work as software and QA engineers, and in embedded systems, HPC and networking.' },
-      { title: 'Joint labs', text: 'Huawei, Cisco and IBM already have academies and equipment here. Let’s build a joint lab with you.' },
+      { title: 'Joint labs', text: 'A joint lab with IBM under a 2017 memorandum and a Huawei networking classroom. Let’s set one up with you.' },
     ],
     spoiler_letter: 'The department’s full letter to employers',
     band_title: 'Describe the engineer you can’t find',

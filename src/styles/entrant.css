@@ -3,7 +3,8 @@
 .ent__grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); grid-template-areas: "text inst" "facts inst"; column-gap: clamp(32px, 5vw, 96px); row-gap: clamp(24px, 2.6vw, 36px); align-items: start; }
 .ent__text { grid-area: text; }
 .ent__facts { grid-area: facts; }
-.ent__inst { grid-area: inst; align-self: center; }
+.ent__inst { grid-area: inst; align-self: center; justify-self: end; width: min(100%, 440px); }   /* компактний прилад: перший екран уміщується цілком */
+.ent__inst .inst__screen { aspect-ratio: 16 / 10; }
 .ent__inst .ph__inst .inst-wrap { margin-top: 64px; }   /* місце над приладом — для КІ-Рекса */
 .ent h1 { max-width: 20ch; font-size: clamp(2.5rem, 1.3rem + 2.6vw, 4rem); }
 .ent .lead { max-width: 44ch; }

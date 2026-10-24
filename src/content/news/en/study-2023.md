@@ -4,8 +4,10 @@ date: "2023-08-21"
 summary: "Students, please note the information on the organisation of the educational process for students of the Faculty of Radiophysics, Electronics and Computer Systems in the 2023-24 academic year. In accordance with the academic calendar for first- and second-level higher education programmes…"
 cover: "../../../assets/images/news/study-2023.jpg"
 coverAlt: "Information on the organisation of the educational process"
+coverFit: contain
 legacy: "/posts/study-2023/"
 source: "posts/22-study-23-24.rst"
+tags: [study]
 ---
 
 ![Photo: Information on the organisation of the educational process](../../../assets/images/news/study-2023.jpg)

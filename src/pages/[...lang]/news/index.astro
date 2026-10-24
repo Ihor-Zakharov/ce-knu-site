@@ -1,44 +1,101 @@
 ---
+// Новини: фільтр за роком і темою (стан — в адресі: ?year=2024&topic=awards), у кожному році — рядки «дата · заголовок, зміст, теми · фото».
+// Роки й теми беруться з самих новин (дата й `tags` у фронтматері, назви тем — src/lib/topics.ts): нова новина потрапляє у фільтр без змін макета.
+// Мініатюра — лише справжнє фото; оголошення без фото — текстовий рядок. Без JS — увесь архів і роки якорями.
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
-import { T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
+import { T, url, langOf, langParams, isoDate } from '../../../lib/i18n';
 import { news, slugOf, photo } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
-import NewsArt from '../../../components/NewsArt.astro';
+import { TOPICS, TOPIC_LABEL } from '../../../lib/topics';
+import '../../../styles/lists.css';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
+const uk = lang === 'uk';
 const list = await news(lang);
 const years = [...new Set(list.map(n => n.data.date.getUTCFullYear()))];
-const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
+const msgs = [uk ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
+const date = (d: Date) => d.toLocaleDateString(uk ? 'uk-UA' : 'en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const real = (s: string) => (s ?? '').trim().length > 3;   // «.» і «-» з чинного сайту — не опис
+const topics = TOPICS.filter(k => list.some(n => n.data.tags.includes(k)));
+const L = uk
+  ? { filter: 'Фільтр', year: 'Рік', topic: 'Тема', allY: 'Усі роки', allT: 'Усі теми', all: 'Усі', reset: 'Скинути', shown: 'Показано', of: 'з', none: 'За цими умовами новин немає.', hint: 'Змініть рік або тему.' }
+  : { filter: 'Filter', year: 'Year', topic: 'Topic', allY: 'All years', allT: 'All topics', all: 'All', reset: 'Reset', shown: 'Showing', of: 'of', none: 'No news match these filters.', hint: 'Change the year or the topic.' };
 ---
 <Base lang={lang} title={t.news} description={HEROES.news.lead[lang]} og="news" crumbs={[]}>
   <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs) }}
-    meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`, `${years.at(-1)}–${years[0]}`, `<a href="${url(lang, '/rss.xml')}">RSS</a>`]} />
-  <section class="section">
-    <div class="wrap page">
-      <div class="page__main">
-      <nav class="years" aria-label={t.year}>
-        {years.map(y => <a class="chip" href={`#y${y}`}>{y} <span class="n">{list.filter(n => n.data.date.getUTCFullYear() === y).length}</span></a>)}
+    meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`]} />
+  <section class="section nl">
+    <div class="wrap">
+      <nav class="nl-years" aria-label={t.year}>
+        {years.map(y => <a href={`#y${y}`}>{y}</a>)}
       </nav>
-      {years.map(y => (
-        <section aria-labelledby={`y${y}`}>
-          <h2 class="year-h" id={`y${y}`}>{y}</h2>
-          <div>
-            {list.filter(n => n.data.date.getUTCFullYear() === y).map(n => (
-              <a class="newsrow" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
-                <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
-                <div><h3>{n.data.title}</h3><p>{n.data.summary}</p></div>
-                <span class="thumb">{photo(n) ? <Image src={photo(n)!} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} small />}</span>
-                <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
-              </a>
-            ))}
+      <!-- data-counts: які лічильники показувати — "topics", "years topics" або "" (рахуються завжди) -->
+      <div class="nf" data-news-filter data-counts="topics" hidden>
+        <button type="button" class="nf__sum" aria-expanded="false" aria-controls="nf-panel">
+          <span class="nf__sum-k">{L.filter}</span><span class="nf__sum-v" data-nf-sum>{L.allY} · {L.allT}</span>
+          <svg class="nf__chev" width="16" height="16" aria-hidden="true"><use href="#i-right"/></svg>
+        </button>
+        <div class="nf__panel" id="nf-panel">
+          <div class="nf__row" role="group" aria-labelledby="nf-ky">
+            <span class="nf__k" id="nf-ky">{L.year}</span>
+            <div class="nf__opts nf__years">
+              <button type="button" class="nf__y" data-f="year" data-v="" data-t={L.allY} aria-pressed="true">{L.allY}<span class="n" data-n></span></button>
+              {years.map(y => <button type="button" class="nf__y" data-f="year" data-v={String(y)} data-t={String(y)} aria-pressed="false">{y}<span class="n" data-n></span></button>)}
+            </div>
           </div>
-        </section>
-      ))}
+          <div class="nf__row" role="group" aria-labelledby="nf-kt">
+            <span class="nf__k" id="nf-kt">{L.topic}</span>
+            <div class="nf__opts">
+              <button type="button" class="chip nf__t" data-f="topic" data-v="" data-t={L.allT} aria-pressed="true">{L.all}<span class="n" data-n>{list.length}</span></button>
+              {topics.map(k => <button type="button" class="chip nf__t" data-f="topic" data-v={k} data-t={TOPIC_LABEL[k][lang]} aria-pressed="false">{TOPIC_LABEL[k][lang]}<span class="n" data-n>{list.filter(n => n.data.tags.includes(k)).length}</span></button>)}
+            </div>
+          </div>
+        </div>
       </div>
+      <p class="nf__state" data-nf-state hidden>
+        <span aria-live="polite" data-nf-count data-w={`${L.shown}|${L.of}`}>{L.shown} {list.length} {L.of} {list.length}</span>
+        <button type="button" class="nf__reset" data-nf-reset hidden>{L.reset}</button>
+        <a class="nf__rss" href={url(lang, '/rss.xml')}>RSS</a>
+      </p>
+      <div class="nf__empty" data-nf-empty hidden>
+        <p><b>{L.none}</b> {L.hint}</p>
+        <button type="button" class="btn btn--line" data-nf-reset>{L.reset}</button>
+      </div>
+      {years.map(y => {
+        const items = list.filter(n => n.data.date.getUTCFullYear() === y);
+        return (
+          <section class="nl-year" aria-labelledby={`y${y}`} data-year={String(y)}>
+            <header class="nl-year__h"><h2 id={`y${y}`}>{y}</h2><span data-ycount={String(items.length)} data-w={L.of}>{t.newsCount(items.length)}</span></header>
+            <ol class="nl-list" role="list">
+              {items.map(n => {
+                const ph = photo(n);
+                return (
+                  <li data-year={String(y)} data-topics={n.data.tags.join(' ')}>
+                    <article class:list={['nl-item', ph && 'nl-item--ph']}>
+                      <time class="nl-date" datetime={isoDate(n.data.date)}>{date(n.data.date)}</time>
+                      <div class="nl-main">
+                        <h3 class="nl-t"><a href={url(lang, `/posts/${slugOf(n.id)}/`)}>{n.data.title}</a></h3>
+                        {real(n.data.summary) && <p class="nl-s">{n.data.summary}</p>}
+                        {n.data.tags.length > 0 && <p class="nl-tags">{n.data.tags.map(k => TOPIC_LABEL[k][lang]).join(' · ')}</p>}
+                      </div>
+                      {ph && <div class="nl-ph"><Image src={ph} alt="" widths={[160, 320]} sizes="160px" fit="cover" /></div>}
+                    </article>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        );
+      })}
     </div>
   </section>
 </Base>
+
+<script>
+  import { newsFilter } from '../../../scripts/newsfilter.js';
+  newsFilter();
+</script>

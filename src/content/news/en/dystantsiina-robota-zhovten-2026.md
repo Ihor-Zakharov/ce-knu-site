@@ -6,6 +6,7 @@ cover: "../../../assets/images/dino/emblem.png"
 coverAlt: "Remote work from 29 September to 16 October 2026"
 legacy: "/posts/dystantsiina-robota-zhovten-2026/"
 source: "posts/dystantsiina-robota-zhovten-2026.rst"
+tags: [study]
 ---
 
 In accordance with Order No. 1095-32 of the First Vice-Rector of Taras Shevchenko National University of Kyiv dated 28 September 2026, due to the deterioration of the security situation in Kyiv, university staff have been transferred to remote work from 29 September to 16 October 2026 inclusive.

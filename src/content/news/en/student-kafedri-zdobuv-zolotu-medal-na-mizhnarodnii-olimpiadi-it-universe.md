@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg"
 coverAlt: "Department student wins gold medal at the IT-Universe international olympiad"
 legacy: "/posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe/"
 source: "posts/student-kafedri-zdobuv-zolotu-medal-na-mizhnarodnii-olimpiadi-it-universe.rst"
+tags: [awards]
 ---
 
 ![Photo: Department student wins gold medal at the IT-Universe international olympiad](../../../assets/images/news/ffee2447b152494b43d9816faaea83c8_M.jpg)

@@ -4,8 +4,10 @@ date: "2017-03-10"
 summary: "On 10 March 2017, the faculty hosted IBM Day. A Memorandum of Understanding was signed between the Faculty of Radiophysics, Electronics and Computer Systems of Taras Shevchenko National University…"
 cover: "../../../assets/images/news/c82cc4e14a1d2c8c8ffff9840d24b558_L.jpg"
 coverAlt: "IBM Day at the Faculty of Radiophysics, Electronics and Computer Systems"
+coverFit: contain
 legacy: "/posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem/"
 source: "posts/den-korporatsiyi-ibm-na-fakulteti-radiofiziki-elektroniki-ta-kompiuternikh-sistem.rst"
+tags: [partners, events]
 ---
 
 ![Dean of the Faculty Professor I. O. Anisimov and O. M. Danko](../../../assets/images/news/1703-ibm-01.jpg "Dean of the Faculty Professor I. O. Anisimov and O. M. Danko")

@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/knuexpo-2023.jpg"
 coverAlt: "Загальноуніверситетський день відкритих дверей КНУ ЕХРО"
 legacy: "/posts/KNUEXPO-2023/"
 source: "posts/24-knuexpo23.rst"
+tags: [admission]
 ---
 
 ![Фото: Загальноуніверситетський день відкритих дверей КНУ ЕХРО](../../../assets/images/news/knuexpo-2023.jpg)

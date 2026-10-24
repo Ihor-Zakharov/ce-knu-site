@@ -4,6 +4,7 @@ date: "2015-04-14"
 summary: "."
 legacy: "/posts/vidano-monografiiu-zastosuvannia-genetichnikh-algoritmiv-u-kompiuternikh-sistemakh/"
 source: "posts/vidano-monografiiu-zastosuvannia-genetichnikh-algoritmiv-u-kompiuternikh-sistemakh.rst"
+tags: [science]
 ---
 
 .

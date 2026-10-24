@@ -4,6 +4,7 @@ date: "2024-05-06"
 summary: "."
 legacy: "/posts/open-lec-mar/"
 source: "posts/30-openlecture.rst"
+tags: [events]
 ---
 
 .

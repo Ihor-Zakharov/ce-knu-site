@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/e31ace2a15a7c70645ad83df9ecd43b0_L.jpg"
 coverAlt: "Підписано меморандум про співпрацю між Київським національним університетом імені Тараса Шевченка та компанією HUAWEI Technologies Ukraine"
 legacy: "/posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim-universitetom-imeni-tarasa-shevchenka-ta-kompaniieiu-huawei-technologies-ukraine/"
 source: "posts/pidpisano-memorandum-pro-spivpratsiu-mizh-kiyivskim-natsionalnim-universitetom-imeni-tarasa-shevchenka-ta-kompaniieiu-huawei-technologies-ukraine.rst"
+tags: [partners]
 ---
 
 ![28 жовтня у Головному (Червоному) корпусі КНУ імені Тараса Шевченка було підписано Меморандум про розширення співпраці (фото Андрія Єловікова)](../../../assets/images/news/1610-huawei-01.jpg "28 жовтня у Головному (Червоному) корпусі КНУ імені Тараса Шевченка було підписано Меморандум про розширення співпраці (фото Андрія Єловікова)")

@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/open-lecture-big-data.jpg"
 coverAlt: "Відкрита лекція “Основні інструменти Big Data Engineer”"
 legacy: "/posts/open-lecture-big-data/"
 source: "posts/open-lecture-big-data.rst"
+tags: [events]
 ---
 
 ![Фото: Відкрита лекція “Основні інструменти Big Data Engineer”](../../../assets/images/news/open-lecture-big-data.jpg)

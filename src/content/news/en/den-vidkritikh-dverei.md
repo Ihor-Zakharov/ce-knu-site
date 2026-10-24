@@ -6,6 +6,7 @@ cover: "../../../assets/images/news/3899dfe821816fbcb3db3e3b23f81585_M.jpg"
 coverAlt: "Open Day"
 legacy: "/posts/den-vidkritikh-dverei/"
 source: "posts/den-vidkritikh-dverei.rst"
+tags: [admission]
 ---
 
 ![Photo: Open Day](../../../assets/images/news/3899dfe821816fbcb3db3e3b23f81585_M.jpg)

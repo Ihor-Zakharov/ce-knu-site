@@ -4,7 +4,8 @@ date: "2026-11-01"
 summary: "Одне-два речення для списку новин і пошуковиків."
 cover: "../../../assets/images/news/назва-фото.jpg"
 coverAlt: "Що зображено на фото"
-tags: []
+# coverFit: contain   # якщо обкладинка — логотип чи таблиця, а не фото
+tags: []   # теми з src/lib/topics.ts: science, awards, partners, events, admission, study, department
 ---
 
 Текст новини. Звичайний Markdown: **жирний**, [посилання](https://knu.ua), списки.

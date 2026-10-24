@@ -1,0 +1,1 @@
+import{o as e}from"./rex.CzFeWCPp.js";var t=document.getElementById(`runner`);t&&e(t,{start:`Game started`,idle:`SPACE / TAP TO START`,again:`LINE BROKEN · SPACE TO RETRY`,paused:`PAUSED · SPACE TO RESUME`,over:(e,t)=>`Line broken. Score ${e}, best ${t}. Press Space to retry`});

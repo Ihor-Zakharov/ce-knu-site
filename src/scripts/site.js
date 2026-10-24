@@ -241,7 +241,18 @@ $$('[data-rail]').forEach(rail => {
   rail.addEventListener('scroll', upd, { passive: true }); new ResizeObserver(upd).observe(rail); upd();
 });
 
-/* ── Телефон: нижня кнопка головної дії (вступникам, роботодавцям) ── */
+/* ── Телефон: шапка ховається під час гортання вниз і повертається вгору; нижня кнопка головної дії ── */
+const bar = $('.hd'), narrowMq = matchMedia('(max-width: 900px)');
+if (bar) {
+  let lastY = scrollY, acc = 0;
+  addEventListener('scroll', () => {
+    const y = scrollY, d = y - lastY; lastY = y;
+    if (!narrowMq.matches || root.classList.contains('menu-open') || y < 80) { bar.classList.remove('hd--away'); acc = 0; return; }
+    acc = Math.sign(d) === Math.sign(acc) ? acc + d : d;
+    if (acc > 24) bar.classList.add('hd--away'); else if (acc < -24) bar.classList.remove('hd--away');
+  }, { passive: true });
+  bar.addEventListener('focusin', () => bar.classList.remove('hd--away'));
+}
 $$('[data-dock-cta]').forEach(dockBar => {
   const src = $(dockBar.dataset.dockCta), end = $(dockBar.dataset.dockEnd);
   if (!src) return;

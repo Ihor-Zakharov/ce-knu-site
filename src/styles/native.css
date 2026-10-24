@@ -1,5 +1,5 @@
 /* Телефон як застосунок: без синього спалаху й затримки подвійного дотику, безпечні зони (виріз, смужка жестів),
-   шапка ховається під час гортання вниз і повертається під час гортання вгору, нижня кнопка головної дії. Лише токени. */
+   нижня кнопка головної дії. Шапка з меню завжди на місці. Лише токени. */
 a, button, summary, label, input, select, textarea, [role="button"] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 @media (hover: none) { a:active, summary:active { opacity: .72; transition: opacity 0s; } }
 
@@ -8,15 +8,10 @@ a, button, summary, label, input, select, textarea, [role="button"] { -webkit-ta
 .footer { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
 .sheet-menu { padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; }
 
-/* шапка на телефоні звільняє екран під час читання */
-@media (max-width: 900px) {
-  .hd { transition: translate 320ms var(--ease-out); }
-  .hd.hd--away { translate: 0 calc(-100% - 2px); }
-}
 
 /* нижня кнопка головної дії (вступникам, роботодавцям): з'являється, коли кнопка героя вже за екраном */
 .dock-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: none; padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom)); background: color-mix(in oklab, var(--bg) 86%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); border-top: 1px solid var(--line); translate: 0 110%; transition: translate 380ms var(--spring); }
 .dock-cta.on { translate: 0 0; }
 .dock-cta .btn { width: 100%; }
 @media (max-width: 900px) { .dock-cta { display: block; } .has-dock .toast { bottom: calc(80px + env(safe-area-inset-bottom)); } }
-@media (prefers-reduced-motion: reduce) { .hd, .dock-cta { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .dock-cta { transition: none; } }

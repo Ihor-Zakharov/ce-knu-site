@@ -8,7 +8,7 @@
 .sh-inst .ph__inst .inst-wrap { margin-top: 64px; }
 .sh-inst .inst__screen { aspect-ratio: 16 / 10; }
 .sh-proof { grid-area: proof; }
-.sh-hero h1 { max-width: 17ch; font-size: clamp(2.25rem, 1.3rem + 2.6vw, 3.75rem); }
+.sh-hero h1 { max-width: 23ch; font-size: clamp(2.25rem, 1.3rem + 2.6vw, 3.75rem); }
 .sh-hero .lead { max-width: 48ch; }
 .sh-cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; animation: fadein 1s var(--ease-out) 600ms both; }
 .sh-down { rotate: 90deg; }

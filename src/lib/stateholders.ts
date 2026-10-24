@@ -16,7 +16,7 @@ export const COPY = {
   uk: {
     meta_description: 'Випускники кафедри комп’ютерної інженерії КНУ знають Verilog, FPGA, Embedded C, Python, ML і мережі. Пропозиції щодо навчання: ce.frecs@knu.ua.',
     eyebrow: 'Роботодавцям',
-    h1: 'Інженери, які пишуть на Verilog і Python',
+    h1: 'Від хмарного ML до ПЛІС для оборонних систем',
     lead: 'Схеми, код і мережі в одній програмі КНУ. Підкажіть кафедрі, чого вчити студентів далі.',
     cta_mail: 'Написати кафедрі',
     cta_skills: 'Навички випускників',
@@ -41,7 +41,7 @@ export const COPY = {
   en: {
     meta_description: 'Graduates of KNU’s Department of Computer Engineering know Verilog, FPGA, Embedded C, Python, ML and networking. Write to us at ce.frecs@knu.ua.',
     eyebrow: 'For employers',
-    h1: 'Engineers who write both Verilog and Python',
+    h1: 'From cloud ML to FPGAs for defence systems',
     lead: 'Circuits, code and networks in one KNU programme. Tell us what students should learn next.',
     cta_mail: 'Email the department',
     cta_skills: 'See graduate skills',

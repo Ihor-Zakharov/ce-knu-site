@@ -1,4 +1,0 @@
-Contact: mailto:ce.frecs@knu.ua
-Expires: 2027-10-24T00:00:00.000Z
-Preferred-Languages: uk, en
-Canonical: https://ce.knu.ua/.well-known/security.txt

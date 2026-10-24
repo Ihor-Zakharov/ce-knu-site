@@ -9,36 +9,341 @@ import NewsArt from '../../../components/NewsArt.astro';
 
 export const getStaticPaths = langParams;
 const lang = langOf(Astro.params.lang);
+const uk = lang === 'uk';
 const t = T[lang];
 const list = await news(lang);
 const years = [...new Set(list.map(n => n.data.date.getUTCFullYear()))];
-const msgs = [lang === 'uk' ? 'НОВИНИ' : 'NEWS', '{today}'];   // {today} — сьогоднішня дата, підставляє браузер
+const msgs = [uk ? 'НОВИНИ' : 'NEWS', '{today}'];
+
+// Автоматична категоризація новин
+function getCategory(title: string, summary: string) {
+  const text = (title + ' ' + summary).toLowerCase();
+  if (/перемог|чемпіон|конкурс|huawei|призер|нагород|олімпіад|грант|winner|award|champion|competition|contest|hackathon/i.test(text)) {
+    return { key: 'awards', label: uk ? '🏆 Перемога' : '🏆 Award' };
+  }
+  if (/лаборатор|наук|підручник|конференц|партнер|ibm|cisco|монограф|lab|science|research|conference|штучн|intel/i.test(text)) {
+    return { key: 'tech', label: uk ? '🔬 Наука & Лабораторії' : '🔬 Science & Labs' };
+  }
+  if (/навчан|вступ|сесі|графік|іспит|дистанційн|освітн|студент|бакалавр|магістр|study|exam|admission|curriculum|student/i.test(text)) {
+    return { key: 'edu', label: uk ? '🎓 Навчання' : '🎓 Education' };
+  }
+  return { key: 'general', label: uk ? '📢 Подія' : '📢 Event' };
+}
+
+const featured = list[0];
+const featuredCategory = featured ? getCategory(featured.data.title, featured.data.summary) : null;
+const restNews = list.slice(1);
 ---
 <Base lang={lang} title={t.news} description={HEROES.news.lead[lang]} og="news" crumbs={[]}>
   <PageHero lang={lang} title={t.news} kind="news" data={{ msgs: JSON.stringify(msgs) }}
     meta={[`<b>${list.length}</b> ${t.newsCount(list.length).replace(/^\d+ /, '')}`, `${years.at(-1)}–${years[0]}`, `<a href="${url(lang, '/rss.xml')}">RSS</a>`]} />
-  <section class="section">
-    <div class="wrap page">
-      <div class="page__main">
-      <nav class="years" aria-label={t.year}>
-        {years.map(y => <a class="chip" href={`#y${y}`}>{y} <span class="n">{list.filter(n => n.data.date.getUTCFullYear() === y).length}</span></a>)}
-      </nav>
-      {years.map(y => (
-        <section aria-labelledby={`y${y}`}>
-          <h2 class="year-h" id={`y${y}`}>{y}</h2>
-          <div>
-            {list.filter(n => n.data.date.getUTCFullYear() === y).map(n => (
-              <a class="newsrow" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
-                <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
-                <div><h3>{n.data.title}</h3><p>{n.data.summary}</p></div>
-                <span class="thumb">{photo(n) ? <Image src={photo(n)!} alt="" width={192} height={144} fit="cover" /> : <NewsArt slug={slugOf(n.id)} small />}</span>
-                <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
-              </a>
-            ))}
+
+  <section class="section news-section">
+    <div class="wrap">
+      <!-- 1. Панель керування: пошук, фільтри категорій, вибір року та перемикач режимів -->
+      <div class="news-toolbar" role="search" aria-label={uk ? 'Фільтри та пошук новин' : 'News filters and search'}>
+        <div class="news-search">
+          <svg class="news-search__icon" width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
+          <input
+            type="search"
+            id="news-search-input"
+            class="news-search__input"
+            placeholder={uk ? "Пошук новин за ключовими словами, подіями чи темами..." : "Search news by topic, keywords or events..."}
+            aria-label={uk ? "Пошук новин" : "Search news"}
+            autocomplete="off"
+          />
+          <button type="button" id="news-search-clear" class="news-search__clear" hidden aria-label={uk ? "Очистити поле пошуку" : "Clear search input"}>✕</button>
+        </div>
+
+        <div class="news-filters-row">
+          <div class="news-categories" role="group" aria-label={uk ? 'Категорії новин' : 'News categories'}>
+            <button type="button" class="news-chip is-active" data-filter="all" aria-pressed="true">{uk ? 'Всі новини' : 'All news'}</button>
+            <button type="button" class="news-chip" data-filter="awards" aria-pressed="false">{uk ? '🏆 Досягнення' : '🏆 Awards'}</button>
+            <button type="button" class="news-chip" data-filter="edu" aria-pressed="false">{uk ? '🎓 Навчання' : '🎓 Education'}</button>
+            <button type="button" class="news-chip" data-filter="tech" aria-pressed="false">{uk ? '🔬 Наука & Партнери' : '🔬 Science & Labs'}</button>
+            <button type="button" class="news-chip" data-filter="general" aria-pressed="false">{uk ? '📢 Події' : '📢 Events'}</button>
           </div>
-        </section>
-      ))}
+
+          <div class="news-view-controls">
+            <label class="sr-only" for="news-year-select">{uk ? 'Фільтр за роком' : 'Filter by year'}</label>
+            <select id="news-year-select" class="news-select" aria-label={uk ? 'Вибір року' : 'Select year'}>
+              <option value="all">{uk ? `Усі роки (${list.length})` : `All years (${list.length})`}</option>
+              {years.map(y => {
+                const count = list.filter(n => n.data.date.getUTCFullYear() === y).length;
+                return <option value={String(y)}>{y} ({count})</option>;
+              })}
+            </select>
+
+            <div class="news-layout-toggle" role="group" aria-label={uk ? 'Режим відображення' : 'Display view'}>
+              <button type="button" id="news-view-grid" class="news-layout-btn is-active" data-view="grid" aria-label={uk ? 'Відобразити сіткою' : 'Grid view'} title={uk ? 'Сітка' : 'Grid'} aria-pressed="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+              </button>
+              <button type="button" id="news-view-list" class="news-layout-btn" data-view="list" aria-label={uk ? 'Відобразити списком' : 'List view'} title={uk ? 'Список' : 'List'} aria-pressed="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="news-status-bar" aria-live="polite">
+          <span id="news-count-msg"><b>{list.length}</b> {t.newsCount(list.length).replace(/^\d+ /, '')}</span>
+          <span id="news-filter-active-desc" class="news-filter-desc"></span>
+        </div>
+      </div>
+
+      <!-- 2. Головна новина (Hero Featured Story) -->
+      {featured && (
+        <article
+          class="news-featured-wrap"
+          id="news-featured-block"
+          data-category={featuredCategory?.key}
+          data-year={String(featured.data.date.getUTCFullYear())}
+          data-search={`${featured.data.title} ${featured.data.summary}`.toLowerCase()}
+        >
+          <a class="newsrow feat-news-card" href={url(lang, `/posts/${slugOf(featured.id)}/`)}>
+            <div class="feat-news-card__media">
+              {photo(featured) ? (
+                <Image src={photo(featured)!} alt="" width={680} height={420} fit="cover" loading="eager" />
+              ) : (
+                <NewsArt slug={slugOf(featured.id)} />
+              )}
+              <span class={`news-badge news-badge--${featuredCategory?.key}`}>
+                {featuredCategory?.label}
+              </span>
+            </div>
+            <div class="feat-news-card__content">
+              <div class="feat-news-card__top">
+                <span class="feat-news-card__eyebrow">{uk ? 'Головна подія' : 'Featured Story'}</span>
+                <time datetime={isoDate(featured.data.date)}>{fmtDate(featured.data.date, lang)}</time>
+              </div>
+              <h2 class="feat-news-card__title">{featured.data.title}</h2>
+              <p class="feat-news-card__summary">{featured.data.summary}</p>
+              <div class="feat-news-card__action">
+                <span>{uk ? 'Читати новину' : 'Read full story'}</span>
+                <svg width="20" height="20" aria-hidden="true"><use href="#i-arrow"/></svg>
+              </div>
+            </div>
+          </a>
+        </article>
+      )}
+
+      <!-- 3. Сітка / список новин -->
+      <div class="news-grid" id="news-grid" role="feed" aria-label={t.news}>
+        {restNews.map(n => {
+          const cat = getCategory(n.data.title, n.data.summary);
+          const y = n.data.date.getUTCFullYear();
+          const hasImg = !!photo(n);
+          return (
+            <article
+              class="news-card-wrap"
+              data-category={cat.key}
+              data-year={String(y)}
+              data-search={`${n.data.title} ${n.data.summary}`.toLowerCase()}
+            >
+              <a class="newsrow news-card" href={url(lang, `/posts/${slugOf(n.id)}/`)}>
+                <div class="news-card__media">
+                  {hasImg ? (
+                    <Image src={photo(n)!} alt="" width={380} height={230} fit="cover" loading="lazy" />
+                  ) : (
+                    <NewsArt slug={slugOf(n.id)} small />
+                  )}
+                  <span class={`news-badge news-badge--${cat.key}`}>{cat.label}</span>
+                </div>
+                <div class="news-card__content">
+                  <div class="news-card__meta">
+                    <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time>
+                    <span class="news-card__year-badge">{y}</span>
+                  </div>
+                  <h3 class="news-card__title">{n.data.title}</h3>
+                  <p class="news-card__summary">{n.data.summary}</p>
+                  <span class="news-card__link">
+                    <span>{uk ? 'Детальніше' : 'Read more'}</span>
+                    <svg width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+                  </span>
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+
+      <!-- Повідомлення при порожньому пошуку -->
+      <div id="news-empty" class="news-empty" hidden>
+        <p class="news-empty__title">{uk ? 'За вашим запитом нічого не знайдено' : 'No news found matching your criteria'}</p>
+        <p class="news-empty__desc">{uk ? 'Спробуйте змінити фільтри або пошуковий запит' : 'Try searching for something else or reset filters'}</p>
+        <button type="button" id="news-reset-btn" class="btn btn--news-reset">{uk ? 'Скинути всі фільтри' : 'Reset all filters'}</button>
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    (function () {
+      const searchInput = document.getElementById('news-search-input');
+      const searchClear = document.getElementById('news-search-clear');
+      const yearSelect = document.getElementById('news-year-select');
+      const categoryChips = document.querySelectorAll('.news-chip');
+      const grid = document.getElementById('news-grid');
+      const featuredBlock = document.getElementById('news-featured-block');
+      const countMsg = document.getElementById('news-count-msg');
+      const emptyState = document.getElementById('news-empty');
+      const resetBtn = document.getElementById('news-reset-btn');
+      const viewGridBtn = document.getElementById('news-view-grid');
+      const viewListBtn = document.getElementById('news-view-list');
+
+      if (!grid) return;
+
+      const items = Array.from(grid.querySelectorAll('.news-card-wrap'));
+      let currentCategory = 'all';
+      let currentYear = 'all';
+      let currentQuery = '';
+
+      function applyFilters() {
+        let visibleCount = 0;
+        const q = currentQuery.trim().toLowerCase();
+
+        // 1. Головна новина
+        if (featuredBlock) {
+          const fCat = featuredBlock.getAttribute('data-category');
+          const fYear = featuredBlock.getAttribute('data-year');
+          const fSearch = featuredBlock.getAttribute('data-search') || '';
+
+          const matchCat = currentCategory === 'all' || fCat === currentCategory;
+          const matchYear = currentYear === 'all' || fYear === currentYear;
+          const matchQuery = !q || fSearch.includes(q);
+
+          if (matchCat && matchYear && matchQuery) {
+            featuredBlock.hidden = false;
+            visibleCount++;
+          } else {
+            featuredBlock.hidden = true;
+          }
+        }
+
+        // 2. Звичайні картки
+        items.forEach(el => {
+          const cat = el.getAttribute('data-category');
+          const year = el.getAttribute('data-year');
+          const text = el.getAttribute('data-search') || '';
+
+          const matchCat = currentCategory === 'all' || cat === currentCategory;
+          const matchYear = currentYear === 'all' || year === currentYear;
+          const matchQuery = !q || text.includes(q);
+
+          if (matchCat && matchYear && matchQuery) {
+            el.hidden = false;
+            visibleCount++;
+          } else {
+            el.hidden = true;
+          }
+        });
+
+        // 3. Оновлення лічильника та стану
+        if (countMsg) {
+          const isUk = document.documentElement.lang !== 'en';
+          const word = isUk ? (visibleCount === 1 ? 'новина' : (visibleCount >= 2 && visibleCount <= 4 ? 'новини' : 'новин')) : (visibleCount === 1 ? 'item' : 'items');
+          countMsg.innerHTML = '<b>' + visibleCount + '</b> ' + word;
+        }
+
+        if (emptyState) {
+          emptyState.hidden = visibleCount > 0;
+        }
+      }
+
+      // Категорії
+      categoryChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          categoryChips.forEach(c => {
+            c.classList.remove('is-active');
+            c.setAttribute('aria-pressed', 'false');
+          });
+          chip.classList.add('is-active');
+          chip.setAttribute('aria-pressed', 'true');
+          currentCategory = chip.getAttribute('data-filter') || 'all';
+          applyFilters();
+        });
+      });
+
+      // Рік
+      if (yearSelect) {
+        yearSelect.addEventListener('change', () => {
+          currentYear = yearSelect.value;
+          applyFilters();
+        });
+      }
+
+      // Пошук
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          currentQuery = searchInput.value;
+          if (searchClear) searchClear.hidden = !currentQuery;
+          applyFilters();
+        });
+      }
+
+      if (searchClear) {
+        searchClear.addEventListener('click', () => {
+          if (searchInput) searchInput.value = '';
+          currentQuery = '';
+          searchClear.hidden = true;
+          applyFilters();
+          searchInput?.focus();
+        });
+      }
+
+      // Скидання
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          currentCategory = 'all';
+          currentYear = 'all';
+          currentQuery = '';
+          if (searchInput) searchInput.value = '';
+          if (searchClear) searchClear.hidden = true;
+          if (yearSelect) yearSelect.value = 'all';
+          categoryChips.forEach(c => {
+            const isAll = c.getAttribute('data-filter') === 'all';
+            c.classList.toggle('is-active', isAll);
+            c.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+          });
+          applyFilters();
+        });
+      }
+
+      // Перемикач виглядів (Сітка / Список)
+      function setView(view) {
+        const isList = view === 'list';
+        grid.classList.toggle('is-list-view', isList);
+        if (viewGridBtn) {
+          viewGridBtn.classList.toggle('is-active', !isList);
+          viewGridBtn.setAttribute('aria-pressed', !isList ? 'true' : 'false');
+        }
+        if (viewListBtn) {
+          viewListBtn.classList.toggle('is-active', isList);
+          viewListBtn.setAttribute('aria-pressed', isList ? 'true' : 'false');
+        }
+        try {
+          localStorage.setItem('ce-news-view', view);
+        } catch (_) {}
+      }
+
+      if (viewGridBtn) viewGridBtn.addEventListener('click', () => setView('grid'));
+      if (viewListBtn) viewListBtn.addEventListener('click', () => setView('list'));
+
+      try {
+        const savedView = localStorage.getItem('ce-news-view');
+        if (savedView === 'list') setView('list');
+      } catch (_) {}
+    })();
+  </script>
 </Base>

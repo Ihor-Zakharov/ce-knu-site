@@ -42,17 +42,17 @@ export const HISTORY: Record<Lang, { y: string; t: string; d: string }[]> = {
 // Де працюють випускники — лише те, що названо на сторінці «Наші випускники» (src/content/pages/*/graduates.md).
 // Новий випускник = ще один запис; без людини (лише company) — просто знак компанії. Понад три — стрічка з гортанням.
 // photo — ключ у PHOTOS компонента AlumniStrip; say — репліка КІ-Рекса при наведенні.
-export interface Alum { company: string; who?: string; role?: string; anchor?: string; photo?: string; say?: string }
+export interface Alum { company: string; who?: string; role?: string; anchor?: string; photo?: string; say?: string; tag?: string }
 export const ALUMNI: Record<Lang, Alum[]> = {
   uk: [
-    { company: 'Intel', who: 'Дмитро Калита', role: 'Директор офісу Intel в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita', say: 'Я старший за x86.' },
-    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'Інженер-дослідник з NLP, One AI, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov', say: 'Моя мова теж природна.' },
-    { company: 'Lyft', who: 'Максим Слинько', role: 'Керівник проєктів розробки ПЗ, Lyft', anchor: 'максим-слинько', photo: 'm_slynko', say: 'Lyft не викликаю, я ходжу.' },
+    { company: 'Intel', who: 'Дмитро Калита', role: 'Директор офісу Intel в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita', say: 'Я старший за x86.', tag: '⚡ Апаратні платформи' },
+    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'Інженер-дослідник з NLP, One AI, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov', say: 'Моя мова теж природна.', tag: '🧠 ШІ & Обробка мови' },
+    { company: 'Lyft', who: 'Максим Слинько', role: 'Керівник проєктів розробки ПЗ, Lyft', anchor: 'максим-слинько', photo: 'm_slynko', say: 'Lyft не викликаю, я ходжу.', tag: '☁️ Хмарні системи & High-load' },
   ],
   en: [
-    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of Intel’s Ukraine office, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita', say: 'I predate x86.' },
-    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, One AI, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov', say: 'Roar is natural language.' },
-    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager, Lyft', anchor: 'maksym-slynko', photo: 'm_slynko', say: 'No Lyft for me. I walk.' },
+    { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of Intel’s Ukraine office, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita', say: 'I predate x86.', tag: '⚡ Hardware Platforms' },
+    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, One AI, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov', say: 'Roar is natural language.', tag: '🧠 AI & Natural Language' },
+    { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager, Lyft', anchor: 'maksym-slynko', photo: 'm_slynko', say: 'No Lyft for me. I walk.', tag: '☁️ Cloud Infrastructure' },
   ],
 };
 

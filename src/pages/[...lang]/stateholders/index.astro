@@ -1,0 +1,101 @@
+---
+// «Роботодавцям»: на першому екрані — хто ми, чому нам вірити (докази), що вміють випускники й як написати;
+// далі — як працювати з кафедрою; повний текст звернення чинного сайту — під спойлером.
+import Base from '../../../layouts/Base.astro';
+import SkillCards from '../../../components/SkillCards.astro';
+import { render } from 'astro:content';
+import { T, NAV, url, langOf, langParams } from '../../../lib/i18n';
+import { page } from '../../../lib/content';
+import { COPY, MAIL, PROOF_KICKER } from '../../../lib/stateholders';
+import '../../../styles/stateholders.css';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const t = T[lang];
+const c = COPY[lang];
+const uk = lang === 'uk';
+const entry = (await page(lang, 'stateholders'))!;
+const { Content } = await render(entry);
+const mail = `mailto:${MAIL}?subject=${encodeURIComponent(uk ? 'Співпраця з кафедрою' : 'Working with the department')}`;
+const words = c.h1.split(' ');
+const label = NAV.find(n => n.path === '/stateholders/')![lang];   // як у меню: «Роботодавцям»
+const [ch, chLong] = c.eyebrow.split(' · ');
+---
+<Base lang={lang} title={label} description={c.meta_description} og="stateholders" crumbs={[]}>
+  <section class="ph sh-hero">
+    <div class="wrap sh-hero__grid">
+      <div class="ph__text">
+        <nav aria-label={uk ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
+          <ol class="crumbs">
+            <li><a href={url(lang, '/')}>{t.home}</a></li>
+            <li aria-current="page">{label}</li>
+          </ol>
+        </nav>
+        <p class="ph__eyebrow"><b>{ch}</b>{chLong && <span>· {chLong}</span>}</p>
+        <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>
+        <p class="lead">{c.lead}</p>
+        <div class="sh-cta">
+          <a class="btn" href={mail}><svg width="18" height="18" aria-hidden="true"><use href="#i-mail"/></svg> {c.cta_mail}</a>
+          <a class="btn btn--line sh-cta__skills" href="#skills">{c.cta_skills} <svg class="sh-down" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+      <ul class="sh-proof" role="list">
+        {c.proof.map((p, i) => (
+          <li class="sh-proof__i" style={`--i:${i}`}>
+            <span class="sh-proof__k">{PROOF_KICKER[lang][i]}</span>
+            <b class="sh-proof__v">{p.value}</b>
+            <span class="sh-proof__l">{p.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section hm sh-skills" id="skills" aria-labelledby="h-skills">
+    <div class="wrap">
+      <header class="sh-head">
+        <h2 class="sec-h2" id="h-skills">{c.skills_title}</h2>
+        <p class="sh-head__note">{c.skills_note}</p>
+      </header>
+      <SkillCards lang={lang} />
+    </div>
+  </section>
+
+  <section class="section hm" aria-labelledby="h-ways">
+    <div class="wrap">
+      <header class="sh-head">
+        <h2 class="sec-h2" id="h-ways">{c.ways_title}</h2>
+      </header>
+      <ol class="sh-ways" role="list">
+        {c.ways.map((w, i) => (
+          <li class="sh-ways__i rv" style={`--i:${i}`}>
+            <p class="sh-ways__n">{String(i + 1).padStart(2, '0')}</p>
+            <h3>{w.title}</h3>
+            <p class="sh-ways__t">{w.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight hm" aria-labelledby="h-letter">
+    <div class="wrap">
+      <details class="more">
+        <summary><span class="eyebrow">{label}</span><h2 id="h-letter">{c.spoiler_letter}</h2><span class="more__ico" aria-hidden="true"></span></summary>
+        <div class="page more__body">
+          <article class="prose"><Content /></article>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="section section--tight hm">
+    <div class="wrap">
+      <div class="sh-band rv">
+        <p class="sh-band__t">{c.band_title}</p>
+        <a class="sh-band__mail" href={mail}>{MAIL}</a>
+        <a class="btn" href={mail}><svg width="18" height="18" aria-hidden="true"><use href="#i-mail"/></svg> {c.band_cta}</a>
+      </div>
+    </div>
+  </section>
+</Base>

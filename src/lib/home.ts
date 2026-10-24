@@ -73,13 +73,43 @@ export const PROFILE_TAGS: Record<Lang, { hw: string[]; sw: string[] }> = {
   },
 };
 
-// Лабораторії: фото з тексту «Про кафедру» (ключ — у LAB_IMG головної) з тими самими підписами; назви й тексти — COPY.labs_items, той самий порядок
-export const LAB_PHOTOS = [
-  { img: '01', uk: 'Робочі місця та обладнання виробництва компанії HUAWEI', en: 'Workstations and equipment manufactured by HUAWEI' },
-  { img: '03', uk: 'Проведення лабораторних робіт доцентом О. В. Барабановим в лабораторії цифрового зв’язку', en: 'Laboratory classes conducted by Associate Professor O. V. Barabanov in the Digital Communications Laboratory' },
-  { img: 'ibm-1', uk: 'Сервер IBM Power 550, що використовується в навчальному процесі', en: 'IBM Power 550 server used in the educational process' },
-  { img: '05', uk: 'Експериментальний стенд та збільшене зображення плати ALTERA DE1', en: 'Experimental test bench and an enlarged image of the ALTERA DE1 board' },
-] as const;
+// Роботодавцям: що вміють випускники — навички, як їх пишуть у вакансіях, від мов опису апаратури до ML.
+export const SKILLS: Record<Lang, { g: string; items: string[] }[]> = {
+  uk: [
+    { g: 'Залізо', items: ['Verilog', 'SystemVerilog', 'VHDL', 'ПЛІС', 'Embedded C', 'Мікроконтролери'] },
+    { g: 'Код', items: ['C', 'C++', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
+    { g: 'ШІ та дані', items: ['Машинне навчання', 'PyTorch', 'TensorFlow', 'NLP', 'Комп’ютерний зір', 'Аналіз даних'] },
+    { g: 'Сигнали й мережі', items: ['ЦОС', 'Відеостримінг', 'Cisco · Huawei', 'Кібербезпека', 'AWS · Azure', 'IoT'] },
+  ],
+  en: [
+    { g: 'Hardware', items: ['Verilog', 'SystemVerilog', 'VHDL', 'FPGA', 'Embedded C', 'Microcontrollers'] },
+    { g: 'Code', items: ['C', 'C++', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
+    { g: 'AI and data', items: ['Machine learning', 'PyTorch', 'TensorFlow', 'NLP', 'Computer vision', 'Data analysis'] },
+    { g: 'Signals and networks', items: ['DSP', 'Video streaming', 'Cisco · Huawei', 'Cybersecurity', 'AWS · Azure', 'IoT'] },
+  ],
+};
+
+// Лабораторії — «стійка»: кожна лабораторія — блок обладнання (бренд на панелі, індикатори), вибраний висувається й показує фото й опис.
+// img — ключ у LAB_IMG головної (фото з тексту «Про кафедру» з тими самими підписами); без фото — ілюстрація КІ-Рекса.
+// ReLab: DOU, «Relab — вільна лабораторія робототехніки та мікроелектроніки в КНУ» (03.04.2018; статтю передруковано на rex.knu.ua);
+// фото studying/relab.jpg — кадр «Резиденти лабораторії» з тієї ж статті.
+export interface Lab { brand: string; name: string; text: string; spec: string[]; img: string; alt: string }
+export const LABS: Record<Lang, Lab[]> = {
+  uk: [
+    { brand: 'HUAWEI', name: 'Мережева лабораторія Huawei', text: 'Комутація й маршрутизація на обладнанні Huawei для мереж великих підприємств: лабораторні практикуми й дослідження.', spec: ['Huawei ICT Academy', 'Комутація', 'Маршрутизація'], img: '01', alt: 'Робочі місця та обладнання виробництва компанії HUAWEI' },
+    { brand: 'CISCO · MICROSOFT · FORTINET', name: 'Академії вендорів', text: 'На кафедрі працюють Cisco Networking Academy, академії Microsoft і Fortinet.', spec: ['Мережі', 'Кібербезпека', 'Програмні платформи'], img: '03', alt: 'Проведення лабораторних робіт доцентом О. В. Барабановим в лабораторії цифрового зв’язку' },
+    { brand: 'IBM POWER 550', name: 'Сервер IBM Power 550', text: 'Unix AIX у навчанні. Сервер передано кафедрі за меморандумом з IBM Ukraine 2017 року.', spec: ['IBM Power', 'Unix AIX', 'з 2017'], img: 'ibm-1', alt: 'Сервер IBM Power 550, що використовується в навчальному процесі' },
+    { brand: 'ALTERA DE1 · MIPS', name: 'ПЛІС і мікропроцесори', text: 'Плати Altera DE1 для цифрової логіки й архітектури комп’ютерів, обладнання MIPS Technologies у лабораторії цифрового зв’язку.', spec: ['ПЛІС', 'Цифрова логіка', 'Архітектура'], img: '05', alt: 'Експериментальний стенд та збільшене зображення плати ALTERA DE1' },
+    { brand: 'RELAB', name: 'ReLab', text: 'Вільна лабораторія робототехніки й мікроелектроніки факультету з 2017 року: паяльні станції, осцилограф, 3D-принтер, мікроконтролери й датчики. Старші студенти навчають молодших.', spec: ['Робототехніка', 'IoT', '3D-друк'], img: 'relab', alt: 'Резидент ReLab паяє плату' },
+  ],
+  en: [
+    { brand: 'HUAWEI', name: 'Huawei networking lab', text: 'Switching and routing on Huawei enterprise equipment, used for lab classes and research.', spec: ['Huawei ICT Academy', 'Switching', 'Routing'], img: '01', alt: 'Workstations and equipment manufactured by HUAWEI' },
+    { brand: 'CISCO · MICROSOFT · FORTINET', name: 'Vendor academies', text: 'Cisco Networking Academy, Microsoft and Fortinet academies run at the department.', spec: ['Networks', 'Cybersecurity', 'Software platforms'], img: '03', alt: 'Laboratory classes conducted by Associate Professor O. V. Barabanov in the Digital Communications Laboratory' },
+    { brand: 'IBM POWER 550', name: 'IBM Power 550 server', text: 'Unix AIX in teaching. The server came to the department under a 2017 memorandum with IBM Ukraine.', spec: ['IBM Power', 'Unix AIX', 'since 2017'], img: 'ibm-1', alt: 'IBM Power 550 server used in the educational process' },
+    { brand: 'ALTERA DE1 · MIPS', name: 'FPGAs and microprocessors', text: 'Altera DE1 boards for digital logic and computer architecture, MIPS Technologies equipment in the digital communications lab.', spec: ['FPGA', 'Digital logic', 'Architecture'], img: '05', alt: 'Experimental test bench and an enlarged image of the ALTERA DE1 board' },
+    { brand: 'RELAB', name: 'ReLab', text: 'The faculty’s open robotics and microelectronics lab since 2017: soldering stations, an oscilloscope, a 3D printer, microcontrollers and sensors. Senior students teach the juniors.', spec: ['Robotics', 'IoT', '3D printing'], img: 'relab', alt: 'A ReLab resident soldering a board' },
+  ],
+};
 
 /** Тексти головної. Писала панель із трьох моделей наосліп, фінал — за більшістю (див. опис PR). */
 export const COPY = {
@@ -97,18 +127,14 @@ export const COPY = {
     profile_sw_title: 'Програмні платформи',
     profile_sw_text: 'Системне програмування, операційні системи, мережі й хмари.',
     labs_title: 'Лабораторії й партнери',
-    labs_items: [
-      { name: 'Клас Huawei', text: 'Комутація й маршрутизація на обладнанні для великих підприємств.' },
-      { name: 'Сервер IBM Power 550', text: 'Unix AIX у навчанні, з 2017 року за меморандумом з IBM Ukraine.' },
-      { name: 'Плати Altera DE1', text: 'Цифрова логіка й архітектура комп’ютерів на ПЛІС.' },
-      { name: 'Мікропроцесорна лабораторія', text: 'Обладнання MIPS Technologies, з якою кафедра має наукові контакти.' },
-    ],
     programs_title: 'Програми',
-    programs_note: 'Спеціальність F7 «Комп’ютерна інженерія».',
-    employers_title: 'Роботодавцям',
-    employers_text: 'Випускники пишуть код і проєктують залізо, будують мережі й пояснюють технічні рішення людям.',
-    employers_skills: ['C++ · Python · C#', '.NET · Django', 'Cisco · Huawei · Fortinet', 'AWS · Azure · GCP', 'TensorFlow · PyTorch', 'ПЛІС · VHDL · SystemVerilog', 'Кібербезпека', 'Agile · Scrum'],
+    programs_note: 'Спеціальність F7 «Комп’ютерна інженерія»',
+    employers_title: 'Інженер, який бачить систему цілком',
+    employers_text: 'Від Verilog до PyTorch: ваші вимоги з однієї вакансії вивчають в одній програмі.',
     employers_cta: 'Написати кафедрі',
+    employers_pick: 'Що вміють випускники',
+    employers_ok: 'Усьому цьому вчать на кафедрі',
+    employers_mail: 'Співпраця з кафедрою',
     history_title: 'Історія',
     history_lead: 'З 1991 року: від автоматизації фізичного експерименту до кафедри комп’ютерної інженерії.',
     about_toggle: 'Повний опис кафедри',
@@ -130,18 +156,14 @@ export const COPY = {
     profile_sw_title: 'Software platforms',
     profile_sw_text: 'Systems programming, operating systems, networks and cloud.',
     labs_title: 'Labs and partners',
-    labs_items: [
-      { name: 'Huawei classroom', text: 'Enterprise switching and routing equipment for labs and research.' },
-      { name: 'IBM Power 550 server', text: 'Unix AIX in teaching, under a 2017 memorandum with IBM Ukraine.' },
-      { name: 'Altera DE1 boards', text: 'Digital logic and computer architecture on FPGAs.' },
-      { name: 'Microprocessor lab', text: 'Equipment from MIPS Technologies, a research contact of the department.' },
-    ],
     programs_title: 'Programmes',
-    programs_note: 'Speciality F7 Computer Engineering.',
-    employers_title: 'For employers',
-    employers_text: 'Our graduates write code and design hardware, build networks and explain technical decisions to people.',
-    employers_skills: ['C++ · Python · C#', '.NET · Django', 'Cisco · Huawei · Fortinet', 'AWS · Azure · GCP', 'TensorFlow · PyTorch', 'FPGA · VHDL · SystemVerilog', 'Cybersecurity', 'Agile · Scrum'],
-    employers_cta: 'Write to us',
+    programs_note: 'Speciality F7 Computer Engineering',
+    employers_title: 'Engineers who see the whole system',
+    employers_text: 'Verilog or PyTorch, networks or embedded C: the skills in your job post are taught in one programme.',
+    employers_cta: 'Write to the department',
+    employers_pick: 'What our graduates know',
+    employers_ok: 'The department teaches all of it',
+    employers_mail: 'Working with the department',
     history_title: 'History',
     history_lead: 'Since 1991: from automating physics experiments to a Department of Computer Engineering.',
     about_toggle: 'Full description',

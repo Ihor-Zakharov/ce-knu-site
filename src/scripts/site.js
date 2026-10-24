@@ -16,7 +16,7 @@ const store = {
 const springAnim = 'linear(0, .006, .025 2.8%, .101 6.1%, .539 18.9%, .721 25.3%, .849 31.5%, .937 38.1%, .968 41.8%, .991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.9%, 1)';
 const anim = (el, kf, ms = 560, easing = springAnim) => (REDUCED ? null : el.animate(kf, { duration: ms, easing, fill: 'both' }));
 const typing = () => /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
-root.classList.add('js');
+root.classList.add('js'); root.setAttribute('data-ready', '');
 
 /* ── Тема: коло від кнопки з одним золотим кільцем по краю ───── */
 const sysDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
@@ -149,8 +149,9 @@ attachPress(document, '.btn, .key, .chip, .menu-btn, .lang-link, .az-bar a', 0.9
 attachGlow(document, '.btn');
 
 /* ── Поява при прокручуванні ────────────────────────────────── */
-const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target); }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
-$$('.rv, .footer').forEach(n => io.observe(n));
+// клас «in» — лише після кадру, намальованого у вихідному стані: блоки, видимі вже при відкритті, теж з'являються з рухом
+const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const t = e.target; io.unobserve(t); requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('in'))); }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+$$('.rv, .footer, [data-draw]').forEach(n => io.observe(n));
 
 /* ── Підвал: діаграма Сміта прокреслюється при появі ────────── */
 const NS = 'http://www.w3.org/2000/svg';

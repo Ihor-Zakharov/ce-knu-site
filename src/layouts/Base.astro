@@ -82,6 +82,10 @@ if (path === '/') ld.push(...orgLd(lang, Astro.site!));
       if (v === 'dark' || v === 'light') document.documentElement.dataset.theme = v;
       var dark = v ? v === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
       document.querySelector('meta[name="theme-color"]').content = dark ? '#141211' : '#F6F2EA';
+      // «js» — до першого кадру: блоки з появою (.rv) малюються вже у вихідному стані й з'являються з рухом;
+      // якщо скрипт сайту так і не запустився — повертаємо все видимим
+      var r = document.documentElement; r.classList.add('js');
+      setTimeout(function () { if (!r.hasAttribute('data-ready')) r.classList.remove('js'); }, 4000);
     })();
   </script>
 </head>

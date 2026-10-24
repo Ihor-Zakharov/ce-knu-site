@@ -418,7 +418,11 @@ a:hover .news-art { animation: none; }
    Ряд — стрічка: три записи стоять сіткою на всю ширину, більше — гортаються (стрілки ‹ › у шапці, на телефоні — свайп) */
 .alum { padding-block: clamp(84px, 7.5vw, 112px) clamp(36px, 4vw, 64px); }
 .alum__frame { position: relative; }
-.alum__head { display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line-strong); }
+.alum__head { position: relative; display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding-top: 14px; }
+/* поява: лінія прокреслюється зліва, знаки компаній піднімаються з розмиття один за одним, КІ-Рекс стрибає на лінію */
+.alum__head::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line-strong); transform-origin: left; scale: 0 1; transition: scale 1.3s var(--ease-lux) .15s; }
+.alum__frame.in .alum__head::before, html:not(.js) .alum__head::before { scale: 1 1; }
+.alum__row .rv { transition-delay: calc(350ms + var(--i) * 130ms); }
 .alum__head .eyebrow { margin-right: auto; }
 .alum__head .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--gold); }
 .alum__nav { display: flex; gap: 8px; }
@@ -449,6 +453,7 @@ a:hover .news-art { animation: none; }
   .alum__who { grid-template-columns: 36px minmax(0, 1fr); font-size: 13.5px; }
   .alum__ph { width: 36px; height: 36px; }
 }
+@media (min-width: 561px) and (max-width: 860px) { .alum__row { grid-auto-columns: 46%; } }
 
 /* перегляд фото: стрілки й хрестик на сталих місцях, підпис — окремим рядком під фото */
 .lightbox__in { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; place-items: center; gap: 16px; padding: 64px clamp(72px, 8vw, 120px) 28px; }
@@ -564,46 +569,47 @@ a:hover .news-art { animation: none; }
 .tags li { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); font: 500 13px/1.25 var(--font-sans); color: var(--ink-2); }
 .tags--lg li { min-height: 40px; padding: 6px 16px; font-size: 14.5px; }
 
-/* два профілі над спільною шкалою «транзистор → ШІ»: ліва половина шкали — апаратні платформи, права — програмні */
-.prof { --gap: clamp(24px, 3vw, 48px); display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: var(--gap); }
-.prof__stack { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-strong); }
-.prof__stack li { position: relative; padding-top: 16px; font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
-.prof__stack li::before { content: ""; position: absolute; left: 0; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--action); }
-.prof__stack li.sw::before { background: var(--gold); }
-.prof__card { grid-column: span 4; padding-top: 32px; }
-.prof__card::before { content: ""; display: block; height: 2px; margin-bottom: 28px; background: var(--action); transform-origin: left; scale: 0 1; transition: scale 1.4s var(--ease-lux) .25s; }
-.prof__card--sw::before { background: var(--gold); transition-delay: .45s; }
-.prof.in .prof__card::before, html:not(.js) .prof__card::before { scale: 1 1; }
-.prof__card h3 { font-size: clamp(1.625rem, 1.2rem + 1.3vw, 2.375rem); font-weight: 300; letter-spacing: -.025em; line-height: 1.1; }
-.prof__card > p:not(.prof__n) { margin-top: 12px; max-width: 44ch; color: var(--ink-2); font-size: var(--fs-lead); line-height: 1.5; }
+/* два профілі: шкала «транзистор → ШІ» розрізана навпіл — ліва половина лежить на смузі апаратних платформ, права — програмних.
+   Картки стоять на спільних рядках (subgrid): шкала, номер, заголовок, текст і теги обох профілів — на одній висоті */
+.prof { --gap: clamp(24px, 3vw, 48px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(5, auto); column-gap: var(--gap); }
+.prof__card { grid-row: span 5; display: grid; grid-template-rows: subgrid; align-content: start; }
+.prof__card > * { min-width: 0; }
+.prof__mini { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0 0 28px; padding: 0; font: 500 var(--fs-mono)/1.3 var(--font-mono); letter-spacing: var(--track-mono); text-transform: uppercase; color: var(--ink-3); --c: var(--action); }
+.prof__card--sw .prof__mini { --c: var(--gold); }
+.prof__mini::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--c); transform-origin: left; scale: 0 1; transition: scale 1.4s var(--ease-lux) .2s; }
+.prof__card--sw .prof__mini::before { transition-delay: .4s; }
+.prof.in .prof__mini::before, html:not(.js) .prof__mini::before { scale: 1 1; }
+.prof__mini li { position: relative; padding: 16px 8px 0 0; overflow-wrap: anywhere; }
+.prof__mini li::before { content: ""; position: absolute; left: 0; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--bg); }
 .prof__n { font: 500 var(--fs-mono)/1 var(--font-mono); letter-spacing: var(--track-mono); color: var(--gold-ink); margin-bottom: 12px; }
-.prof__mini { display: none; }
+.prof__card h3 { font-size: clamp(1.625rem, 1.2rem + 1.3vw, 2.375rem); font-weight: 300; letter-spacing: -.025em; line-height: 1.1; }
+.prof__card > p:not(.prof__n) { margin-top: 12px; max-width: 60ch; color: var(--ink-2); font-size: var(--fs-lead); line-height: 1.5; }
+.prof__card .tags { align-self: start; }
 @media (max-width: 760px) {
-  .prof { grid-template-columns: minmax(0, 1fr); row-gap: 36px; }
-  .prof__stack { display: none; }
-  .prof__card { grid-column: 1; padding-top: 0; }
-  .prof__card::before { display: none; }
-  .prof__mini { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0 0 22px; padding: 0; border-top: 2px solid var(--action); font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
-  .prof__card--sw .prof__mini { border-top-color: var(--gold); }
-  .prof__mini li { position: relative; padding-top: 14px; overflow-wrap: anywhere; }
-  .prof__mini li::before { content: ""; position: absolute; left: 0; top: -5px; width: 8px; height: 8px; border-radius: 50%; background: var(--action); }
-  .prof__card--sw .prof__mini li::before { background: var(--gold); }
+  .prof { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 40px; }
+  .prof__card { grid-row: auto; display: block; }
+  .prof__mini { margin-bottom: 22px; font-size: 10.5px; letter-spacing: .04em; }
 }
+@media (max-width: 400px) { .prof__mini { font-size: 9.5px; letter-spacing: .02em; } .prof__mini li { padding-right: 4px; overflow-wrap: normal; white-space: nowrap; } }
 
-/* лабораторії: чотири кадри; на телефоні — стрічка зі свайпом */
-.labs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2vw, 28px); }
+/* лабораторії: п'ять кадрів в один ряд; вужче — стрічка зі свайпом (рівні картки на будь-якій ширині) */
+.labs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(16px, 1.6vw, 28px); }
+.lab { min-width: 0; }
 .lab__ph { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-lg); overflow: hidden; background: var(--surface-2); }
 .lab__ph img { width: 100%; height: 100%; object-fit: cover; filter: var(--grade); transition: scale 1.2s var(--ease-out), filter 700ms var(--ease-out); }
 .lab:hover .lab__ph img { scale: 1.04; filter: none; }
-.lab h3 { margin-top: 16px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
-.lab p { margin-top: 6px; color: var(--ink-3); font-size: 14.5px; line-height: 1.5; }
-.labs__partners { margin-top: clamp(32px, 4vw, 56px); padding-top: 20px; border-top: 1px solid var(--line); }
-@media (max-width: 1100px) { .labs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; } }
-@media (max-width: 700px) {
-  .labs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 80%; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
+.lab__brand { margin-top: 16px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .1em; color: var(--gold-ink); }
+.lab h3 { margin-top: 6px; font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.3; }
+.lab__t { margin-top: 6px; color: var(--ink-3); font-size: 14.5px; line-height: 1.5; }
+/* партнери — одним рядком під заголовком лабораторій */
+.partners { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 0; font: 500 11.5px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.partners li + li::before { content: ""; display: inline-block; width: 3px; height: 3px; margin: 0 12px; border-radius: 50%; background: var(--gold); vertical-align: middle; }
+@media (max-width: 1199px) {
+  .labs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * 20px) / 2.4); gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); }
   .labs::-webkit-scrollbar { display: none; }
   .lab { scroll-snap-align: start; }
 }
+@media (max-width: 700px) { .labs { grid-auto-columns: 80%; gap: 14px; } }
 
 /* програми: роки — великим числом, місця — дрібно */
 .progs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 3vw, 48px); }
@@ -622,11 +628,28 @@ a:hover .news-art { animation: none; }
   .progs__lvl { grid-area: lvl; } .progs__t { grid-area: t; font-size: 16.5px; } .progs__pl { grid-area: pl; }
 }
 
-/* роботодавцям: панель-прилад */
-.emp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 96px); align-items: center; padding: clamp(24px, 4vw, 56px); border-radius: 16px; background: var(--bezel); border: 1px solid var(--line); box-shadow: var(--bezel-shadow); }
-.emp__cta { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
-.emp .tags { margin: 0; }
-@media (max-width: 900px) { .emp { grid-template-columns: minmax(0, 1fr); } }
+/* роботодавцям: чотири картки-прилади — лінійний знак групи, назва, кількість і навички чипами */
+.skp__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); }
+.skc { display: grid; align-content: start; gap: 18px; padding: clamp(18px, 1.8vw, 26px); border-radius: 14px; background: var(--bezel); border: 1px solid var(--line); box-shadow: var(--bezel-shadow); transition: border-color var(--hover) var(--ease-out), translate 600ms var(--spring); }
+.skc:hover { border-color: var(--line-strong); translate: 0 -3px; }
+.skc__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.skc__ico { width: 40px; height: 40px; padding: 6px; border-radius: 10px; background: var(--screen); box-shadow: inset 0 0 0 1px var(--line); fill: none; stroke: var(--gold); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.skc__t { font-size: 18px; font-weight: 500; letter-spacing: -.01em; line-height: 1.25; }
+.skc__n { font: 500 11px/1 var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
+.skc__tags { margin: 0; }
+.skc__tags li { min-height: 32px; font-size: 13.5px; }
+.skp__bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-top: clamp(14px, 1.6vw, 22px); padding: 14px clamp(18px, 1.8vw, 26px); border-radius: 14px; border: 1px solid var(--line); }
+.skp__ok { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--ink-2); }
+.skp__ok svg { flex: none; color: var(--ok); }
+@media (max-width: 1100px) { .skp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .skp__grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .skc { gap: 14px; padding: 16px; }
+  .skc__head { padding-bottom: 12px; }
+  .skc__tags li { min-height: 30px; padding: 3px 11px; font-size: 13px; }
+  .skp__bar { padding: 14px 16px; }
+  .skp__bar .btn { width: 100%; }
+}
 
 /* повний опис кафедри — згорнутий */
 .more { border-bottom: 1px solid var(--line); }
@@ -655,3 +678,14 @@ a:hover .news-art { animation: none; }
 }
 /* стрічки, що гортаються, доступні з клавіатури (стрілками) — видимий фокус */
 .labs:focus-visible, .tl:focus-visible { outline: 2px solid var(--focus); outline-offset: 6px; border-radius: var(--r-md); }
+
+/* ── Головна щільніше: менше прокручування, уся суть — швидко ─────────── */
+.hm.section { padding-block: clamp(32px, 3.6vw, 56px); }
+.hm.section--tight { padding-block: clamp(20px, 2.2vw, 32px); }
+.hm-head { margin-bottom: clamp(20px, 2.4vw, 32px); }
+.hm-head .sec-h2 { font-size: clamp(1.75rem, 1.25rem + 1.6vw, 2.75rem); }
+.hm-head .lead { margin-top: 14px; }
+.alum { padding-bottom: clamp(24px, 2.6vw, 40px); }
+.prof__mini { margin-bottom: 20px; }
+.prof__card .tags { margin-top: 16px; }
+@media (max-width: 760px) { .prof { row-gap: 28px; } }

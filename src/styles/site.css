@@ -116,8 +116,10 @@ html.menu-open { overflow: hidden; }
 .inst__hud--top { top: 10px; } .inst__hud--bot { bottom: 10px; }
 .inst__hud b { color: var(--gold-ink); font-weight: 500; font-variant-numeric: tabular-nums; }
 .inst__hud { text-transform: none; }
-.inst__bar { display: flex; align-items: center; gap: 10px; padding: 9px 4px 1px; font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.inst__bar { display: flex; align-items: center; gap: 6px; padding: 9px 4px 1px; font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .02em; text-transform: uppercase; color: var(--ink-3); }
 .inst__bar .sp { flex: 1; }
+/* підпис під приладом — завжди один рядок: у вузькій колонці компактного героя (284 px) він переносився на два */
+.inst__bar span { white-space: nowrap; } .inst__bar > span:first-of-type { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .inst__led { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 6px color-mix(in oklab, var(--ok) 70%, transparent); animation: blink 2.4s steps(1) infinite; }
 @keyframes blink { 50% { opacity: .35; } }
 .inst .key { height: 32px; padding: 0 10px; font-size: 10.5px; }
@@ -130,6 +132,13 @@ html.menu-open { overflow: hidden; }
 .perch__say { position: absolute; bottom: 66px; left: 0; width: max-content; max-width: min(260px, 100%); padding: 7px 11px; border-radius: 8px; background: var(--ink); color: var(--bg); font: 500 11px/1.35 var(--font-mono); letter-spacing: .03em; opacity: 0; translate: 0 6px; scale: .94; transform-origin: 20% 100%; transition: opacity 220ms var(--ease-out), translate 520ms var(--spring), scale 520ms var(--spring); pointer-events: none; }
 .perch__say::after { content: ""; position: absolute; left: var(--tail, 22px); top: 100%; border: 5px solid transparent; border-top-color: var(--ink); }
 .perch__say.on { opacity: 1; translate: 0 0; scale: 1; }
+/* над головою тісно (липка шапка) — репліка збоку від Рекса, на рівні голови, хвостик до нього */
+.perch__say.is-r { bottom: 24px; translate: -6px 0; transform-origin: 0 50%; }
+.perch__say.is-l { bottom: 24px; translate: 6px 0; transform-origin: 100% 50%; }
+.perch__say.is-r.on, .perch__say.is-l.on { translate: 0 0; }
+.perch__say.is-r::after, .perch__say.is-l::after { top: 50%; margin-top: -5px; border-top-color: transparent; }
+.perch__say.is-r::after { left: auto; right: 100%; border-right-color: var(--ink); }
+.perch__say.is-l::after { left: 100%; border-left-color: var(--ink); }
 
 
 /* головна: великий осцилограф і промінь, по якому біжить КІ-Рекс */

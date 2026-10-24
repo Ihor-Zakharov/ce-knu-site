@@ -28,14 +28,20 @@ function mount(cv, make) {
   const theme = () => { st.col = { ph: css('--phosphor'), gold: css('--gold'), line: css('--line-strong'), grat: css('--grat'), ink3: css('--ink-3'), ink2: css('--ink-2'), bg: css('--bg'), surface: css('--surface'), surface2: css('--surface-2'), wine: '#5E1424', dark: isDark() }; };
   theme();
   const inst = make(c, st, cv);
-  let raf = 0, last = 0, seen = false;
-  const draw = () => { if (st.W) { c.clearRect(0, 0, st.W, st.H); inst.draw(st.t); } };
-  const size = () => { const r = cv.getBoundingClientRect(); st.D = Math.min(2, devicePixelRatio || 1); st.W = r.width; st.H = r.height; cv.width = Math.round(st.W * st.D); cv.height = Math.round(st.H * st.D); c.setTransform(st.D, 0, 0, st.D, 0, 0); inst.resize?.(); draw(); };
-  const frame = now => { const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now; st.t += dt; inst.step?.(dt); draw(); raf = requestAnimationFrame(frame); };
+  let raf = 0, last = 0, seen = false, failed = false;
+  // збій кадру не зупиняє прилад: стан полотна скидається, помилка — у консоль один раз
+  const guard = f => { try { f(); } catch (e) { c.reset?.(); c.setTransform(st.D, 0, 0, st.D, 0, 0); if (!failed) { failed = true; console.error(e); } } };
+  const draw = () => { if (st.W && st.H) guard(() => { c.clearRect(0, 0, st.W, st.H); inst.draw(st.t); }); };
+  const size = () => { st.D = Math.min(2, devicePixelRatio || 1); st.W = cv.clientWidth; st.H = cv.clientHeight; cv.width = Math.round(st.W * st.D); cv.height = Math.round(st.H * st.D); c.setTransform(st.D, 0, 0, st.D, 0, 0); guard(() => inst.resize?.()); draw(); };   // розмір макета, без transform появи
+  // наступний кадр запитуємо першим: що б не сталося в цьому, цикл не обривається
+  const frame = now => { raf = requestAnimationFrame(frame); const dt = Math.min(.05, Math.max(0, (now - last) / 1000) || 0); last = now; st.t += dt; guard(() => inst.step?.(dt)); draw(); };
   const upd = () => { const want = seen && !document.hidden && !REDUCED; if (want && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); } if (!want && raf) { cancelAnimationFrame(raf); raf = 0; } };
-  new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }, { rootMargin: '60px' }).observe(cv);
+  // у пакеті подій видимості чинна — остання (швидке гортання дає «вийшов, увійшов» одним пакетом)
+  new IntersectionObserver(es => { seen = es[es.length - 1].isIntersecting; upd(); }, { rootMargin: '60px' }).observe(cv);
   document.addEventListener('visibilitychange', upd);
+  addEventListener('pageshow', upd);                     // повернення кнопкою «Назад» зі збереженої сторінки
   document.addEventListener('themechange', () => { theme(); draw(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { theme(); draw(); });   // тема системи без вибору на сайті
   new ResizeObserver(size).observe(cv);
   if (REDUCED) st.t = inst.still ?? 2.2;
   inst.redraw = draw;
@@ -289,10 +295,11 @@ function chladni(c, st, cv) {
     out[2] = -m * P * cnx * smy + n * P * cmx * sny;
   };
   const A = [0, 0, 0], B = [0, 0, 0];
+  const plate = () => Math.max(40, Math.min(st.W * .8, st.H - 52));   // пластина — між верхнім і нижнім підписами, не під ними
   return {
     still: 1.2,
     resize() {
-      const s = Math.min(st.W, st.H) * .8; GW = GH = Math.max(96, Math.round(s / 1.15));
+      const s = plate(); GW = GH = Math.max(96, Math.round(s / 1.15));
       o.width = GW; o.height = GH; img = oc.createImageData(GW, GH);
       grain = new Float32Array(GW * GH); for (let q = 0; q < grain.length; q++) grain[q] = Math.random();   // «піщинки» — сталий шум
     },
@@ -313,7 +320,7 @@ function chladni(c, st, cv) {
         d[q * 4] = ph[0]; d[q * 4 + 1] = ph[1]; d[q * 4 + 2] = ph[2]; d[q * 4 + 3] = Math.round(255 * a);
       }
       oc.putImageData(img, 0, 0);
-      const s = Math.min(W, H) * .8, x0 = (W - s) / 2, y0 = (H - s) / 2 + 2;
+      const s = plate(), x0 = (W - s) / 2, y0 = (H - s) / 2 + 2;
       c.strokeStyle = col.gold; c.globalAlpha = .5; c.lineWidth = 1; c.strokeRect(x0 - .5, y0 - .5, s + 1, s + 1); c.globalAlpha = 1;
       if (col.dark) { c.shadowColor = col.ph; c.shadowBlur = 5; }
       c.imageSmoothingEnabled = true; c.drawImage(o, x0, y0, s, s); c.shadowBlur = 0;

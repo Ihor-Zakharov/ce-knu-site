@@ -181,3 +181,37 @@ test.describe('вітрина головної', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test.describe('прилади й КІ-Рекс', () => {
+  // підпис кадру полотна: змінюється, поки прилад живий
+  const frameSig = (page: Page, sel: string) => page.locator(sel).first().evaluate((c: HTMLCanvasElement) => {
+    const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data; let h = 0;
+    for (let i = 0; i < d.length; i += 53) h = (h * 31 + d[i]) | 0;
+    return h;
+  });
+  test('прилад рухається далі після швидкого гортання туди-сюди й збою кадру', async ({ page, isMobile }) => {
+    await page.goto('/research/');
+    const sel = isMobile ? '[data-inst-dock] canvas[data-draw]' : '.ph__grid canvas[data-draw]';
+    for (let i = 0; i < 12; i++) await page.evaluate(i => scrollTo(0, i % 2 ? 0 : document.body.scrollHeight), i);
+    await page.locator(sel).first().scrollIntoViewIfNeeded();
+    // одноразовий виняток у малюванні саме цього приладу не має зупиняти цикл
+    await page.locator(sel).first().evaluate((cv: HTMLCanvasElement) => { const P = CanvasRenderingContext2D.prototype, o = P.beginPath; let n = 0; P.beginPath = function () { if (this.canvas === cv && n++ === 0) throw new Error('test'); return o.call(this); }; });
+    const a = await frameSig(page, sel);
+    await expect.poll(() => frameSig(page, sel), { timeout: 5000 }).not.toBe(a);
+  });
+  test('репліка Рекса не заходить під шапку', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'на телефоні прилад — у доку внизу сторінки');
+    for (const p of ['/documents/', '/research/', '/graduates/']) {
+      await page.goto(p);
+      const rex = page.locator('.ph__grid .perch canvas');
+      const say = page.locator('.ph__grid .perch__say.on');
+      for (let k = 0; k < 2; k++) {
+        await rex.click({ force: true });
+        await expect(say).toBeVisible();
+        // після приземлення верх репліки — нижче шапки (у стрибку вона летить над шапкою, тому чекаємо умову, а не час)
+        await expect.poll(() => say.evaluate((s: HTMLElement) => (s.style.zIndex ? -999 : s.getBoundingClientRect().top - document.querySelector('.hd')!.getBoundingClientRect().bottom)), { timeout: 3000 }).toBeGreaterThanOrEqual(4);
+        await expect(say).toBeHidden({ timeout: 6000 });
+      }
+    }
+  });
+});

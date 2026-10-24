@@ -1,0 +1,366 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import PageHero from '../../../components/PageHero.astro';
+import Mascot from '../../../components/Mascot.astro';
+import { T, url, langOf, langParams } from '../../../lib/i18n';
+import { HEROES } from '../../../lib/heroes';
+import '../../../styles/research.css';
+
+import imgAward from '../../../assets/images/research/7m8a7065.jpg';
+import img04 from '../../../assets/images/research/04.jpg';
+import img05 from '../../../assets/images/research/05.jpg';
+import img06 from '../../../assets/images/research/06.jpg';
+import img07 from '../../../assets/images/research/07.jpg';
+import img08 from '../../../assets/images/research/08.jpg';
+import imgConf from '../../../assets/images/research/xiii-science-conf.png';
+import img09 from '../../../assets/images/research/09.jpg';
+import img10 from '../../../assets/images/research/10.jpg';
+import img11 from '../../../assets/images/research/11.jpg';
+import imgKosice from '../../../assets/images/research/kosice.jpg';
+import imgLund from '../../../assets/images/research/lund.jpg';
+import dinoResearch from '../../../assets/images/dino/dino-research.png';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const uk = lang === 'uk';
+const t = T[lang];
+
+const docText = uk
+  ? 'Дослідження · Напрями наукової роботи · Державні премії · Проекти · Конференції'
+  : 'Research · Scientific Directions · State Awards · Projects · Conferences';
+
+// Напрями
+const TRACKS = [
+  {
+    code: '01 · HPC',
+    title: uk ? 'Високопродуктивні та розподілені системи' : 'High-Performance & Distributed Computing',
+    desc: uk
+      ? 'Використання сучасних ІТ-технологій для створення високопродуктивних обчислювальних і розподілених систем, грід-середовищ та хмарних платформ.'
+      : 'The use of modern IT technologies to create high-performance computing and distributed systems, grid environments and cloud platforms.',
+  },
+  {
+    code: '02 · COMM',
+    title: uk ? 'Цифровий зв’язок і мережеві протоколи' : 'Digital Communications & Protocols',
+    desc: uk
+      ? 'Новітні методи створення та дослідження систем цифрового зв’язку, оптимізації передачі сигналів та спеціалізованих телекомунікаційних мереж.'
+      : 'Novel methods for creating and studying digital communication systems, signal transmission optimization and specialized telecommunication networks.',
+  },
+  {
+    code: '03 · SPEC',
+    title: uk ? 'Суперкомп’ютери та алгебра процесів' : 'Supercomputing & Process Algebra',
+    desc: uk
+      ? 'Застосування новітніх методів і підходів для створення та аналізу суперкомп’ютерних систем, математичний апарат модифікованих систем алгоритмічних алгебр, алгебра процесів реального часу, генетичні алгоритми, шаблони потоків робіт і кольорові мережі Петрі.'
+      : 'Application of novel methods and approaches to the creation and analysis of supercomputer systems, mathematical apparatus of modified systems of algorithmic algebras, real-time process algebra, genetic algorithms, workflow patterns, and coloured Petri nets.',
+  },
+  {
+    code: '04 · AI',
+    title: uk ? 'Штучний інтелект і машинне навчання' : 'Artificial Intelligence & Machine Learning',
+    desc: uk
+      ? 'Нейронні мережі, великі мовні моделі (LLM), комп’ютерна лінгвістика й обробка природної мови (NLP), комп’ютерний зір і цифрова обробка зображень.'
+      : 'Neural networks, large language models (LLM), computational linguistics and natural language processing (NLP), computer vision and digital image processing.',
+  },
+];
+
+// Проекти
+const PROJECTS = [
+  uk
+    ? 'Створено та введено в експлуатацію перший в Україні обчислювальний кластер (суперкомп’ютер) для вирішення задач у галузях фундаментальних та прикладних наук, що потребують великих витрат машинного часу та оперують великими об’ємами інформації.'
+    : 'The first computing cluster (supercomputer) in Ukraine was created and put into operation to solve problems in fundamental and applied sciences requiring large amounts of machine time and processing big data.',
+  uk
+    ? 'Створено та наповнено перший сегмент Українських академічних грід-ресурсів, що об’єднав 5 обчислювальних кластерів Київського національного університету імені Тараса Шевченка та інститутів НАН України.'
+    : 'The first segment of Ukrainian Academic Grid resources was created and populated, uniting 5 computing clusters of Taras Shevchenko National University of Kyiv and NAS of Ukraine institutes.',
+  uk
+    ? 'За допомогою математичного апарату систем алгоритмічних алгебр створено схематологію паралельних найбільш поширених алгоритмів маршрутизації (в протоколах RIP, OSPF тощо) в мережах великих підприємств, Intranet-мережах та Internet.'
+    : 'Using the mathematical apparatus of algorithmic algebra systems, schematology was developed for parallel versions of widely used routing algorithms (RIP, OSPF, etc.) in enterprise networks, intranets, and the Internet.',
+  uk
+    ? 'Створено інструментальні засоби моделювання та оцінки паралельних і розподілених алгоритмів для високопродуктивних середовищ.'
+    : 'Tools were created for modelling and performance evaluation of parallel and distributed algorithms in high-performance environments.',
+];
+
+// Конференції
+const CONFERENCES = [
+  'УкрПРОГ',
+  'COIA',
+  'IEEE ATIT',
+  'IEEE SAIC',
+  'CSIT',
+  'NorduGrid',
+  'IDAACS',
+];
+---
+<Base lang={lang} title={uk ? 'Дослідження' : 'Research'} description={HEROES.research.lead[lang]} og="research" crumbs={[]}>
+  <PageHero lang={lang} title={uk ? 'Дослідження' : 'Research'} kind="research" text={docText} />
+
+  <section class="section">
+    <div class="wrap rsrc-wrap">
+      <!-- Навігаційні швидкі переходи -->
+      <nav class="rsrc-nav-ribbon" aria-label={uk ? 'Розділи досліджень' : 'Research sections'}>
+        <a class="rsrc-nav-chip" href="#tracks">{uk ? 'Напрями досліджень' : 'Research tracks'}</a>
+        <a class="rsrc-nav-chip" href="#awards">{uk ? 'Державні нагороди' : 'State awards'}</a>
+        <a class="rsrc-nav-chip" href="#projects">{uk ? 'Проекти кафедри' : 'Projects'}</a>
+        <a class="rsrc-nav-chip" href="#world-tour">{uk ? 'Світова співпраця' : 'Global collaboration'}</a>
+        <a class="rsrc-nav-chip" href="#publications">{uk ? 'Видання та ради' : 'Publications & Councils'}</a>
+        <a class="rsrc-nav-chip" href="#llm-group">{uk ? 'LLM & Memory Group' : 'LLM Group'}</a>
+      </nav>
+
+      <!-- 1. Напрями наукової роботи -->
+      <section id="tracks" aria-labelledby="h-tracks">
+        <header class="rsrc-sec-head">
+          <p class="rsrc-eyebrow">{uk ? 'Наукова діяльність' : 'Scientific activity'}</p>
+          <h2 class="rsrc-h2" id="h-tracks">{uk ? 'Основними напрямами наукової роботи на кафедрі є:' : 'The main areas of research at the department are:'}</h2>
+          <p class="rsrc-lead">{uk ? 'Співробітники кафедри проводять передові фундаментальні та прикладні дослідження на перетині апаратних платформ, суперкомп’ютерів та штучного інтелекту.' : 'Department researchers conduct leading fundamental and applied studies at the intersection of hardware platforms, supercomputing, and artificial intelligence.'}</p>
+        </header>
+
+        <div class="rsrc-tracks-grid">
+          {TRACKS.map(tr => (
+            <article class="rsrc-track-card">
+              <span class="rsrc-track-card__code">{tr.code}</span>
+              <h3 class="rsrc-track-card__title">{tr.title}</h3>
+              <p class="rsrc-track-card__desc">{tr.desc}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <!-- 2. Високі державні нагороди та досягнення -->
+      <section id="awards" aria-labelledby="h-awards">
+        <header class="rsrc-sec-head">
+          <p class="rsrc-eyebrow">{uk ? 'Визнання найвищого рівня' : 'National recognition'}</p>
+          <h2 class="rsrc-h2" id="h-awards">{uk ? 'Державні нагороди та премії' : 'State Awards and Prizes'}</h2>
+          <p class="rsrc-lead">{uk ? 'Вагомий внесок науковців кафедри у розвиток вітчизняної та світової науки відзначено найвищими державними преміями України.' : 'The significant contributions of department scientists to national and global science have been recognized with Ukraine’s highest state accolades.'}</p>
+        </header>
+
+        <div class="rsrc-awards-grid">
+          <!-- Державна премія -->
+          <article class="rsrc-award-card rsrc-award-card--state">
+            <div class="rsrc-award-card__media">
+              <Image
+                src={imgAward}
+                alt={uk ? 'Професор С.Д. Погорілий та доцент Ю.В. Бойко під час нагородження лауреатів Державної премії України в галузі науки і техніки' : 'Professor S. D. Pohorilyi and Associate Professor Yu. V. Boiko at the award ceremony'}
+                width={700}
+                height={440}
+                fit="cover"
+                loading="eager"
+              />
+              <span class="rsrc-award-card__badge">{uk ? 'Державна премія України 2018' : 'State Prize of Ukraine 2018'}</span>
+            </div>
+            <div class="rsrc-award-card__body">
+              <h3 class="rsrc-award-card__title">{uk ? 'Державна премія України в галузі науки і техніки 2018 року' : 'State Prize of Ukraine in Science and Technology (2018)'}</h3>
+              <p class="rsrc-award-card__laureates">{uk ? 'Лауреати: проф. С. Д. Погорілий, доц. Ю. В. Бойко' : 'Laureates: Prof. S. D. Pohorilyi, Assoc. Prof. Yu. V. Boiko'}</p>
+              <p class="rsrc-award-card__topic">{uk ? 'За участь у наукових дослідженнях «Методи та новітні підходи до проектування, управління і застосування високопродуктивних IT-інфраструктур».' : 'For participation in research "Methods and Novel Approaches to the Design, Management and Application of High-Performance IT Infrastructures".'}</p>
+              <p class="rsrc-award-card__result"><b>{uk ? 'Головний результат:' : 'Main result:'}</b> {uk ? 'формування цілісної науково обґрунтованої методології підтримки процесів проектування, управління і використання ІТ-інфраструктури.' : 'development of a coherent, scientifically grounded methodology for supporting the processes of designing, managing and using IT infrastructure.'}</p>
+            </div>
+          </article>
+
+          <!-- Премія Президента -->
+          <article class="rsrc-award-card rsrc-award-card--pres">
+            <div class="rsrc-award-card__body">
+              <span class="rsrc-award-card__badge" style="align-self: flex-start; position: static;">{uk ? 'Премія Президента України 2018' : 'Presidential Prize 2018'}</span>
+              <h3 class="rsrc-award-card__title">{uk ? 'Премія Президента України для молодих вчених 2018 року' : 'President of Ukraine’s Prize for Young Scientists (2018)'}</h3>
+              <p class="rsrc-award-card__laureates">{uk ? 'Лауреати: асистенти А. О. Сальніков, Є. А. Слюсар' : 'Laureates: Assist. Profs. A. O. Salnikov, Ye. A. Sliusar'}</p>
+              <p class="rsrc-award-card__topic">{uk ? 'За участь у наукових дослідженнях «Створення високопродуктивної інфраструктури в грід для досліджень конформаційних змін біополімерів».' : 'For participation in research "Creation of a High-Performance Grid Infrastructure for Studying Conformational Changes of Biopolymers".'}</p>
+              <p class="rsrc-award-card__result"><b>{uk ? 'Головний результат:' : 'Main result:'}</b> {uk ? 'створення інтегрованої інформаційно-обчислювальної платформи, що дозволило значно підвищити ефективність обчислень у комп\'ютерних дослідженнях біологічних макромолекул та їхніх комплексів.' : 'creation of an integrated information and computing platform, which has significantly increased the efficiency of computations in computer studies of biological macromolecules and their complexes.'}</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 3. Основні наукові проекти кафедри -->
+      <section id="projects" aria-labelledby="h-projs">
+        <header class="rsrc-sec-head">
+          <p class="rsrc-eyebrow">{uk ? 'Флагманські розробки' : 'Flagship developments'}</p>
+          <h2 class="rsrc-h2" id="h-projs">{uk ? 'Основні наукові проекти кафедри' : 'The department’s main research projects'}</h2>
+        </header>
+
+        <div class="rsrc-projects-grid">
+          {PROJECTS.map((p, i) => (
+            <div class="rsrc-proj-item">
+              <span class="rsrc-proj-num">0{i + 1}</span>
+              <p class="rsrc-proj-text">{p}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- 4. Світова співпраця та міжнародні конференції -->
+      <section id="world-tour" aria-labelledby="h-tour">
+        <header class="rsrc-sec-head">
+          <p class="rsrc-eyebrow">{uk ? 'Глобальне наукове партнерство' : 'Global scientific reach'}</p>
+          <h2 class="rsrc-h2" id="h-tour">{uk ? 'Міжнародні наукові конференції та співпраця' : 'International Scientific Conferences & Cooperation'}</h2>
+          <p class="rsrc-lead">{uk ? 'Активну участь у міжнародних наукових конференціях беруть як викладачі, так і студенти кафедри комп’ютерної інженерії.' : 'Both lecturers and students of the Department of Computer Engineering take an active part in international scientific conferences.'}</p>
+        </header>
+
+        <div class="rsrc-tour-card">
+          <!-- Вкладки туру -->
+          <div class="rsrc-tour-tabs" role="tablist" aria-label={uk ? 'Осередки світової співпраці' : 'International hubs'}>
+            <button type="button" class="rsrc-tour-btn is-active" role="tab" id="tab-coia" aria-selected="true" aria-controls="pane-coia" data-target="pane-coia">{uk ? 'Баку та Стенфорд (COIA)' : 'Baku & Stanford (COIA)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-uib" aria-selected="false" aria-controls="pane-uib" data-target="pane-uib">{uk ? 'Іспанія (UIB)' : 'Spain (UIB)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-nord" aria-selected="false" aria-controls="pane-nord" data-target="pane-nord">{uk ? 'NorduGrid (Швейцарія, Словаччина, Швеція)' : 'NorduGrid (Switzerland, Slovakia, Sweden)'}</button>
+            <button type="button" class="rsrc-tour-btn" role="tab" id="tab-tele" aria-selected="false" aria-controls="pane-tele" data-target="pane-tele">{uk ? 'Телекомунікаційні системи' : 'Special Telecom Systems'}</button>
+          </div>
+
+          <!-- Панель 1: COIA & Stanford -->
+          <div class="rsrc-tour-pane" id="pane-coia" role="tabpanel" aria-labelledby="tab-coia">
+            <p class="rsrc-tour-text">{uk ? 'В Бакінському університеті (Азербайджан) з 27 по 29 серпня 2015 р. відбулася п’ята міжнародна конференція COIA 2015 (Control and Optimization with Industrial Applications), на якій професором С. Д. Погорілим було представлено доповідь з методу комбінаторної оптимізації.' : 'At Baku University (Azerbaijan), on 27–29 August 2015, the 5th International Conference COIA 2015 (Control and Optimization with Industrial Applications) took place, where Professor S. D. Pohorilyi presented a paper on combinatorial optimization methods.'}</p>
+            <div class="rsrc-tour-gallery">
+              <figure class="rsrc-tour-photo">
+                <Image src={img04} alt={uk ? 'Професор С.Д. Погорілий в президії конференції COIA 2015' : 'Prof. S. Pohorilyi in the presidium of COIA 2015'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Професор С.Д. Погорілий в президії конференції COIA 2015' : 'Prof. S. D. Pohorilyi in the presidium of COIA 2015'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={img05} alt={uk ? 'Наноцентр Бакінського університету' : 'Nanocentre of Baku State University'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Наноцентр Бакінського університету' : 'Nanocentre of Baku State University'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={img06} alt={uk ? 'Під час перерви на каву. Професори С. Бойд (Стенфордський університет, США) та С. Д. Погорілий' : 'Coffee break: Prof. Stephen Boyd (Stanford University, USA) and Prof. S. Pohorilyi'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Під час перерви на каву: професори С. Бойд (Стенфордський університет, США) та С. Д. Погорілий' : 'Professors Stephen Boyd (Stanford University, USA) and S. D. Pohorilyi'}</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Панель 2: UIB Іспанія -->
+          <div class="rsrc-tour-pane" id="pane-uib" role="tabpanel" aria-labelledby="tab-uib" hidden>
+            <p class="rsrc-tour-text">{uk ? 'Починаючи з 2000 р. й дотепер, професор В. А. Львов співпрацює з Університетом Балеарських островів (Іспанія). На запрошення Ради правління UIB він здійснив 7 візитів на умовах повного професора.' : 'Since 2000 to the present, Professor V. A. Lvov has been collaborating with the University of the Balearic Islands (Spain). At the invitation of the UIB Governing Board, he has made 7 visits as a full visiting professor.'}</p>
+            <div class="rsrc-tour-gallery">
+              <figure class="rsrc-tour-photo">
+                <Image src={img07} alt={uk ? 'Професор В. А. Львов та завідувач лабораторії фізики матеріалів професор Е. Цезарі' : 'Prof. V. Lvov and head of laboratory Prof. E. Cesari'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Професор В. А. Львов та завідувач лабораторії фізики матеріалів професор Е. Цезарі працюють над спільною статтею з фізики магнітних сплавів' : 'Prof. V. A. Lvov and head of the materials physics laboratory Prof. E. Cesari working on magnetic alloys'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={img08} alt={uk ? 'Експериментальна установка для дослідження метамагнітних фазових переходів' : 'Experimental setup for metamagnetic phase transitions'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Експериментальна установка для дослідження метамагнітних фазових переходів у магнітних полях до 30 кЕ та інтервалі температур від 120 К до 400 К' : 'Experimental apparatus for investigating metamagnetic phase transitions in fields up to 30 kOe (120–400 K)'}</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Панель 3: NorduGrid -->
+          <div class="rsrc-tour-pane" id="pane-nord" role="tabpanel" aria-labelledby="tab-nord" hidden>
+            <p class="rsrc-tour-text">{uk ? 'Співробітники кафедри, кандидати технічних наук А. О. Сальніков та Є. А. Слюсар приймають участь в роботі щорічних міжнародних конференцій NorduGrid та технічних нарад з питань розвитку програмного забезпечення для побудови грід-інфраструктур Advanced Resource Connector (ARC), де представляють результати, отримані при створенні Українського національного грід.' : 'Department researchers, PhDs in Technical Sciences A. O. Salnikov and Ye. A. Sliusar take part in annual NorduGrid international conferences and technical meetings on developing the Advanced Resource Connector (ARC) middleware, presenting results from the Ukrainian National Grid.'}</p>
+            <div class="rsrc-tour-gallery">
+              <figure class="rsrc-tour-photo">
+                <Image src={img09} alt={uk ? 'Головний корпус університету м. Берн, Швейцарія' : 'Main building of University of Bern, Switzerland'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Головний корпус університету м. Берн, Швейцарія, NorduGrid 2015' : 'Main building of the University of Bern, Switzerland, NorduGrid 2015'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={img10} alt={uk ? 'А. О. Сальніков робить доповідь на конференції NorduGrid 2015' : 'A. Salnikov delivers a talk at NorduGrid 2015'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'А. О. Сальніков робить доповідь на конференції NorduGrid 2015' : 'A. O. Salnikov delivers a talk at NorduGrid 2015'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={img11} alt={uk ? 'Є. А. Слюсар під час роботи технічної наради NorduGrid' : 'Ye. Sliusar during a NorduGrid technical meeting'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Є. А. Слюсар під час роботи технічної наради NorduGrid' : 'Ye. A. Sliusar during a NorduGrid technical meeting'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={imgKosice} alt={uk ? 'Борецький О.Ф., Сальніков А.О та Слюсар Є.А. разом з учасниками конференції NorduGrid, Кошице, Словаччина, 2016' : 'O. Boretskyi, A. Salnikov and Ye. Sliusar at NorduGrid, Košice, Slovakia, 2016'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Борецький О.Ф., Сальніков А.О та Слюсар Є.А. разом з учасниками конференції NorduGrid, Кошице, Словаччина, 2016' : 'O. F. Boretskyi, A. O. Salnikov and Ye. A. Sliusar with NorduGrid participants, Košice, Slovakia, 2016'}</figcaption>
+              </figure>
+              <figure class="rsrc-tour-photo">
+                <Image src={imgLund} alt={uk ? 'Головний корпус Лундського університету, Швеція, NorduGrid 2019' : 'Main building of Lund University, Sweden, NorduGrid 2019'} width={360} height={270} fit="cover" />
+                <figcaption>{uk ? 'Головний корпус Лундського університету, Швеція, NorduGrid 2019' : 'Main building of Lund University, Sweden, NorduGrid 2019'}</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Панель 4: Спецзв’язок -->
+          <div class="rsrc-tour-pane" id="pane-tele" role="tabpanel" aria-labelledby="tab-tele" hidden>
+            <p class="rsrc-tour-text">{uk ? 'Співробітники кафедри регулярно беруть участь у профільних вітчизняних та міжнародних форумах з розвитку мереж спеціального призначення та захищених інфраструктур.' : 'Department faculty regularly contribute to specialized national and international forums on secure networks and critical communication systems.'}</p>
+            <div class="rsrc-tour-gallery">
+              <figure class="rsrc-tour-photo" style="max-width: 520px;">
+                <Image src={imgConf} alt={uk ? 'XІІІ науково-практична конференція „Пріоритетні напрямки розвитку телекомунікаційних систем та мереж спеціального призначення”' : 'XIII Scientific and Practical Conference on Telecommunications and Special-Purpose Networks'} width={500} height={350} fit="cover" />
+                <figcaption>{uk ? 'XІІІ науково-практична конференція «Пріоритетні напрямки розвитку телекомунікаційних систем та мереж спеціального призначення»' : 'XIII Scientific and Practical Conference on Telecommunications and Special-Purpose Networks'}</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Повний список конференцій -->
+          <div style="margin-top: 24px; padding-top: 18px; border-top: 1px dashed var(--line);">
+            <p style="font-size: 14.5px; color: var(--ink-2); margin: 0 0 8px;">{uk ? 'За останні роки молоді вчені кафедри брали участь у конференціях у Німеччині, Фінляндії, Швеції, Швейцарії, Азербайджані тощо:' : 'In recent years, young scientists of the department have taken part in conferences in Germany, Finland, Sweden, Switzerland, Azerbaijan, and elsewhere:'}</p>
+            <div class="rsrc-conf-list">
+              {CONFERENCES.map(c => <span class="rsrc-conf-chip">{c}</span>)}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Наукові видання, вчені ради та експертна діяльність -->
+      <section id="publications" aria-labelledby="h-pubs">
+        <header class="rsrc-sec-head">
+          <p class="rsrc-eyebrow">{uk ? 'Публікації та академічна експертиза' : 'Academic expertise & publications'}</p>
+          <h2 class="rsrc-h2" id="h-pubs">{uk ? 'Видання, вчені ради та експертна діяльність' : 'Journals, Academic Councils and Expert Activity'}</h2>
+        </header>
+
+        <div class="rsrc-pub-grid">
+          <article class="rsrc-pub-card">
+            <h3>{uk ? 'Провідні міжнародні та фахові журнали' : 'Leading International & Specialised Journals'}</h3>
+            <p>{uk ? 'Наукові статті викладачів і співробітників кафедри регулярно публікуються в індексованих фахових виданнях (Scopus / Web of Science):' : 'Research papers by the department’s staff are regularly published in indexed specialised journals (Scopus / Web of Science):'}</p>
+            <div class="rsrc-journal-chips">
+              <span class="rsrc-journal-chip">Applied and Computational Mathematics (ISSN 1683-3511)</span>
+              <span class="rsrc-journal-chip">Proceedings of the Institute of Applied Mathematics (ISSN 2225-0530)</span>
+              <span class="rsrc-journal-chip">Математичнi машини i системи</span>
+              <span class="rsrc-journal-chip">Проблеми програмування</span>
+              <span class="rsrc-journal-chip">Кибернетика и системный анализ</span>
+              <span class="rsrc-journal-chip">Вісник Київського університету (фіз.-мат.)</span>
+              <span class="rsrc-journal-chip">Український фізичний журнал</span>
+              <span class="rsrc-journal-chip">Journal of Automation and Information Sciences</span>
+              <span class="rsrc-journal-chip">International Journal of Computing</span>
+              <span class="rsrc-journal-chip">Instruments and Experimental Techniques</span>
+              <span class="rsrc-journal-chip">Physical Review B</span>
+            </div>
+          </article>
+
+          <article class="rsrc-pub-card">
+            <h3>{uk ? 'Спеціалізовані вчені ради та експертні органи' : 'Specialised Academic Councils & Expert Bodies'}</h3>
+            <p>{uk ? 'Двоє викладачів кафедри комп’ютерної інженерії (професори В. А. Львов і С. Д. Погорілий) є членами спеціалізованих вчених рад (Д 26.001.09, Д 26.248.01, Д 11.184.01).' : 'Two lecturers of the Department (Professors V. A. Lvov and S. D. Pohorilyi) are members of specialised academic councils (D 26.001.09, D 26.248.01, D 11.184.01).'}</p>
+            <p>{uk ? 'Один викладач є членом Експертної ради ДАК МОН України з питань інформатики, кібернетики та приладобудування.' : 'One lecturer is a member of the Expert Council on Informatics, Cybernetics and Instrument Engineering of the State Accreditation Commission of the Ministry of Education and Science of Ukraine.'}</p>
+            <p>{uk ? 'Один викладач (доцент Ю. В. Бойко) є членом науково-методичної комісії інформатизації та комп’ютеризації закладів освіти МОН України (відділення дошкільної та загальної середньої освіти).' : 'One lecturer (Associate Professor Yu. V. Boiko) is a member of the Scientific and Methodological Commission on the Informatisation and Computerisation of Educational Institutions (Division of Preschool and General Secondary Education).'}</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 6. Наукова група LLM & Memory Group Callout -->
+      <section id="llm-group" aria-labelledby="h-llm">
+        <div class="rsrc-group-callout">
+          <div class="rsrc-group-callout__content">
+            <p class="rsrc-eyebrow">{uk ? 'Спеціалізована дослідницька група' : 'Specialised research group'}</p>
+            <h2 class="rsrc-group-callout__title" id="h-llm">{uk ? 'Довготривала пам\'ять і оцінювання великих мовних моделей' : 'Long-term memory and evaluation of large language models'}</h2>
+            <p class="rsrc-group-callout__desc">{uk ? 'Керівник: Білецький Павло Володимирович, доктор філософії з комп’ютерної інженерії, асистент кафедри. Група досліджує масштабовану архітектуру зовнішньої пам’яті LLM для роботи з наддовгими контекстами та україномовні бенчмарки.' : 'Group lead: Pavlo Biletskyi, PhD in Computer Engineering. The group studies scalable external memory architectures for LLMs to process ultra-long contexts and develops Ukrainian-language evaluation benchmarks.'}</p>
+          </div>
+          <a class="rsrc-group-callout__btn" href={url(lang, '/research/llm-memory-group/')}>
+            <span>{uk ? 'Докладніше про групу' : 'View research group'}</span>
+            <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Маскот КІ-Рекс за науковою роботою -->
+      <div style="display: flex; justify-content: center; padding: 20px 0;">
+        <Mascot src={dinoResearch} alt={uk ? 'КІ-Рекс за науковою роботою' : 'KI-Rex doing research'} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Скрипт перемикання вкладок світової співпраці -->
+  <script is:inline>
+    (function () {
+      const btns = document.querySelectorAll('.rsrc-tour-btn');
+      const panes = document.querySelectorAll('.rsrc-tour-pane');
+
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          panes.forEach(p => p.hidden = true);
+
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+
+          const targetId = btn.getAttribute('data-target');
+          const targetPane = document.getElementById(targetId);
+          if (targetPane) targetPane.hidden = false;
+        });
+      });
+    })();
+  </script>
+</Base>

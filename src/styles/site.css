@@ -15,9 +15,7 @@ main { flex: 1; }
 @keyframes hairline { from { transform: scaleX(0); } }
 .hd__in { display: flex; align-items: center; gap: 16px; min-height: 72px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-right: auto; min-width: 0; flex: none; }
-.brand img { width: 42px; height: 42px; flex: none; border-radius: 50%; transition: rotate 900ms var(--spring); }
-.brand:hover img { rotate: -8deg; }
-:root[data-theme="dark"] .brand img { box-shadow: 0 0 0 1px rgb(230 211 163 / .3); }
+.brand img { width: 42px; height: 42px; flex: none; border-radius: 50%; }
 .brand__t { display: grid; line-height: 1.15; }
 .brand__t b { font-size: 15.5px; font-weight: 500; letter-spacing: -.01em; }
 .brand__t small { font: 500 10.5px/1.3 var(--font-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-top: 3px; }
@@ -287,7 +285,7 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 .footer .h3f { font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--brand-gold); margin-bottom: 16px; }
 .footer__nav ul { display: block; columns: 2; column-gap: 32px; }
 .footer__nav li { break-inside: avoid; margin-bottom: 10px; }
-.footer__grid img { width: 96px; height: 96px; }
+.footer__grid img { width: 144px; height: 144px; }
 .footer address { font-style: normal; display: grid; gap: 10px; font-size: 15px; color: rgb(239 227 207 / .82); }
 .footer__rex { position: absolute; right: clamp(16px, 4vw, 40px); bottom: 58px; width: 66px; height: 54px; image-rendering: pixelated; opacity: .9; }
 @media (max-width: 860px) { .footer__grid { grid-template-columns: 1fr; } .footer__rex { display: none; } }
@@ -846,7 +844,7 @@ a:hover .news-art { animation: none; }
   /* підвал коротший */
   .footer { padding-block: 44px 24px; }
   .footer__grid { gap: 28px; }
-  .footer__grid img { width: 64px; height: 64px; }
+  .footer__grid img { width: 88px; height: 88px; }
   .footer__bot { margin-top: 32px; }
 
   /* поява розділів на телефоні вимкнена: блоки, що з'являються посеред екрана, читаються як затримка */

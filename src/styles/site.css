@@ -801,8 +801,12 @@ a:hover .news-art { animation: none; }
   .showcase .sc-rail { display: contents; }
   .showcase .scope__keys .sp { display: none; }
   .showcase .key, .showcase .sc-rail .key { height: 44px; padding: 0 8px; font-size: 12px; }
-  .showcase [data-sc-play], .showcase .key--auto { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; padding: 0; z-index: 2; justify-content: center; }
-  .showcase .key--auto { right: 62px; }
+  /* керування — третім рядом сітки, не поверх екрана: «АВТО» (після ручного вибору) ліворуч, пауза праворуч;
+     під час автозміни пауза на весь ряд, і по ній іде смужка до наступного експоната */
+  .showcase .key--auto { grid-column: 1 / span 2; grid-row: 3; height: 44px; justify-content: center; }
+  .showcase .key--auto .t { display: inline; }
+  .showcase [data-sc-play] { grid-column: 3; grid-row: 3; height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .showcase .key--auto[hidden] + [data-sc-play] { grid-column: 1 / -1; }
 
   /* лабораторії: картка 82 %, стрілки під стрічкою */
   .labs { grid-auto-columns: 82%; gap: 12px; }

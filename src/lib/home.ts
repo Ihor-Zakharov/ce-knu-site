@@ -46,12 +46,12 @@ export interface Alum { company: string; who?: string; role?: string; anchor?: s
 export const ALUMNI: Record<Lang, Alum[]> = {
   uk: [
     { company: 'Intel', who: 'Дмитро Калита', role: 'Директор офісу Intel в Україні, 2014–2017', anchor: 'дмитро-калита', photo: 'd_kalita', say: 'Я старший за x86.' },
-    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'Інженер-дослідник з NLP, One AI, Тель-Авів', anchor: 'крамов-артем-андрійович', photo: 'a_kramov', say: 'Моя мова теж природна.' },
+    { company: 'One AI Inc.', who: 'Артем Крамов', role: 'Інженер-дослідник з NLP, One AI, Тель-Авів', anchor: 'артем-крамов', photo: 'a_kramov', say: 'Моя мова теж природна.' },
     { company: 'Lyft', who: 'Максим Слинько', role: 'Керівник проєктів розробки ПЗ, Lyft', anchor: 'максим-слинько', photo: 'm_slynko', say: 'Lyft не викликаю, я ходжу.' },
   ],
   en: [
     { company: 'Intel', who: 'Dmytro Kalyta', role: 'Director of Intel’s Ukraine office, 2014–2017', anchor: 'dmytro-kalyta', photo: 'd_kalita', say: 'I predate x86.' },
-    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, One AI, Tel Aviv', anchor: 'artem-andriiovych-kramov', photo: 'a_kramov', say: 'Roar is natural language.' },
+    { company: 'One AI Inc.', who: 'Artem Kramov', role: 'NLP research engineer, One AI, Tel Aviv', anchor: 'artem-kramov', photo: 'a_kramov', say: 'Roar is natural language.' },
     { company: 'Lyft', who: 'Maksym Slynko', role: 'Software project manager, Lyft', anchor: 'maksym-slynko', photo: 'm_slynko', say: 'No Lyft for me. I walk.' },
   ],
 };

@@ -7,11 +7,18 @@ legacy: "/graduates/"
 source: "pages/graduates.rst"
 ---
 
+<!-- sections -->
+
+
 ## Dmytro Kalyta
 
 ![Photo: Dmytro Kalyta](../../../assets/images/abiturient/d_kalita.jpg)
 
 *Director of the Intel Corporation office for Ukraine, Belarus and Moldova from 2014 to 2017.*
+
+> In today's world of high technology, knowledge is a constant search for something new.
+
+<!-- fold: Dmytro Kalyta’s story -->
 
 ### Background
 
@@ -45,13 +52,19 @@ The field of software engineering focuses on the theory and practice of the soft
 
 Graduates work as programmers and software test engineers, in particular in the fields of embedded devices, high-performance computing and network applications.
 
-## Artem Andriiovych Kramov
+## Artem Kramov
 
 ![Photo: Artem Andriiovych Kramov](../../../assets/images/abiturient/a_kramov.jpg)
 
-Position: research engineer in natural language processing; his tasks involve applying artificial intelligence tools to the automated analysis of texts in various languages (English, French, Hebrew): creating summaries of articles and conversations, finding key sentences, analysing the coherence of Ukrainian-language texts and the emotional component of documents, etc. Company: One AI Inc., Tel Aviv, Israel
+*Research engineer in natural language processing, One AI Inc., Tel Aviv, Israel*
+
+> …what matters is not only the final result, but also the path taken to achieve it.
+
+<!-- fold: Artem Kramov’s story -->
 
 ### Background
+
+His tasks involve applying artificial intelligence tools to the automated analysis of texts in various languages (English, French, Hebrew): creating summaries of articles and conversations, finding key sentences, analysing the coherence of Ukrainian-language texts and the emotional component of documents, etc.
 
 From 2011 to 2017, he studied at the Department of Computer Engineering of the Faculty of Radiophysics, Electronics and Computer Systems of Taras Shevchenko National University of Kyiv and received Bachelor's and Master's diplomas with honours. From 2017 to 2021, he was a PhD student at the Department of Computer Engineering (academic supervisor: Serhii Demianovych Pohorilyi, D.Sc. in Engineering, Professor); in 2022, he received the Doctor of Philosophy degree in the field of study "Information Technologies". His main research focused on studying and creating modern methods for processing Ukrainian-language texts using various types of artificial intelligence tools (deep neural networks, machine learning models). Author of more than 20 scientific papers, 9 of which are indexed in the Scopus scientometric database (h-index 3) and 3 in the Web of Science database (h-index 1).
 
@@ -67,7 +80,11 @@ The combination of fundamental knowledge, an understanding of modern technologie
 
 ![Photo: Maksym Slynko](../../../assets/images/abiturient/m_slynko.png)
 
-Software Project Manager at Lyft
+*Software Project Manager at Lyft*
+
+> "Learning how to learn" is, in my opinion, one of the most important achievements of the department's graduates.
+
+<!-- fold: Maksym Slynko’s story -->
 
 ### Background
 

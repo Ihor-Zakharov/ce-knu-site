@@ -527,10 +527,10 @@ function lorenz(c, st, cv) {
   cv.addEventListener('pointerleave', () => { yaw.set(0); tilt.set(0); });
   return {
     still: 0,
-    step(dt) { for (let i = 0; i < 5; i++) { p = rk(p); pts.push(p); pts.shift(); } tt += dt; },
+    step(dt) { for (let i = 0; i < 2; i++) { p = rk(p); pts.push(p); pts.shift(); } tt += dt; },   // 2 кроки на кадр — спокійний темп
     draw() {
       // вигляд «метелика» спереди, ледь погойдується; курсор нахиляє
-      const { W, H, col } = st, a = .45 * Math.sin(tt * .09) + yaw.value, b = .12 + tilt.value, s = Math.min(W / 42, (H - 64) / 44), cx = W / 2, cy = H / 2 + 6;
+      const { W, H, col } = st, a = .45 * Math.sin(tt * .06) + yaw.value, b = .12 + tilt.value, s = Math.min(W / 42, (H - 64) / 44), cx = W / 2, cy = H / 2 + 6;
       const pr = ([x, y, z]) => { const X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a), Z = z - 25; return [cx + X * s, cy - (Z * Math.cos(b) - Y * Math.sin(b)) * s]; };
       c.lineJoin = 'round'; c.lineCap = 'round';
       const CH = 26, step = Math.ceil(pts.length / CH);

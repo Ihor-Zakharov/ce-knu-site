@@ -1,26 +1,23 @@
 ---
-// Що вміють випускники: чотири картки-прилади — лінійний знак групи, назва, кількість і навички чипами.
-// Дані — SKILLS з src/lib/home.ts; під картками — довільний рядок через slot (підсумок і кнопка листа).
+// Що вміють випускники: чотири легкі картки (рішення арт-директорів) — знак і назва групи, шість навичок із зеленою позначкою «вчать».
+// Рядки спільні для всіх карток (subgrid), тож картки рівні на будь-якій ширині. Дані — SKILLS з src/lib/home.ts;
+// під картками — довільний рядок через slot (посилання й кнопка листа).
 import { SKILLS } from '../lib/home';
 import type { Lang } from '../lib/i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 ---
-<div class="skp">
+<div class="skp rv">
   <ul class="skp__grid" role="list">
     {SKILLS[lang].map((grp, gi) => (
-      <li class="skc rv" style={`--i:${gi}`}>
-        <div class="skc__head">
-          <svg class="skc__ico" viewBox="0 0 48 48" aria-hidden="true">{[
-            <><rect x="14" y="14" width="20" height="20" rx="2.5"/><rect x="19.5" y="19.5" width="9" height="9" rx="1"/><path d="M19 14V8M24 14V8M29 14V8M19 34v6M24 34v6M29 34v6M14 19H8M14 24H8M14 29H8M34 19h6M34 24h6M34 29h6"/></>,
-            <><path d="M17 14 7 24l10 10M31 14l10 10-10 10M27 10l-6 28"/></>,
-            <><circle cx="10" cy="14" r="3"/><circle cx="10" cy="34" r="3"/><circle cx="24" cy="10" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="24" cy="38" r="3"/><circle cx="38" cy="24" r="3"/><path d="M13 14.5 21 10.5M13 15l8 7.5M13 33l8-7.5M13 33.5l8 4M27 11l8.5 11M27 24h8M27 37l8.5-11"/></>,
-            <><path d="M4 24c3.3 0 3.3-12 6.7-12s3.3 24 6.6 24 3.4-24 6.7-24 3.3 24 6.7 24 3.3-24 6.6-24S40.7 24 44 24"/></>,
-          ][gi]}</svg>
-          <h3 class="skc__t">{grp.g}</h3>
-          <span class="skc__n" aria-hidden="true">{String(grp.items.length).padStart(2, '0')}</span>
-        </div>
-        <ul class="tags skc__tags" role="list">{grp.items.map(it => <li>{it}</li>)}</ul>
+      <li class="skc">
+        <h3 class="skc__t"><svg class="skc__ico" viewBox="0 0 48 48" aria-hidden="true">{[
+          <><rect x="14" y="14" width="20" height="20" rx="2.5"/><rect x="19.5" y="19.5" width="9" height="9" rx="1"/><path d="M19 14V8M24 14V8M29 14V8M19 34v6M24 34v6M29 34v6M14 19H8M14 24H8M14 29H8M34 19h6M34 24h6M34 29h6"/></>,
+          <><path d="M17 14 7 24l10 10M31 14l10 10-10 10M27 10l-6 28"/></>,
+          <><circle cx="10" cy="14" r="3"/><circle cx="10" cy="34" r="3"/><circle cx="24" cy="10" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="24" cy="38" r="3"/><circle cx="38" cy="24" r="3"/><path d="M13 14.5 21 10.5M13 15l8 7.5M13 33l8-7.5M13 33.5l8 4M27 11l8.5 11M27 24h8M27 37l8.5-11"/></>,
+          <><path d="M4 24c3.3 0 3.3-12 6.7-12s3.3 24 6.6 24 3.4-24 6.7-24 3.3 24 6.7 24 3.3-24 6.6-24S40.7 24 44 24"/></>,
+        ][gi]}</svg>{grp.g}</h3>
+        <ul class="skc__list" role="list">{grp.items.map(it => <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>{it}</span></li>)}</ul>
       </li>
     ))}
   </ul>

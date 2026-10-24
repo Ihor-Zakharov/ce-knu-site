@@ -7,6 +7,7 @@ import { page } from '../../lib/content';
 import { HISTORY, PROGRAMS, STACK, LABS, SKILLS, COPY } from '../../lib/home';
 import AlumniStrip from '../../components/AlumniStrip.astro';
 import RailNav from '../../components/RailNav.astro';
+import SkillCards from '../../components/SkillCards.astro';
 import lab01 from '../../assets/images/studying/01.jpg';
 import lab03 from '../../assets/images/studying/03.jpg';
 import lab05 from '../../assets/images/studying/05.jpg';
@@ -110,25 +111,12 @@ const nSkills = SKILLS[lang].reduce((n, g) => n + g.items.length, 0);
         <h2 class="sec-h2 mt-s" id="h-emp">{c.employers_title}</h2>
         <p class="skp__claim"><svg width="22" height="22" aria-hidden="true"><use href="#i-check"/></svg><span>{c.employers_ok(nSkills)} <a class="link" href={PLAN}>{c.employers_plan}</a></span></p>
       </header>
-      <div class="skp rv">
-        <ul class="skp__grid" role="list">
-          {SKILLS[lang].map((grp, gi) => (
-            <li class="skc">
-              <h3 class="skc__t"><svg class="skc__ico" viewBox="0 0 48 48" aria-hidden="true">{[
-                <><rect x="14" y="14" width="20" height="20" rx="2.5"/><rect x="19.5" y="19.5" width="9" height="9" rx="1"/><path d="M19 14V8M24 14V8M29 14V8M19 34v6M24 34v6M29 34v6M14 19H8M14 24H8M14 29H8M34 19h6M34 24h6M34 29h6"/></>,
-                <><path d="M17 14 7 24l10 10M31 14l10 10-10 10M27 10l-6 28"/></>,
-                <><circle cx="10" cy="14" r="3"/><circle cx="10" cy="34" r="3"/><circle cx="24" cy="10" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="24" cy="38" r="3"/><circle cx="38" cy="24" r="3"/><path d="M13 14.5 21 10.5M13 15l8 7.5M13 33l8-7.5M13 33.5l8 4M27 11l8.5 11M27 24h8M27 37l8.5-11"/></>,
-                <><path d="M4 24c3.3 0 3.3-12 6.7-12s3.3 24 6.6 24 3.4-24 6.7-24 3.3 24 6.7 24 3.3-24 6.6-24S40.7 24 44 24"/></>,
-              ][gi]}</svg>{grp.g}</h3>
-              <ul class="skc__list" role="list">{grp.items.map(it => <li><svg aria-hidden="true"><use href="#i-check"/></svg><span>{it}</span></li>)}</ul>
-            </li>
-          ))}
-        </ul>
+      <SkillCards lang={lang}>
         <div class="skp__bar">
           <a class="arrow-link" href={url(lang, '/stateholders/')}>{c.employers_page} <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn" href={`mailto:${MAIL}?subject=${encodeURIComponent(c.employers_mail)}`}><svg width="18" height="18" aria-hidden="true"><use href="#i-mail"/></svg> {c.employers_cta}</a>
         </div>
-      </div>
+      </SkillCards>
     </div>
   </section>
 

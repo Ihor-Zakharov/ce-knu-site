@@ -215,3 +215,16 @@ test.describe('прилади й КІ-Рекс', () => {
     }
   });
 });
+
+test.describe('мапа сайту', () => {
+  test('посилання з підвалу відкриває HTML-сторінку з усіма розділами', async ({ page }) => {
+    for (const lang of ['', '/en']) {
+      await page.goto(lang + '/');
+      await page.locator('.footer__bot a', { hasText: /Мапа сайту|Sitemap/ }).click();
+      await expect(page).toHaveURL(new RegExp(`${lang}/sitemap/$`));
+      await expect(page.locator('h1')).toHaveText(/Мапа сайту|Sitemap/);
+      for (const p of NAV) await expect(page.locator(`.sm a[href$="${lang}${p}"]`).first()).toBeVisible();
+      expect(await page.locator('.sm__news a').count()).toBeGreaterThan(10);
+    }
+  });
+});

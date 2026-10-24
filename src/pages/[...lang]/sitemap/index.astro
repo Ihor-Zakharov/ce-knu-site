@@ -1,0 +1,78 @@
+---
+// Мапа сайту для людей: розділи з вкладеними сторінками, персоналії, новини за роками, службові адреси.
+// Пошуковим системам — /sitemap-index.xml (генерує @astrojs/sitemap), ця сторінка його не замінює.
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { NAV, T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
+import { news, people, slugOf } from '../../../lib/content';
+import '../../../styles/lists.css';
+
+export const getStaticPaths = langParams;
+const lang = langOf(Astro.params.lang);
+const t = T[lang];
+// вкладені сторінки розділів (напр. дослідницька група в «Дослідженнях»)
+const subs = (await getCollection('pages', p => p.id.startsWith(lang + '/') && slugOf(p.id).includes('/')))
+  .map(p => { const [parent] = slugOf(p.id).split('/'); return { parent, title: p.data.title, href: url(lang, `/${slugOf(p.id)}/`) }; });
+const sections = [
+  { title: t.home, href: url(lang, '/') },
+  ...NAV.map(n => ({ title: n[lang], href: url(lang, n.path) })),
+  { title: t.studying, href: url(lang, '/studying/') },
+].map(s => ({ ...s, subs: subs.filter(x => s.href === url(lang, `/${x.parent}/`)) }));
+const persons = (await people(lang)).filter(p => p.data.legacy && !p.data.unlisted);
+const all = await news(lang);
+const years = [...new Set(all.map(n => n.data.date.getUTCFullYear()))];
+const xml = url('uk', '/sitemap-index.xml');
+---
+<Base lang={lang} title={t.sitemap} description={t.sitemapLead}>
+  <section class="ph ph--compact">
+    <div class="wrap">
+      <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
+        <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li aria-current="page">{t.sitemap}</li></ol>
+      </nav>
+      <h1>{t.sitemap}</h1>
+      <p class="lead">{t.sitemapLead}</p>
+    </div>
+  </section>
+  <section class="section sm" data-pagefind-ignore>
+    <div class="wrap sm__grid">
+      <section aria-labelledby="sm-s">
+        <h2 class="sm__h" id="sm-s">{t.sections}</h2>
+        <ul class="sm__list">
+          {sections.map(s => (
+            <li><a href={s.href}>{s.title}</a>
+              {s.subs.length > 0 && <ul>{s.subs.map(x => <li><a href={x.href}>{x.title}</a></li>)}</ul>}
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section aria-labelledby="sm-p">
+        <h2 class="sm__h" id="sm-p">{t.people}</h2>
+        <ul class="sm__list">
+          {persons.map(p => <li><a href={url(lang, `/personas/${slugOf(p.id)}/`)}>{p.data.name}</a></li>)}
+        </ul>
+      </section>
+      <section aria-labelledby="sm-x">
+        <h2 class="sm__h" id="sm-x">{t.service}</h2>
+        <ul class="sm__list">
+          <li><a href={url(lang, '/rss.xml')}>{t.rss}</a></li>
+          <li><a href={xml}>{t.sitemapXml}</a></li>
+        </ul>
+      </section>
+      <section class="sm__news" aria-labelledby="sm-n">
+        <h2 class="sm__h" id="sm-n">{t.news}</h2>
+        <div class="sm__years">
+          {years.map(y => (
+            <section class="sm__year" aria-label={String(y)}>
+              <h3>{y}</h3>
+              <ul class="sm__list">
+                {all.filter(n => n.data.date.getUTCFullYear() === y).map(n => (
+                  <li><a href={url(lang, `/posts/${slugOf(n.id)}/`)}>{n.data.title}</a> <time datetime={isoDate(n.data.date)}>{fmtDate(n.data.date, lang)}</time></li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </section>
+    </div>
+  </section>
+</Base>

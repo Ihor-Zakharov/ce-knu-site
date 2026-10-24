@@ -35,7 +35,7 @@ const [ch, chLong] = c.eyebrow.split(' · ');
         <p class="ph__eyebrow"><b>{ch}</b>{chLong && <span>· {chLong}</span>}</p>
         <h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>
         <p class="lead">{c.lead}</p>
-        <div class="sh-cta">
+        <div class="sh-cta" id="hero-cta">
           <a class="btn" href={mail}><svg width="18" height="18" aria-hidden="true"><use href="#i-mail"/></svg> {c.cta_mail}</a>
           <a class="btn btn--line sh-cta__skills" href="#skills">{c.cta_skills} <svg class="sh-down" width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </div>
@@ -102,4 +102,5 @@ const [ch, chLong] = c.eyebrow.split(' · ');
       </div>
     </div>
   </section>
+  <div class="dock-cta" data-dock-cta="#hero-cta" data-dock-end=".sh-band" aria-hidden="true"><a class="btn" href={mail} tabindex="-1"><svg width="18" height="18" aria-hidden="true"><use href="#i-mail"/></svg> {c.cta_mail}</a></div>
 </Base>

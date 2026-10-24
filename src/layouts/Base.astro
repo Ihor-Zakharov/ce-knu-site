@@ -2,6 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/kit.css';
 import '../styles/site.css';
+import '../styles/native.css';
 import '../styles/webapi.css';
 import fixel from '../assets/fonts/FixelVariable.woff2?url';
 import Icons from '../components/Icons.astro';
@@ -50,7 +51,7 @@ const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches
 <html lang={lang} data-base={base}>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{full}</title>
   <meta name="description" content={metaDesc} />
   <link rel="canonical" href={canonical} />

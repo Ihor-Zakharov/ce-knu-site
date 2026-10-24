@@ -850,3 +850,20 @@ a:hover .news-art { animation: none; }
 }
 @media (hover: none) { .inst__bar .sp + span { visibility: hidden; position: relative; } .inst__bar .sp + span::after { content: "торкніться Рекса"; visibility: visible; position: absolute; right: 0; white-space: nowrap; } :lang(en) .inst__bar .sp + span::after { content: "tap Rex"; } }
 @media (max-width: 374px) { .skc { padding-inline: 12px; } .skc__list li { font-size: 14.5px; } }   /* 360 px: «Мікроконтролери» цілим словом */
+/* підсітки: зазор між картками не має розсувати рядки всередині картки */
+.lab { row-gap: 0; }
+
+/* ── Вертикальний ритм (заміри порожнечі між блоками): ~75 px на ПК, ~50 px на телефоні — без зайвого прокручування й без тісноти ── */
+.hm.section { padding-block: clamp(24px, 2.6vw, 40px); }
+.hm.section--tight { padding-block: clamp(16px, 1.6vw, 24px); }
+.alum { padding-bottom: clamp(16px, 1.8vw, 28px); }
+.footer { padding-top: clamp(40px, 4vw, 56px); }
+@media (max-width: 600px) {
+  .hm.section { padding-block: 24px; }
+  .hm.section--tight { padding-block: 16px; }
+  .rail-foot { margin-top: 12px; }
+  .hm-act-end { margin-top: 10px; }
+  .skp__bar { margin-top: 14px; }
+  .progs__note { margin-top: 10px; }
+}
+.section--tight:has(> .wrap > .band) { padding-bottom: clamp(20px, 2vw, 32px); }   /* фінальна плашка ближче до підвалу */

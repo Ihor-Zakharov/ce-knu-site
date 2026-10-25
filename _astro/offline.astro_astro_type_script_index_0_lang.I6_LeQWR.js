@@ -1,1 +1,0 @@
-import{o as e}from"./rex.CzFeWCPp.js";var t=document.getElementById(`runner`);t&&e(t,{start:`Гра почалася`,idle:`ПРОБІЛ / ТАП — СТАРТ`,again:`ОБРИВ ЛІНІЇ · ПРОБІЛ — ЩЕ РАЗ`,paused:`ПАУЗА · ПРОБІЛ — ДАЛІ`,over:(e,t)=>`Обрив лінії. Рахунок ${e}, рекорд ${t}. Пробіл — ще раз`});

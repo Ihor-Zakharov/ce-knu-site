@@ -929,3 +929,22 @@ a:hover .news-art { animation: none; }
   .footer__nav li { margin-bottom: 0; }                          /* рядки — самі цілі по 44 px */
   .footer__bot { margin-top: 18px; flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* ── ПК: розділи .hm (головна від «Що ви навчитеся будувати» донизу і «Вступникам», спільний ритм) і фінальна плашка — трохи більше повітря:
+   між розділами ≈ 92 px на 1440 і 104 px на 1920 (було 75–80), усередині блоків +2–4 px і ширші міжколонки; телефон і планшет без змін ── */
+@media (min-width: 1200px) {
+  .hm.section { padding-block: clamp(44px, 3.2vw, 52px); }
+  .hm.section--tight { padding-block: clamp(28px, 2.2vw, 32px); }
+  .hm-head { margin-bottom: clamp(36px, 2.5vw, 40px); }
+  .hm-head .lead { margin-top: 16px; }
+  .prof { --gap: clamp(32px, 3.6vw, 64px); }
+  .prof__mini { margin-bottom: 24px; }
+  .prof__card > p { margin-top: 12px; }
+  .labs { column-gap: clamp(20px, 1.8vw, 32px); }
+  .skp__grid { gap: 20px; }
+  .skc { padding: 24px; }
+  .skp__bar { margin-top: 24px; }
+  .progs { column-gap: clamp(32px, 3.4vw, 60px); }
+  .progs__note { margin-top: 20px; }
+  .section--tight:has(> .wrap > .band) { padding-block: 32px 28px; }
+}

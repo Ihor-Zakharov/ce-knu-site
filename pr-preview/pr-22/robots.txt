@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://ihor-zakharov.github.io/ce-knu-site/pr-preview/pr-22/sitemap-index.xml

@@ -35,8 +35,8 @@ const brand = `${import.meta.env.BASE_URL}brand/`;
       </div>
     </div>
     <div class="footer__bot">
-      <span>© {year} · {t.dept} · {lang === 'uk' ? 'Розроблено студентами кафедри' : 'Developed by department students'} · <a href={url(lang, '/sitemap/')}>{t.sitemap}</a></span>
-      <span class="footer__credit"><span class="footer__made">{t.made}</span> <a href="https://www.linkedin.com/in/zakharov-ihor/" rel="noopener" target="_blank">ZakharovLabs</a></span>
+      <span>© {year} · {t.dept} · <a href={url(lang, '/sitemap/')}>{t.sitemap}</a></span>
+      <span class="footer__credit"><span class="footer__made">{t.made}</span> {lang === 'uk' ? 'студенти кафедри' : 'department students'}</span>
       <canvas class="footer__rex" data-rex="cap" width="90" height="72" aria-hidden="true"></canvas>
     </div>
   </div>

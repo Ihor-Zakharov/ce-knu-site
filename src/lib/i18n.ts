@@ -25,7 +25,7 @@ export function stripLang(pathname: string) {
 export const NAV = [
   { path: '/news/', uk: 'Новини', en: 'News', ch: 'NEWS' },
   { path: '/research/', uk: 'Дослідження', en: 'Research', ch: 'RSRC' },
-  { path: '/medu-guide/', uk: 'НМЗ', en: 'Materials', ch: 'EDU', title: { uk: 'Навчально-методичне забезпечення', en: 'Teaching materials' } },
+  { path: '/medu-guide/', uk: 'НМП', en: 'Materials', ch: 'EDU', title: { uk: 'Навчально-методичне забезпечення', en: 'Teaching materials' } },
   { path: '/entrant/', uk: 'Вступникам', en: 'Admission', ch: 'ADM' },
   { path: '/documents/', uk: 'Документи', en: 'Regulations', ch: 'DOCS' },
   { path: '/graduates/', uk: 'Випускники', en: 'Alumni', ch: 'ALUM' },

@@ -66,13 +66,13 @@ export const STACK: Record<Lang, string[]> = {
 export const SKILLS: Record<Lang, { g: string; items: string[] }[]> = {
   uk: [
     { g: 'Залізо', items: ['Verilog', 'SystemVerilog', 'VHDL', 'ПЛІС', 'Embedded C', 'Мікроконтролери'] },
-    { g: 'Код', items: ['C', 'C++', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
+    { g: 'Код', items: ['C / C++', 'Асемблер / машинний код', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
     { g: 'ШІ та дані', items: ['Машинне навчання', 'PyTorch', 'TensorFlow', 'NLP', 'Комп’ютерний зір', 'Аналіз даних'] },
     { g: 'Сигнали й мережі', items: ['ЦОС', 'Відеостримінг', 'Cisco · Huawei', 'Кібербезпека', 'AWS · Azure', 'IoT'] },
   ],
   en: [
     { g: 'Hardware', items: ['Verilog', 'SystemVerilog', 'VHDL', 'FPGA', 'Embedded C', 'Microcontrollers'] },
-    { g: 'Code', items: ['C', 'C++', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
+    { g: 'Code', items: ['C / C++', 'Assembly / machine code', 'Python', 'C# / .NET', 'Linux', 'SQL'] },
     { g: 'AI and data', items: ['Machine learning', 'PyTorch', 'TensorFlow', 'NLP', 'Computer vision', 'Data analysis'] },
     { g: 'Signals and networks', items: ['DSP', 'Video streaming', 'Cisco · Huawei', 'Cybersecurity', 'AWS · Azure', 'IoT'] },
   ],

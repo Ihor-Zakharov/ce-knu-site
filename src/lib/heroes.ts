@@ -58,7 +58,7 @@ export const HEROES: Record<string, Hero> = {
   stateholders: {
     ch: 'CH 08 · EMPL', inst: 'nnet', acc: 'tie',
     lead: { uk: 'Знання випускників і пропозиції щодо змісту освіти.', en: 'Graduate skills and suggestions for educational content.' },
-    hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['NEURAL NETWORK · FORWARD PASS', 'MOVE CURSOR'] },
+    hud: { top: ['4 · 7 · 7 · 5 · 2', 'PASS <b data-hud="pass">0</b>'], bot: ['FORWARD PASS', 'MOVE CURSOR'] },
     lines: { uk: ['Звіряємо протоколи', 'Знайдемо спільну частоту', 'Краватка є. Зв’язки теж'], en: ['Comparing protocols', 'Finding a shared frequency', 'Tie on. Connections made'] },
   },
   studying: {

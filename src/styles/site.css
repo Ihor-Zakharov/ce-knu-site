@@ -300,7 +300,7 @@ a.pcard:hover > svg { opacity: 1; translate: 0; }
 @media (max-width: 860px) { .footer__grid { grid-template-columns: 1fr; } .footer__rex { display: none; } }
 
 /* ── 404 ──────────────────────────────────────────────────── */
-.nf .runner { height: clamp(200px, 30vw, 280px); margin-top: 32px; }
+.nf .runner { height: clamp(240px, 30vw, 340px); margin-top: 32px; }
 
 /* утиліти — останніми */
 .mt-s { margin-top: 12px; } .mt-m { margin-top: 24px; } .mt-l { margin-top: 48px; }
@@ -490,7 +490,7 @@ a:hover .news-art { animation: none; }
 /* компактний герой: зміст сторінки видно одразу */
 .ph--compact { padding-block: clamp(16px, 2vw, 28px) clamp(16px, 2vw, 28px); }
 .ph--compact h1 { max-width: min(100%, 36ch); }
-/* службовий заголовок внутрішніх сторінок: без коду каналу, назва з’являється цілою, не по словах */
+/* службовий заголовок внутрішніх сторінок: без коду каналу; назва з’являється по словах (RiseTitle.astro, .ph h1 .w) */
 .ph--compact h1 { margin-top: 10px; font-size: clamp(1.875rem, 1.25rem + 1.6vw, 2.75rem); line-height: 1.1; letter-spacing: -.025em; animation: fadein .8s var(--ease-out) both; }
 .ph--compact .lead { margin-top: 12px; }
 @media (min-width: 901px) { .ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 288px); } .ph--compact .ph__inst .inst-wrap { margin-top: 60px; } .ph--compact .ph__inst .inst__screen { aspect-ratio: 2 / 1; } }
@@ -498,7 +498,7 @@ a:hover .news-art { animation: none; }
 
 
 /* прилад у компактному герої: праворуч від назви, невеликий; КІ-Рекс у спокої — під шапкою */
-.ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: end; gap: clamp(24px, 4vw, 72px); }
+.ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); align-items: start; gap: clamp(24px, 4vw, 72px); }
 @media (min-width: 1700px) { .ph--compact .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); } }
 .ph__inst .inst-wrap { margin-top: 76px; }
 .ph__inst .inst { padding: 7px; border-radius: 12px; }
@@ -507,6 +507,14 @@ a:hover .news-art { animation: none; }
 .ph__inst .inst__hud--top { top: 7px; } .ph__inst .inst__hud--bot { bottom: 7px; }
 .ph__inst .inst__bar { padding: 7px 2px 0; font-size: 9.5px; }
 @media (max-width: 900px) { .ph--compact .ph__grid { grid-template-columns: 1fr; } .ph__grid > .ph__inst { display: none; } .inst-dock .ph__inst { max-width: 420px; } }
+
+/* Один шаблон шапки для всіх сторінок (зразок — «Персоналії»): ланцюжок і назва стоять на тій самій висоті,
+   хоч би якої довжини підзаголовок і чи є праворуч прилад. На десктопі текст опущено на --ph-drop
+   (півтори клітинки сітки тла) — під КІ-Рекса над приладом; на телефоні й планшеті — одразу під шапкою сайту */
+:root { --ph-drop: 0px; }
+@media (min-width: 901px) { :root { --ph-drop: 72px; } }
+.ph--compact .ph__text, .ph--compact > .wrap:not(.ph__grid, .ph__after), .np-hd > .wrap, .pp-hd > .wrap { padding-top: var(--ph-drop); }
+.ph__after { margin-top: clamp(20px, 2.4vw, 36px); }   /* картки з фактами під героєм («Вступникам», «Роботодавцям») */
 
 /* «Попередня / Наступна»: довгі слова не розпирають сітку */
 .prevnext { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -739,7 +747,6 @@ a:hover .news-art { animation: none; }
 .prof__card { grid-row: span 3; }
 .prof__card > p { margin-top: 10px; }
 :root[data-theme="dark"] .prof__card--hw .prof__mini { --c: var(--ink-2); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) .prof__card--hw .prof__mini { --c: var(--ink-2); } }
 /* лабораторії: спільні рядки (фото, бренд, назва, текст) — тексти починаються на одній висоті; без збільшення при наведенні */
 .labs { grid-template-rows: repeat(4, auto); }
 .lab { display: grid; grid-template-rows: subgrid; grid-row: span 4; align-content: start; }

@@ -1,0 +1,7 @@
+---
+// Назва героя розділу, що з’являється по словах: кожне слово виїжджає з-під маски одне за одним
+// (site.css: .ph h1 .w, @keyframes rise — так само, як заголовок головної). Для читачів екрана це звичайний текст.
+interface Props { text: string }
+const words = Astro.props.text.split(' ');
+---
+<h1>{words.map((w, i) => <><span class="w"><span style={`--i:${i}`}>{w}</span></span>{i < words.length - 1 ? ' ' : ''}</>)}</h1>

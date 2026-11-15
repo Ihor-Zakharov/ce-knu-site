@@ -19,7 +19,7 @@ import { columns } from './dotfont.js';
 
 const root = document.documentElement;
 const css = v => getComputedStyle(root).getPropertyValue(v).trim();
-const isDark = () => (root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);
+const isDark = () => root.dataset.theme === 'dark';   // тема системи не враховується: типова — світла
 const TAU = Math.PI * 2;
 
 function mount(cv, make) {
@@ -41,7 +41,6 @@ function mount(cv, make) {
   document.addEventListener('visibilitychange', upd);
   addEventListener('pageshow', upd);                     // повернення кнопкою «Назад» зі збереженої сторінки
   document.addEventListener('themechange', () => { theme(); draw(); });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { theme(); draw(); });   // тема системи без вибору на сайті
   new ResizeObserver(size).observe(cv);
   if (REDUCED) st.t = inst.still ?? 2.2;
   inst.redraw = draw;
@@ -404,7 +403,7 @@ function mobius(c, st, cv) {
     const { W, H } = st, a = yaw.value + tt * .12, b = pitch.value;
     const X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a), Z = z;
     const Y2 = Y * Math.cos(b) - Z * Math.sin(b), Z2 = Y * Math.sin(b) + Z * Math.cos(b);
-    const s = Math.min(W * .26, H * .36) / (1 + Y2 * .18);
+    const s = Math.min(W * .26, H * .28) / (1 + Y2 * .18);   // у компактному приладі 2:1 стрічка не заходить на підписи
     return [W / 2 + X * s, H / 2 + 4 - Z2 * s * 1.05, Y2];
   };
   const wave = u => .78 * Math.sin(u * 3.5) * Math.cos(u / 2 - Math.floor(u / (Math.PI * 2)) * Math.PI);

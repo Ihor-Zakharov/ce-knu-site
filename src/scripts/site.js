@@ -19,8 +19,7 @@ const typing = () => /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagNam
 root.classList.add('js'); root.setAttribute('data-ready', '');
 
 /* ── Тема: коло від кнопки з одним золотим кільцем по краю ───── */
-const sysDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
-let theme = root.dataset.theme || (sysDark() ? 'dark' : 'light');
+let theme = root.dataset.theme || 'light';                 // типова — світла (див. Base.astro)
 const TL = { uk: ['Темна тема', 'Світла тема'], en: ['Dark theme', 'Light theme'] }[L];
 function reflectTheme() {
   $$('.theme-toggle').forEach(b => { b.setAttribute('aria-pressed', String(theme === 'dark')); b.setAttribute('aria-label', theme === 'dark' ? TL[1] : TL[0]); b.title = b.getAttribute('aria-label'); });

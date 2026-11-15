@@ -5,6 +5,7 @@ import Base from '../../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { NAV, T, url, langOf, langParams, fmtDate, isoDate } from '../../../lib/i18n';
 import { news, people, slugOf } from '../../../lib/content';
+import RiseTitle from '../../../components/RiseTitle.astro';
 import '../../../styles/lists.css';
 
 export const getStaticPaths = langParams;
@@ -29,7 +30,7 @@ const xml = url('uk', '/sitemap-index.xml');
       <nav aria-label={lang === 'uk' ? 'Навігаційний ланцюжок' : 'Breadcrumbs'}>
         <ol class="crumbs"><li><a href={url(lang, '/')}>{t.home}</a></li><li aria-current="page">{t.sitemap}</li></ol>
       </nav>
-      <h1>{t.sitemap}</h1>
+      <RiseTitle text={t.sitemap} />
       <p class="lead">{t.sitemapLead}</p>
     </div>
   </section>

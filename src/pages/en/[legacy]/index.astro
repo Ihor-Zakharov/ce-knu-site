@@ -1,0 +1,11 @@
+---
+// Старі англійські адреси розділів ведуть на нові, названі як у меню: /en/entrant/ → /en/admission/ (таблиця — src/lib/routes.mjs)
+import LegacyRedirect from '../../../components/LegacyRedirect.astro';
+import { EN_SLUG } from '../../../lib/routes.mjs';
+import { NAV, T, url } from '../../../lib/i18n';
+
+export const getStaticPaths = () => Object.keys(EN_SLUG).map(legacy => ({ params: { legacy } }));
+const path = `/${Astro.params.legacy}/`;
+const label = NAV.find(n => n.path === path)?.en ?? T.en.studying;   // «Навчання» є лише в повному меню
+---
+<LegacyRedirect to={url('en', path)} label={label} />

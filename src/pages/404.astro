@@ -10,7 +10,7 @@ const t = T.uk, e = T.en;
       <h1>{t.notFound}</h1>
       <p class="lead">{t.notFoundLead}</p>
       <p class="lead" lang="en" style="font-size:15px">{e.notFound}. {e.notFoundLead}</p>
-      <div class="runner" id="runner" tabindex="0" role="application" aria-label="КІ-Рекс: гра. Пробіл або дотик — стрибок, P — пауза">
+      <div class="runner" id="runner" role="application" aria-label="Гра з КІ-Рексом. Стрибок: пробіл або дотик. Пригнутися: стрілка вниз. Пауза: P">
         <canvas aria-hidden="true"></canvas>
         <span class="sr-only" data-runner-live aria-live="polite"></span>
       </div>
@@ -18,8 +18,16 @@ const t = T.uk, e = T.en;
     </div>
   </section>
   <script>
-    import { runner } from '../scripts/rex.js';
+    import { runner } from '../scripts/runner.js';
     const el = document.getElementById('runner');
-    if (el) runner(el, { start: 'Гра почалася', idle: 'ПРОБІЛ / ТАП — СТАРТ', again: 'ОБРИВ ЛІНІЇ · ПРОБІЛ — ЩЕ РАЗ', paused: 'ПАУЗА · ПРОБІЛ — ДАЛІ', over: (s: number, b: number) => `Обрив лінії. Рахунок ${s}, рекорд ${b}. Пробіл — ще раз` });
+    // рядки гри: keys і touch — рядок керування на екрані, tips — слова підказок; решта — оголошення для екранного читача
+    if (el) runner(el, {
+      keys: 'Керування: стрілки вгору і вниз', touch: 'Керування: торкання або утримання',
+      tips: { jump: 'Стрибок', duck: 'Пригнутися', pad: 'Пружина', orb: 'Ще стрибок' },
+      start: 'Гра', paused: 'Пауза', victory: 'Перемога', seasons: ['Зима', 'Весна', 'Сакура', 'Літо', 'Осінь'],
+      over: (s: number, b: number) => `Кінець. Рахунок ${s}, рекорд ${b}`,
+      won: (s: number, b: number) => `Перемога. Рахунок ${s}, рекорд ${b}`,
+      resume: (season: string, s: number) => `Продовження: ${season}, рахунок ${s}`,
+    });
   </script>
 </Base>

@@ -1,11 +1,15 @@
 ---
-// Герой розділу — компактний службовий заголовок: ланцюжок, назва, один рядок підзаголовка.
+// Герой розділу — компактний службовий заголовок: ланцюжок, назва, підзаголовок. Один шаблон для всіх розділів:
+// ланцюжок і назва на кожній сторінці стоять на тій самій висоті (site.css, --ph-drop).
 // Код каналу («CH 02 · RSRC») живе лише в приладі з КІ-Рексом (Instrument.astro), у правій колонці.
+// lead — свій підзаголовок замість типового з HEROES; слот без назви — під підзаголовком (кнопки),
+// слот after — під усім героєм на всю ширину (картки з фактами).
 import { HEROES } from '../lib/heroes';
 import { T, url, type Lang } from '../lib/i18n';
 import Instrument from './Instrument.astro';
-interface Props { lang: Lang; title: string; kind: string; crumbs?: { href: string; label: string }[]; meta?: string[]; text?: string; data?: Record<string, string> }
-const { lang, title, kind, crumbs = [], meta = [], text = '', data = {} } = Astro.props;
+import RiseTitle from './RiseTitle.astro';
+interface Props { lang: Lang; title: string; kind: string; crumbs?: { href: string; label: string }[]; meta?: string[]; text?: string; data?: Record<string, string>; lead?: string }
+const { lang, title, kind, crumbs = [], meta = [], text = '', data = {}, lead = '' } = Astro.props;
 const h = HEROES[kind];
 ---
 <section class="ph ph--compact">
@@ -18,10 +22,12 @@ const h = HEROES[kind];
           <li aria-current="page">{title.length > 48 ? title.slice(0, title.lastIndexOf(' ', 46)) + '…' : title}</li>
         </ol>
       </nav>
-      <h1>{title}</h1>
-      <p class="lead">{h.lead[lang]}</p>
+      <RiseTitle text={title} />
+      <p class="lead">{lead || h.lead[lang]}</p>
       {meta.length > 0 && <p class="ph__meta">{meta.map(m => <span class="cap" set:html={m} />)}</p>}
+      <slot />
     </div>
     <Instrument lang={lang} kind={kind} text={text} data={data} />
   </div>
+  {Astro.slots.has('after') && <div class="wrap ph__after"><slot name="after" /></div>}
 </section>

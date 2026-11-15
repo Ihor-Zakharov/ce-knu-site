@@ -100,23 +100,13 @@ export default function (env) {
     x.lineWidth = lw; x.lineJoin = 'round'; x.strokeStyle = dark ? 'rgba(170,240,200,.15)' : 'rgba(255,255,255,.2)';
     traces.forEach(q => x.stroke(q));
 
-    /* дрібні деталі в смузі між мікросхемами й контактами: SPD, PMIC, конденсатори */
+    /* дрібні деталі в смузі між мікросхемами й контактами: лише конденсатори (чорні корпуси SPD і PMIC прибрано — візуальний шум) */
     const sy = chB, sH = fyTop - chB, mid = sy + sH / 2, u = Math.max(1, Mh / 190);
     const lh = clamp(sH * .62, 10, 24), fs = clamp(lh * .46, 5.5, 10), lx = snap(mx + Mw * .06, D), ly = snap(mid - lh / 2, D);
     mono(x, 10, 700); const lw2 = Math.max(Mw * .2, lh * 1.15 + x.measureText('KI-RAM · DDR5').width * fs / 10), noTr = new Path2D();
     noTr.rect(0, 0, W, H); noTr.rect(lx, ly, lw2, lh);
     const smd = (px, py, w, h, c, o = 1) => { x.globalAlpha = o; x.fillStyle = c; x.fillRect(snap(px, D), snap(py, D), w, h); x.globalAlpha = 1; };
-    const ic = (px, py, w, h) => {                            // корпус з ніжками
-      x.strokeStyle = 'rgba(214,190,130,.75)'; x.lineWidth = Math.max(.6, u * .7);
-      x.beginPath(); for (let i = 1; i < 4; i++) { const q = px + w * i / 4; x.moveTo(q, py - u * 1.4); x.lineTo(q, py + h + u * 1.4); } x.stroke();
-      smd(px, py, w, h, '#101213'); smd(px + 1, py + 1, w - 2, 1, 'rgba(255,255,255,.12)');
-    };
-    const spdX = Math.min(Math.max(mx + Mw * .335, lx + lw2 + u * 6), nx - u * 20), pmX = mx + Mw * .5;
-    ic(spdX, mid - u * 4, u * 14, u * 8);                        // SPD
-    ic(pmX, mid - u * 6, u * 22, u * 12);                        // PMIC
-    smd(pmX + u * 3, mid - u * 3.4, u * 1.8, u * 1.8, 'rgba(255,255,255,.35)');
     for (let i = 0; i < 6; i++) { const cx = mx + Mw * (.63 + i * .042); smd(cx, mid - u * 2.8, u * 3, u * 5.6, '#C9B58A', .85); smd(cx, mid - u * 2.8, u * .9, u * 5.6, '#7A6A48', .9); }
-    for (let i = 0; i < 4; i++) smd(mx + Mw * (.905 + i * .017), mid - u * 1.6, u * 2.2, u * 3.2, '#101213', .9);
 
     /* етикетка модуля — відсилка до КІ */
     x.save(); x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowBlur = 2; x.shadowOffsetY = 1;

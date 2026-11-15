@@ -1,10 +1,13 @@
 // Критерії 7.1: навігація, перемикання мов, мобільний вигляд, доступність (axe), меню й мови з клавіатури.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { EN_SLUG, toEn } from '../src/lib/routes.mjs';
 
 const TYPICAL = ['/', '/news/', '/personas/', '/entrant/'];
 const NAV = ['/news/', '/research/', '/medu-guide/', '/entrant/', '/documents/', '/graduates/', '/personas/', '/stateholders/'];
-const both = (p: string) => [p, '/en' + p];
+/** адреса сторінки мовою: at('/en', '/entrant/') → /en/admission/ (англійські розділи названо як у меню) */
+const at = (lang: string, p: string) => (lang ? lang + toEn(p) : p);
+const both = (p: string) => [p, at('/en', p)];
 async function firstPost(page: Page, lang = '') {
   await page.goto(lang + '/news/');
   return (await page.locator('.nl-t a').first().getAttribute('href'))!;
@@ -15,11 +18,11 @@ test.describe('навігація', () => {
     for (const lang of ['', '/en']) {
       for (const p of NAV) {
         await page.goto(lang + '/');
-        if (isMobile) { await page.getByRole('button', { name: /Меню|Menu/ }).first().click(); await page.locator(`#menu a[href$="${lang}${p}"]`).click(); }
-        else await page.locator(`.nav a[href$="${lang}${p}"]`).click();
-        await expect(page).toHaveURL(new RegExp(`${lang}${p}$`));
+        if (isMobile) { await page.getByRole('button', { name: /Меню|Menu/ }).first().click(); await page.locator(`#menu a[href$="${at(lang, p)}"]`).click(); }
+        else await page.locator(`.nav a[href$="${at(lang, p)}"]`).click();
+        await expect(page).toHaveURL(new RegExp(`${at(lang, p)}$`));
         await expect(page.locator('h1')).toBeVisible();
-        if (!isMobile) await expect(page.locator(`.nav a[href$="${lang}${p}"]`)).toHaveAttribute('aria-current', 'page');
+        if (!isMobile) await expect(page.locator(`.nav a[href$="${at(lang, p)}"]`)).toHaveAttribute('aria-current', 'page');
       }
     }
   });
@@ -38,6 +41,15 @@ test.describe('навігація', () => {
 });
 
 test.describe('мови', () => {
+  test('старі англійські адреси розділів і профілів перенаправляють на нові', async ({ page }) => {
+    for (const old of Object.keys(EN_SLUG)) {
+      await page.goto(`/en/${old}/`);
+      await expect(page).toHaveURL(new RegExp(`${at('/en', `/${old}/`)}$`));
+      await expect(page.locator('h1')).toBeVisible();
+    }
+    await page.goto('/en/personas/boiko/');
+    await expect(page).toHaveURL(/\/en\/people\/boiko\/$/);
+  });
   for (const p of [...TYPICAL, '/research/']) {
     test(`перемикач мов на ${p} веде на ту саму сторінку іншою мовою`, async ({ page, isMobile }) => {
       await page.goto(p);
@@ -45,7 +57,7 @@ test.describe('мови', () => {
       const open = async () => { if (isMobile) await page.getByRole('button', { name: /Меню|Menu/ }).first().click(); };
       await open();
       await page.locator(isMobile ? '#menu .lang-link' : '.hd .lang-link').click();
-      await expect(page).toHaveURL(new RegExp(`/en${p}$`));
+      await expect(page).toHaveURL(new RegExp(`${at('/en', p)}$`));
       await expect(page.locator('html')).toHaveAttribute('lang', 'en');
       await open();
       await page.locator(isMobile ? '#menu .lang-link' : '.hd .lang-link').click();
@@ -59,6 +71,18 @@ test.describe('мови', () => {
     await page.goto('/en/news/');
     const en = await page.locator('.nl-t a').evaluateAll(as => as.map(a => (a as HTMLAnchorElement).pathname.replace(/^\/en/, '')));
     expect(en.sort()).toEqual(uk.sort());
+  });
+});
+
+test.describe('тема', () => {
+  test.use({ colorScheme: 'dark' });
+  test('типово світла навіть за темної теми системи; вибір на сайті зберігається', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.keyboard.press('t');                          // клавіша T — той самий перемикач, що й кнопка
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.goto('/en/');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   });
 });
 
@@ -223,8 +247,49 @@ test.describe('мапа сайту', () => {
       await page.locator('.footer__bot a', { hasText: /Мапа сайту|Sitemap/ }).click();
       await expect(page).toHaveURL(new RegExp(`${lang}/sitemap/$`));
       await expect(page.locator('h1')).toHaveText(/Мапа сайту|Sitemap/);
-      for (const p of NAV) await expect(page.locator(`.sm a[href$="${lang}${p}"]`).first()).toBeVisible();
+      for (const p of NAV) await expect(page.locator(`.sm a[href$="${at(lang, p)}"]`).first()).toBeVisible();
       expect(await page.locator('.sm__news a').count()).toBeGreaterThan(10);
     }
+  });
+});
+
+test.describe('копіювання адреси', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+  test('кнопка копіює адресу, на мить показує галочку й повертає значок', async ({ page }) => {
+    await page.goto('/stateholders/');
+    const btn = page.locator('.mail-copy:visible').first();
+    await btn.click();
+    await expect(btn).toHaveClass(/is-done/);
+    await expect(btn.locator('.mail-copy__done')).toHaveCSS('opacity', '1');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/@knu\.ua$/);
+    await expect(btn).not.toHaveClass(/is-done/, { timeout: 4000 });
+    await expect(btn.locator('.mail-copy__copy')).toHaveCSS('opacity', '1');
+  });
+});
+
+test.describe('шапка розділу', () => {
+  // зразок — «Персоналії»: ланцюжок стоїть на тій самій висоті на кожній сторінці (розділи, підсторінка, мапа сайту,
+  // новина, профіль); у розділів однакові ще й розмір назви та підзаголовка
+  test('ланцюжок на тій самій висоті, назва й підзаголовок розділів однакові', async ({ page }) => {
+    await page.goto('/personas/');
+    const person = (await page.locator('main a[href*="/personas/"]:not([href$="/personas/"])').first().getAttribute('href'))!;
+    const post = await firstPost(page);
+    const sections = [...NAV, '/research/llm-memory-group/', '/sitemap/'].flatMap(both);
+    const rows: { p: string; crumbs: number; h1: string; lead: string }[] = [];
+    for (const p of [...sections, post, person]) {
+      await page.goto(p);
+      rows.push({ p, ...(await page.evaluate(() => {
+        const q = (s: string) => document.querySelector(s);
+        return {
+          crumbs: Math.round(q('.crumbs')!.getBoundingClientRect().top + scrollY),
+          h1: getComputedStyle(q('h1')!).fontSize,
+          lead: q('.ph .lead') ? getComputedStyle(q('.ph .lead')!).fontSize : '',
+        };
+      })) });
+    }
+    const one = (k: 'crumbs' | 'h1' | 'lead', list = rows) => expect(new Set(list.map(r => r[k])).size, JSON.stringify(list.map(r => [r.p, r[k]]))).toBe(1);
+    one('crumbs');
+    one('h1', rows.slice(0, sections.length));
+    one('lead', rows.slice(0, sections.length));
   });
 });

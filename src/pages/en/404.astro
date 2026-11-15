@@ -9,7 +9,7 @@ const e = T.en;
       <p class="ph__eyebrow"><b>404</b>NO SIGNAL</p>
       <h1>{e.notFound}</h1>
       <p class="lead">{e.notFoundLead}</p>
-      <div class="runner" id="runner" tabindex="0" role="application" aria-label="KI-Rex game. Space or tap to jump, P to pause">
+      <div class="runner" id="runner" role="application" aria-label="KI-Rex game. Jump: Space or tap. Duck: Down arrow. Pause: P">
         <canvas aria-hidden="true"></canvas>
         <span class="sr-only" data-runner-live aria-live="polite"></span>
       </div>
@@ -17,8 +17,16 @@ const e = T.en;
     </div>
   </section>
   <script>
-    import { runner } from '../../scripts/rex.js';
+    import { runner } from '../../scripts/runner.js';
     const el = document.getElementById('runner');
-    if (el) runner(el, { start: 'Game started', idle: 'SPACE / TAP TO START', again: 'LINE BROKEN · SPACE TO RETRY', paused: 'PAUSED · SPACE TO RESUME', over: (s: number, b: number) => `Line broken. Score ${s}, best ${b}. Press Space to retry` });
+    // рядки гри: keys і touch — рядок керування на екрані, tips — слова підказок; решта — оголошення для екранного читача
+    if (el) runner(el, {
+      keys: 'Controls: up and down arrows', touch: 'Controls: tap or hold',
+      tips: { jump: 'Jump', duck: 'Duck', pad: 'Springboard', orb: 'Jump again' },
+      start: 'Go', paused: 'Paused', victory: 'Victory', seasons: ['Winter', 'Spring', 'Sakura', 'Summer', 'Autumn'],
+      over: (s: number, b: number) => `Game over. Score ${s}, best ${b}`,
+      won: (s: number, b: number) => `Victory. Score ${s}, best ${b}`,
+      resume: (season: string, s: number) => `Resuming: ${season}, score ${s}`,
+    });
   </script>
 </Base>

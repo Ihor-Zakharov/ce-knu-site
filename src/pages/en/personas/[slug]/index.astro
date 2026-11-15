@@ -1,0 +1,14 @@
+---
+// Старі англійські адреси профілів ведуть на нові: /en/personas/boiko/ → /en/people/boiko/
+import LegacyRedirect from '../../../../components/LegacyRedirect.astro';
+import { getCollection } from 'astro:content';
+import { url } from '../../../../lib/i18n';
+import { slugOf } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+  // ті самі люди, що мають власну сторінку (див. [...lang]/[personas]/[slug])
+  const all = await getCollection('people', p => !!p.data.legacy && p.id.startsWith('en/'));
+  return all.map(p => ({ params: { slug: slugOf(p.id) }, props: { name: p.data.name } }));
+}
+---
+<LegacyRedirect to={url('en', `/personas/${Astro.params.slug}/`)} label={Astro.props.name} />

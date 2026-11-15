@@ -11,37 +11,37 @@ source: "pages/documents.rst"
 
 ## University
 
-- [Statute of Taras Shevchenko National University of Kyiv (in Ukrainian)](https://www.univ.kiev.ua/pdfs/statut/statut-22-11-28.pdf)
-- [Licence (in Ukrainian)](https://www.univ.kiev.ua/ua/official/litsenzia/)
+- [Statute of Taras Shevchenko National University of Kyiv (in Ukrainian)](https://knu.ua/pdfs/statut/statut-22-11-28.pdf)
+- [Licence (in Ukrainian)](https://knu.ua/ua/official/litsenzia/)
 - [Decrees of the President (in Ukrainian)](https://zakon.rada.gov.ua/laws/show/1496/99#Text)
-- [Information Subject to Mandatory Disclosure (in Ukrainian)](https://www.univ.kiev.ua/ua/official/must-published/)
+- [Information Subject to Mandatory Disclosure (in Ukrainian)](https://knu.ua/ua/official/must-published/)
 
 ## Educational process
 
-- Regulations on the Organisation of the Educational Process at Taras Shevchenko National University of Kyiv: [regulations (in Ukrainian)](http://www.univ.kiev.ua/pdfs/official/Polozhennia-pro-organizatsiyu-osvitniogo-procesu-11_04_2022.pdf) · [order](/files/nakaz_pro_polozhennya_pro_organizatsiyu_osvitnyogo_processu.pdf)
+- Regulations on the Organisation of the Educational Process at Taras Shevchenko National University of Kyiv: [regulations (in Ukrainian)](https://knu.ua/pdfs/official/Polozhennia-pro-organizatsiyu-osvitniogo-procesu-druga-redaktsiia-zi-zminamy.pdf) · [order](/files/nakaz_pro_polozhennya_pro_organizatsiyu_osvitnyogo_processu.pdf)
 - [Regulations on the Procedure for Exercising the Right of Students of Taras Shevchenko National University of Kyiv to a Free Choice of Academic Disciplines.](/files/poriadok_vyboru_dyscyplin_03_12_2018.pdf)
 - [Regulations on the Diploma with Honours of Taras Shevchenko National University of Kyiv of 3 November 2014.](/files/polojennya_pro_dyplomy_z_vidzn_1.pdf)
 - [Concept for Introducing Distance Learning into the Educational Process of Taras Shevchenko National University of Kyiv](/files/30062020_kontseptsia_dystantsiynogo_navchannya.pdf)
-- [Concept for Foreign Language Learning by Students of Non-Language Faculties/Institutes of Taras Shevchenko National University of Kyiv](http://www.univ.kiev.ua/pdfs/official/Concept-of-studying-foreign-languages-at-non-special-faculties-and-institutes-in-University.pdf)
+- [Concept for Foreign Language Learning by Students of Non-Language Faculties/Institutes of Taras Shevchenko National University of Kyiv](https://knu.ua/pdfs/official/Concept-of-studying-foreign-languages-at-non-special-faculties-and-institutes-in-University.pdf)
 - [Higher Education Standards by Speciality (in Ukrainian)](https://mon.gov.ua/ua/osvita/visha-osvita/naukovo-metodichna-rada-ministerstva-osviti-i-nauki-ukrayini/zatverdzheni-standarti-vishoyi-osviti)
 
 ## Quality, integrity and community
 
-- [Regulations on the Quality Assurance System for Education and the Educational Process at Taras Shevchenko National University of Kyiv](http://www.univ.kiev.ua/pdfs/official/Quality-assurance-system-of-education-and-educational-process.pdf)
-- [Code of Ethics of the University Community](http://www.univ.kiev.ua/pdfs/official/ethical-code/Ethical-code-of-the-university-community.pdf)
+- [Regulations on the Quality Assurance System for Education and the Educational Process at Taras Shevchenko National University of Kyiv](https://knu.ua/pdfs/official/Quality-assurance-system-of-education-and-educational-process.pdf)
+- [Code of Ethics of the University Community](https://knu.ua/pdfs/official/ethical-code/Ethical-code-of-the-university-community.pdf)
 - [Regulations on the System for Detecting and Preventing Academic Plagiarism at KNU](/files/polozhennia-pro-sistemu-viiavlennia-ta-zapobigannia-akademichnomu-plagiatu-u-knu.pdf)
 - [Regulations on Surveys of Students and Academic Staff of Taras Shevchenko National University of Kyiv](/files/poloz_oputuvanya_2020.pdf)
 - [Regulations on Employers' Councils at Taras Shevchenko National University of Kyiv](/files/poloz_rad-robotodavc_2020.pdf)
-- [Procedure for Resolving Conflict Situations at Taras Shevchenko National University of Kyiv](http://www.univ.kiev.ua/pdfs/official/Procedure-for-resolving-conflict-situations-in-University.pdf)
-- [Procedure for Preventing and Combating Discrimination, Bullying and Gender-Based Violence at Taras Shevchenko National University of Kyiv](http://www.univ.kiev.ua/pdfs/official/Procedure-for-preventing-discrimination-bullying-gender-based-violence-in-University.pdf)
+- [Procedure for Resolving Conflict Situations at Taras Shevchenko National University of Kyiv](https://knu.ua/pdfs/official/Procedure-for-resolving-conflict-situations-in-University.pdf)
+- [Procedure for Preventing and Combating Discrimination, Bullying and Gender-Based Violence at Taras Shevchenko National University of Kyiv](https://knu.ua/pdfs/official/Procedure-for-preventing-discrimination-bullying-gender-based-violence-in-University.pdf)
 - [Concept for the Development of Inclusive Education "University of Equal Opportunities"](/files/kontseptsiia-universitet-rivnikh-mozhlivostei.pdf)
-- [Prevention and Combating of Corruption (in Ukrainian)](http://www.univ.kiev.ua/ua/official/preventing-corruption)
-- [Anti-Corruption Programme (in Ukrainian)](http://www.univ.kiev.ua/pdfs/official/preventing-corruption/antykoruptsiyna_prohrama.pdf)
+- [Prevention and Combating of Corruption (in Ukrainian)](https://knu.ua/ua/official/preventing-corruption)
+- [Anti-Corruption Programme (in Ukrainian)](https://knu.ua/pdfs/official/preventing-corruption/antykoruptsiyna_prohrama.pdf)
 
 ## Faculty and department
 
 - [Regulations on the Faculty at KNU](/files/polozhennia_pro_fakultet.pdf)
-- [Regulations on the Department at KNU (in Ukrainian)](http://senate.univ.kiev.ua/?p=1161)
+- [Regulations on the Department at KNU (in Ukrainian)](https://senate.knu.ua/?p=1161)
 
 <!-- fold -->
 

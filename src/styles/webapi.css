@@ -4,7 +4,21 @@
 .mail-copy { position: relative; flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: inherit; opacity: .7; cursor: pointer; transition: opacity var(--hover) var(--ease-out), background var(--hover) var(--ease-out); -webkit-tap-highlight-color: transparent; }
 .mail-copy::before { content: ""; position: absolute; inset: -6px; }   /* ціль дотику — 44 px */
 .mail-copy:hover { opacity: 1; background: color-mix(in oklab, currentColor 10%, transparent); }
-.mail-copy svg { width: 16px; height: 16px; }
+.mail-copy svg { grid-area: 1 / 1; width: 16px; height: 16px; }
+
+/* Скопійовано: значок стискається й гасне, на його місці «вистрибує» зелена галочка й прорисовується штрихом;
+   за DONE_MS (webapi.js) усе вертається назад. Обидва значки лежать в одній клітинці сітки — кнопка не змінює розміру */
+.mail-copy__copy, .mail-copy__done { transition: opacity 180ms var(--ease-out), scale 420ms var(--spring); }
+.mail-copy__done { color: var(--ok); stroke-width: 2.2; opacity: 0; scale: .5; }
+.mail-copy__done path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0s linear 200ms; }   /* скидаємо штрих, коли галочка вже згасла */
+.mail-copy.is-done { opacity: 1; }
+.mail-copy.is-done .mail-copy__copy { opacity: 0; scale: .5; }
+.mail-copy.is-done .mail-copy__done { opacity: 1; scale: 1; }
+.mail-copy.is-done .mail-copy__done path { stroke-dashoffset: 0; transition: stroke-dashoffset 340ms var(--ease-out) 80ms; }
+.footer .mail-copy__done { color: var(--ok-on-wine); }   /* підвал винний в обох темах — світліший зелений */
+@media (prefers-reduced-motion: reduce) {
+  .mail-copy__copy, .mail-copy__done, .mail-copy__done path, .mail-copy.is-done .mail-copy__done path { transition: none; }
+}
 
 .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 400; translate: -50% 16px; max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: var(--r-pill); background: var(--ink); color: var(--bg); font: 500 14px/1.3 var(--font-sans); box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--ink) 60%, transparent); opacity: 0; pointer-events: none; transition: opacity 220ms var(--ease-out), translate 420ms var(--spring); }
 .toast.on { opacity: 1; translate: -50% 0; }

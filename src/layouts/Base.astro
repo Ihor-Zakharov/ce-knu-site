@@ -92,13 +92,13 @@ const speculation = JSON.stringify({ prerender: [{ where: { and: [{ href_matches
   <script type="speculationrules" set:html={speculation} />
   <link rel="preload" href={fixel} as="font" type="font/woff2" crossorigin />
   <script is:inline>
-    // тема до першого кадру — без спалаху; ?theme=dark|light для перевірок
+    // тема до першого кадру — без спалаху; ?theme=dark|light для перевірок.
+    // Типова — світла для всіх (тема системи не враховується); темна — лише якщо людина сама обрала її на сайті
     (function () {
       var q = new URLSearchParams(location.search).get('theme'), s = null;
       try { s = localStorage.getItem('ki-theme'); } catch (e) {}
-      var v = q === 'dark' || q === 'light' ? q : s;
-      var dark = v ? v === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset.theme = dark ? 'dark' : 'light';   // і системна тема — через data-theme: усі правила [data-theme] діють
+      var dark = (q === 'dark' || q === 'light' ? q : s) === 'dark';
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
       document.querySelector('meta[name="theme-color"]').content = dark ? '#141211' : '#F6F2EA';
       // «js» — до першого кадру: блоки з появою (.rv) малюються вже у вихідному стані й з'являються з рухом;
       // якщо скрипт сайту так і не запустився — повертаємо все видимим

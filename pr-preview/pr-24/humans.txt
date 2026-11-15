@@ -1,0 +1,16 @@
+/* TEAM */
+Розробка сайту: ZakharovLabs
+LinkedIn: https://www.linkedin.com/in/zakharov-ihor/
+Контакт: ce.frecs@knu.ua
+Місто: Київ, Україна
+
+/* THANKS */
+Кафедра комп'ютерної інженерії, ФРЕКС, КНУ
+КІ-Рекс, маскот кафедри
+
+/* SITE */
+Мови: українська, англійська
+Стек: Astro (статичний сайт), власний UI-кіт «Сигнал», CSS без фреймворків
+Шрифти: Fixel, Signal Mono (IBM Plex Mono, OFL)
+Перевірки: Playwright, axe, Lighthouse CI
+Код: https://github.com/Ihor-Zakharov/ce-knu-site

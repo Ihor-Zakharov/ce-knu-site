@@ -1,4 +1,4 @@
-const V = 'mw5502uz', BASE = '/ce-knu-site/', OFFLINE = BASE + 'offline/';
+const V = 'mwi37rq7', BASE = '/ce-knu-site/', OFFLINE = BASE + 'offline/';
 const SHELL = 'ki-shell-' + V, PAGES = 'ki-pages-' + V, ASSETS = 'ki-assets-' + V;
 self.addEventListener('install', e => e.waitUntil((async () => {
   try {
@@ -7,7 +7,20 @@ self.addEventListener('install', e => e.waitUntil((async () => {
       const html = await res.clone().text();
       await c.put(OFFLINE, res);
       const files = [...new Set([...html.matchAll(/(?:href|src)="([^"]*\/_astro\/[^"]+)"/g)].map(m => m[1]))];
-      await Promise.all(files.map(f => c.add(f).catch(() => {})));
+      // Скрипти сторінки підключають спільні частини рядком import … from "./x.js" чи динамічним import("./x.js") (гра, КІ-Рекс) — у HTML цих файлів немає.
+      // Тому йдемо за імпортами й кладемо в кеш і їх: інакше без мережі сторінка відкриється, а гра не запуститься
+      const seen = new Set();
+      const keep = async f => {
+        if (seen.has(f)) return;
+        seen.add(f);
+        const res = await fetch(f);
+        if (!res.ok) return;
+        await c.put(f, res.clone());
+        if (!f.endsWith('.js')) return;
+        const dir = f.slice(0, f.lastIndexOf('/') + 1);
+        await Promise.all([...(await res.text()).matchAll(/(?:from|import)\s*\(?\s*["'`]\.\/([^"'`]+\.js)["'`]/g)].map(m => keep(dir + m[1])));
+      };
+      await Promise.all(files.map(f => keep(f).catch(() => {})));
     }
   } catch (err) { /* без мережі під час встановлення — спробуємо наступного разу */ }
   await self.skipWaiting();

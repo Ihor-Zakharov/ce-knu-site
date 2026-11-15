@@ -9,13 +9,25 @@ const REX = [
   '..d.....dggggggggdd...', '..dd...ddggggggd......', '..dgd.dgnnnnnnndgd....', '..dggddgnnyyynndgd....',
   '...dggggnnyynnnd......', '....dgggnnnyynnd......', '.....dggbbbbbbd.......', '......dggbbbbd........',
 ];
-// ноги: 0 — стоїть, 1 — крок урозкид, 2 — ноги разом (проміжна фаза кроку)
-const LEGS = [['.......dgg..dgg.......', '.......dd....dd.......'], ['......dgg....dgg......', '.....dd.......dd......'], ['........dggdgg........', '........dd.dd.........']];
+// ноги: 0 — стоїть, 1 — крок урозкид, 2 — ноги разом (проміжна фаза кроку);
+// для гри: 3 — відштовхнувся (ноги позаду), 4 — падає (ноги винесені вперед)
+const LEGS = [['.......dgg..dgg.......', '.......dd....dd.......'], ['......dgg....dgg......', '.....dd.......dd......'], ['........dggdgg........', '........dd.dd.........'],
+  ['......dgg..dgg........', '.....dd...dd..........'], ['........dgg..dgg......', '..........dd...dd.....']];
 const BLINK = { 2: '........dgggggggggd...', 3: '........dggdddgggggd..' };
+// хвіст на пів кроку нижче — у бігу чергується зі звичайним, і хвіст «гуляє»
+const TAIL = { 8: '........dggggggggdd...', 9: '.......ddggggggd......', 10: '.dd...dgnnnnnnndgd....', 11: '.dggdddgnnyyynndgd....', 12: '..ddggggnnyynnnd......' };
+// присідання (гра на 404): голова опущена й винесена вперед, спина горизонтальна, хвіст витягнутий —
+// силует 26×11 замість 22×18. Рядки йдуть від 7-го рядка спрайта, x — зсув лівого краю; legs — два кадри кроку
+const DUCK = { x: -2, y: 7, px: [
+  '...............dddddddd.....', '..............dggggggggd....', '........dddddddggwwkggggd...', 'ddddddddnnnnnndggwkkgggggd..',
+  'dgggggggnnnnnndgggggggggggd.', '.ddgggggnnyynndgggggggggggd.', '...dddggnnnyyndggggggwwwwwd.', '......dgbbbbbbdgggggggdwdwd.',
+  '.......dgbbbbddggggggggdd...',
+], legs: [['......dgg...dgg.............', '.....dd......dd.............'], ['........dggdgg..............', '........dd.dd...............']] };
 const PAL = { d: '#1E3416', g: '#5E9B3A', w: '#FFFFFF', k: '#111111', n: '#23305A', y: '#D8B56E', b: '#E9D9A6',
-  W: '#5E1424', r: '#A4202A', s: '#B9B3A8', c: '#CFE6F2', G: '#7FD36B', K: '#2A2420', o: '#E6D3A3' };
+  W: '#5E1424', r: '#A4202A', s: '#B9B3A8', c: '#CFE6F2', G: '#7FD36B', K: '#2A2420', o: '#E6D3A3', p: '#E88FAB', O: '#D97A2B', h: '#FF5FA2' };
 
-// аксесуар: рядки піксель-арту й зсув відносно спрайта; back — малюється за тілом
+// аксесуар: рядки піксель-арту й зсув відносно спрайта; back — малюється за тілом;
+// duck — те саме для пози присідання (голова там на 4 пікселі правіше й на 7 нижче)
 const ACC = {
   cap: { x: 6, y: -3, px: ['...oWWWWWo...', 'WWWWWWWWWWWWy', 'oooWWWWWWWooy', '...WWWWWWW..y', '............y'] },
   glasses: { x: 10, y: 1, px: ['.kkk..', 'k...kk', 'k...k.', '.kkk..'] },
@@ -26,28 +38,48 @@ const ACC = {
   tube: { x: 18, y: 3, px: ['.c.', '...', 'c.c', 's.s', 's.s', 'sGs', 'sGs', '.s.'] },
   laptop: { x: 14, y: 10, px: ['.KKKKKK', '.KKyKKK', '.KKKKKK', 'ssssssss'] },
   pointer: { x: 15, y: 4, px: ['......y', '.....y.', '....y..', '...y...', '..y....', '.y.....', 'K......'] },
-  headset: { x: 9, y: -1, px: ['..kkkkkk..', '.k......k.', 'k........k', 'K........K', 'K.........'] },
+  headset: { x: 9, y: -1, px: ['..kkkkkk..', '.k......k.', 'k........k', 'K........K', 'K.........'], duck: { x: 13, y: 6 } },
   // листоноша: кашкет з козирком і кокардою, сумка через плече з листом, конверт у лапі
   postcap: { x: 9, y: -3, px: ['...nnnnnn...', '..nnnnynnnn.', '.nnnnnnnnnnkk'] },
   bag: { x: 3, y: 8, px: ['.........y', '........y.', '.......y..', 'WWWWWWy...', 'Wwwwww....', 'WwyywW....', 'WWWWWW....'] },
   letter: { x: 16, y: 9, px: ['ooooo', 'onoon', 'ooWoo', 'ooooo'] },   // конверт: клапан «V» і сургучна печатка
+  // сезонні, для гри на 404: шарф (два кадри — кінець майорить), квітка за вухом, темні окуляри, кленовий листок
+  scarf: { x: 3, y: 7, px: ['or...........', '..rW.........', '....WrrWrrWrr', '.....rrWrrWr.'], duck: { x: 5, y: 7, px: ['or.....', '..rW...', '....WrW', '.....rW', '.....Wr', '.....rW'] } },
+  scarf2: { x: 3, y: 9, px: ['....WrrWrrWrr', '..rW.rrWrrWr.', 'or...........'], duck: { x: 5, y: 9, px: ['..rWWrW', 'or...rW', '.....Wr', '.....rW'] } },
+  flower: { x: 6, y: 0, px: ['.p.', 'pyp', '.p.'], duck: { x: 10, y: 7 } },
+  shades: { x: 10, y: 2, px: ['KKKKKKKK', 'KsKKK...', '.KsK....'], duck: { x: 14, y: 9 } },
+  leaf: { x: 11, y: -5, px: ['....O', '.OOOO', 'OOyO.', 'OyOO.', 'WOO..'], duck: { x: 5, y: 6, px: ['.OOO..', 'OyyyOW', '.OOO..'] } },
+  // пора сакури в грі — образ «альтушки», рожеве з чорним: гарнітура з котячими вушками (замість звичайної), сердечко-рум'янець,
+  // чорний чокер із сердечком, смугаста манжета на лапі, бантик на хвості, іскорка біля ока; socks — смугасті рожево-чорні гетри
+  // (це не малюнок, а перефарбування ніг: вони рухаються, тож гетри мають рухатися разом із ними)
+  catset: { x: 9, y: -3, px: ['..h....h..', '.hph..hph.', '..hhhhhh..', '.h......h.', 'h........h', 'h........h', 'k.........'], duck: { x: 13, y: 4 } },
+  blush: { x: 13, y: 4, px: ['h.h', '.h.'], duck: { x: 17, y: 11 } },
+  choker: { x: 9, y: 8, px: ['kkkkkkk', '...h...'], duck: { x: 11, y: 10, px: ['.k', '.k', 'hk', '.k'] } },
+  cuff: { x: 15, y: 10, px: ['hkh', 'khk'], duck: { px: [] } },
+  bow: { x: 0, y: 7, px: ['h.h', 'hkh', 'h.h'], duck: { x: -2, y: 8 } },
+  sparkle: { x: 15, y: 2, px: ['w'], duck: { x: 19, y: 9 } },
+  socks: { x: 0, y: 0, px: [], socks: 'hk' },
 };
 
 const OX = 3, OY = 5, GW = 30, GH = 24;   // поле з запасом під аксесуари
-export function rexFrame({ legs = 0, blink = false, acc = null, flip = false } = {}) {
-  const accs = (Array.isArray(acc) ? acc : String(acc || '').split('+')).map(a => ACC[a]).filter(Boolean);
+// duck — поза присідання, tail — хвіст нижче (обидва лише для гри; типові значення дають той самий спрайт, що й раніше)
+export function rexFrame({ legs = 0, blink = false, acc = null, flip = false, duck = false, tail = false } = {}) {
+  const accs = (Array.isArray(acc) ? acc : String(acc || '').split('+')).map(a => ACC[a]).filter(Boolean).map(a => (duck ? { ...a, ...a.duck } : a));
   const grid = Array.from({ length: GH }, () => Array(GW).fill(null));
   const put = (x, y, ch) => { const gx = flip ? GW - 1 - (x + OX) : x + OX, gy = y + OY; if (PAL[ch] && gy >= 0 && gy < GH && gx >= 0 && gx < GW) grid[gy][gx] = PAL[ch]; };
   const layer = l => l.px.forEach((row, yy) => [...row].forEach((ch, xx) => put(l.x + xx, l.y + yy, ch)));
+  // гетри: якщо серед аксесуарів є socks, пікселі ніг (рядки 16–17) фарбуються у смужку двома його кольорами
+  const socks = accs.find(a => a.socks), leg = (ch, x, y) => (socks && y >= 16 && ch !== '.' ? socks.socks[(x + y) & 1] : ch);
   accs.filter(a => a.back).forEach(layer);
-  [...REX, ...LEGS[legs]].forEach((row, y) => [...(blink && BLINK[y] ? BLINK[y] : row)].forEach((ch, x) => put(x, y, ch)));
+  if (duck) { layer(DUCK); DUCK.legs[legs % 2].forEach((row, yy) => [...row].forEach((ch, xx) => put(DUCK.x + xx, 16 + yy, leg(ch, xx, 16 + yy)))); }
+  else [...REX, ...LEGS[legs]].forEach((row, y) => [...((blink && BLINK[y]) || (tail && TAIL[y]) || row)].forEach((ch, x) => put(x, y, leg(ch, x, y))));
   accs.filter(a => !a.back).forEach(layer);
   return grid;
 }
 export function drawGrid(c, grid, px, ox = 0, oy = 0) {
   for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const col = grid[y][x]; if (col) { c.fillStyle = col; c.fillRect(ox + x * px, oy + y * px, px, px); } }
 }
-export const REX_GRID = { w: GW, h: GH };
+export const REX_GRID = { w: GW, h: GH, ox: OX, oy: OY };   // ox, oy — де в полі лежить лівий верхній піксель самого спрайта
 
 /* статичний Рекс у будь-якому <canvas data-rex="аксесуар"> */
 export function paintStatic(cv) {
@@ -237,88 +269,4 @@ export function perch(box) {
   new IntersectionObserver(es => { seen = es[es.length - 1].isIntersecting; if (!seen) { say.classList.remove('on'); sayT = 0; } upd(); }).observe(box);
   document.addEventListener('visibilitychange', upd);
   addEventListener('pageshow', upd);
-}
-
-/* раннер для сторінки 404 — з кіту: фіксований крок 1/120 с, «час койота», буфер стрибка */
-export function runner(el, txt) {
-  const cv = el.querySelector('canvas'), c = cv.getContext('2d'), live = el.querySelector('[data-runner-live]');
-  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-  const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* приватний режим */ } } };
-  const OB = [
-    { w: 5, h: 7, px: ['gg.gg', '.ygy.', '.yry.', '.ygy.', '.yry.', '.ygy.', 'gg.gg'] },
-    { w: 5, h: 7, px: ['..g..', '..g..', 'ggggg', '.....', 'ggggg', '..g..', '..g..'] },
-    { w: 5, h: 5, px: ['k...k', '.kkk.', 'krrrk', 'rkrkr', '.kkk.'], fly: true },
-  ];
-  const OPAL = { g: '#8C8478', y: '#D8B56E', r: '#A4202A', k: '#2A2420' };
-  let W, H, D, P, ground, st, best = +store.get('ki-best') || 0, raf = 0, acc = 0, last = 0;
-  const STEP = 1 / 120;
-  const reset = () => ({ mode: 'idle', y: 0, vy: 0, onGround: true, coyote: 0, buffer: 0, holding: false, t: 0, speed: 0, obs: [], next: .9, score: 0, frame: 0, dust: [] });
-  st = reset();
-  const size = () => { const r = el.getBoundingClientRect(); D = devicePixelRatio || 1; W = r.width; H = r.height; cv.width = Math.round(W * D); cv.height = Math.round(H * D); c.setTransform(D, 0, 0, D, 0, 0); P = Math.max(2, Math.floor(H / 56)); ground = H - 30; draw(); };
-  const G = () => P * 340, JUMP = () => P * 92, MAXF = () => P * 150;
-  function press() {
-    if (st.mode !== 'run') { st = reset(); st.mode = 'run'; st.speed = P * 58; live.textContent = txt.start; kick(); return; }
-    st.buffer = .11; st.holding = true;
-  }
-  // коротке натискання — стрибок на повній гравітації (≈12 пікселів спрайта, вище за будь-яку перешкоду);
-  // утримання зменшує гравітацію на підйомі — до ≈22 пікселів
-  const release = () => { st.holding = false; };
-  function update(dt) {
-    if (st.mode !== 'run') return;
-    st.t += dt; st.speed = Math.min(P * 132, P * 58 + st.t * P * 1.4); st.score += dt * st.speed / P / 6;
-    st.buffer = Math.max(0, st.buffer - dt); st.coyote = st.onGround ? .09 : Math.max(0, st.coyote - dt);
-    if (st.buffer > 0 && st.coyote > 0) { st.vy = -JUMP(); st.onGround = false; st.coyote = 0; st.buffer = 0; }
-    st.vy = Math.min(MAXF(), st.vy + G() * (st.vy < 0 && st.holding ? .55 : 1) * dt);
-    st.y += st.vy * dt;
-    if (st.y >= 0) { if (!st.onGround && st.vy > P * 40) for (let i = 0; i < 5; i++) st.dust.push({ x: 40 + 9 * P, y: ground, vx: (Math.random() - .5) * P * 40, vy: -Math.random() * P * 30, l: .35 }); st.y = 0; st.vy = 0; st.onGround = true; }
-    else st.onGround = false;
-    st.next -= dt;
-    if (st.next <= 0) { const k = st.t < 8 ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 3); st.obs.push({ k, x: W + 10 }); const gap = 1.05 - Math.min(.45, st.t * .008); st.next = gap + Math.random() * .7; }
-    st.obs.forEach(o => { o.x -= st.speed * dt; }); st.obs = st.obs.filter(o => o.x > -10 * P);
-    st.dust.forEach(p => { p.x += p.vx * dt - st.speed * dt * .5; p.y += p.vy * dt; p.vy += G() * .3 * dt; p.l -= dt; }); st.dust = st.dust.filter(p => p.l > 0);
-    const rx = 40 + (6 + OX) * P, ry = ground - 17 * P + st.y, rw = 9 * P, rh = 15 * P;
-    for (const o of st.obs) { const ob = OB[o.k]; const oy = ob.fly ? ground - 16 * P : ground - ob.h * P; if (o.x + P < rx + rw && o.x + (ob.w - 1) * P > rx && oy + P < ry + rh && oy + (ob.h - 1) * P > ry) { st.mode = 'over'; best = Math.max(best, Math.floor(st.score)); store.set('ki-best', best); live.textContent = txt.over(Math.floor(st.score), best); } }
-    st.frame += dt * st.speed / (P * 9);
-  }
-  function draw() {
-    if (!W) return;
-    c.clearRect(0, 0, W, H);
-    const line = css('--line-strong'), ink3 = css('--ink-3');
-    c.fillStyle = line; c.fillRect(0, ground, W, 1);
-    const off = (st.t * st.speed) % (P * 14); c.globalAlpha = .6;
-    for (let x = -off; x < W; x += P * 14) c.fillRect(x, ground + P * 2, P * 3, 1);
-    c.globalAlpha = 1;
-    for (const o of st.obs) { const ob = OB[o.k], oy = ob.fly ? ground - 16 * P + Math.sin(st.t * 8 + o.x / 30) * P : ground - ob.h * P; ob.px.forEach((row, yy) => [...row].forEach((ch, x) => { if (OPAL[ch]) { c.fillStyle = OPAL[ch]; c.fillRect(Math.round(o.x + x * P), Math.round(oy + yy * P), P, P); } })); }
-    c.fillStyle = ink3; st.dust.forEach(p => { c.globalAlpha = Math.max(0, p.l * 2.4); c.fillRect(p.x, p.y, P * .8, P * .8); }); c.globalAlpha = 1;
-    const f = st.mode === 'run' ? (st.onGround ? (Math.floor(st.frame) % 2 ? 1 : 2) : 0) : 0;
-    drawGrid(c, rexFrame({ legs: f, acc: 'headset' }), P, 40, Math.round(ground - (18 + OY) * P + st.y));
-    c.font = `500 ${Math.max(11, P * 4)}px "Signal Mono", monospace`; c.fillStyle = ink3; c.textAlign = 'right';
-    const hx = n => '0x' + Math.floor(n).toString(16).toUpperCase().padStart(4, '0');
-    c.fillText(`HI ${hx(best)}   ${hx(st.score)}`, W - 16, 26);
-    c.textAlign = 'center'; c.fillStyle = css('--ink-2');
-    if (st.mode === 'idle') c.fillText(txt.idle, W / 2, H / 2 - 8);
-    if (st.mode === 'over') c.fillText(txt.again, W / 2, H / 2 - 8);
-    if (st.mode === 'paused') c.fillText(txt.paused, W / 2, H / 2 - 8);
-  }
-  function loop(now) {
-    raf = 0; acc += Math.min(.1, (now - last) / 1000); last = now;
-    let n = 0; while (acc >= STEP && n++ < 8) { update(STEP); acc -= STEP; }
-    draw(); if (st.mode === 'run') raf = requestAnimationFrame(loop);
-  }
-  function kick() { if (!raf) { last = performance.now(); acc = 0; raf = requestAnimationFrame(loop); } }
-  const pause = () => { if (st.mode === 'run') { st.mode = 'paused'; draw(); } };
-  const resume = () => { if (st.mode === 'paused') { st.mode = 'run'; kick(); } };
-  const jumpKey = e => e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW';
-  el.addEventListener('pointerdown', e => { e.preventDefault(); el.focus({ preventScroll: true }); st.mode === 'paused' ? resume() : press(); });
-  addEventListener('pointerup', release); addEventListener('pointercancel', release);
-  el.addEventListener('keydown', e => {
-    if (jumpKey(e)) { e.preventDefault(); if (e.repeat) return; st.mode === 'paused' ? resume() : press(); }
-    if (e.code === 'KeyP' || e.key === 'Escape') { st.mode === 'paused' ? resume() : pause(); }
-  });
-  el.addEventListener('keyup', e => { if (jumpKey(e)) release(); });
-  el.addEventListener('blur', pause); document.addEventListener('visibilitychange', () => document.hidden && pause());
-  new IntersectionObserver(([e]) => { if (!e.isIntersecting) pause(); }).observe(el);
-  // розмір міряємо після появи й на кожну зміну — канвас не розмивається під час анімації входу
-  new ResizeObserver(size).observe(el); document.addEventListener('themechange', draw);
-  document.fonts?.ready.then(size);
 }

@@ -1,15 +1,16 @@
 // Обробка HTML вмісту під час збирання:
 //  • одиноке зображення з title → <figure> з <figcaption>;
-//  • внутрішні посилання отримують базовий шлях і префікс мови (/en/…);
+//  • внутрішні посилання отримують базовий шлях і префікс мови; англійською — й англійську назву розділу (/personas/x/ → /en/people/x/);
 //  • домени без схеми («manf.org.ua») отримують https://;
 //  • зовнішні посилання відкриваються в новій вкладці з rel="noopener";
 //  • таблиці обгортаються для горизонтальної прокрутки на телефоні;
 //  • курсивний абзац, що повторює підпис щойно оформленого фото, прибирається (підпис лишається у figcaption);
-//  • посилання в пунктах списку отримують data-meta («PDF», «univ.kiev.ua») — тип і джерело документа в реєстрах;
+//  • посилання в пунктах списку отримують data-meta («PDF», «knu.ua») — тип і джерело документа в реєстрах;
 //  • <!-- fold --> перед заголовком згортає розділ у <details>: заголовок стає підписом, поруч — кількість фото чи записів;
 //    <!-- fold: Підпис --> згортає все від наступного заголовка до кінця батьківського розділу під власним підписом;
 //  • <!-- sections --> у файлі: кожен розділ ## стає <section class="sec"> (реєстри, історії випускників).
 import { visit, SKIP } from 'unist-util-visit';
+import { toEn } from './routes.mjs';
 
 const ASSET = /^\/(files|images|licenses)\//;
 // на чинному сайті частина посилань — домени без схеми («manf.org.ua»); браузер вважає їх відносними
@@ -61,7 +62,8 @@ function sections(children) {
 export default function rehypeSite({ base = '/' } = {}) {
   const b = base.replace(/\/$/, '');
   return (tree, file) => {
-    const en = /[\\/]en[\\/][^\\/]+\.md$/.test(file.path || file.history?.[0] || '');
+    // англійський файл — і вкладений теж (pages/en/research/llm-memory-group.md)
+    const en = /[\\/]content[\\/][^\\/]+[\\/]en[\\/]/.test(file.path || file.history?.[0] || '');
     const marks = tree.children.filter(mark).map(n => mark(n)[1]);
     if (marks.length) {
       folds(tree.children, en);
@@ -99,7 +101,7 @@ export default function rehypeSite({ base = '/' } = {}) {
           if (!ASSET.test(href)) {
             const [path, hash = ''] = href.split('#');
             href = (path.endsWith('/') || /\.\w+$/.test(path) ? path : path + '/') + (hash ? '#' + hash : '');
-            if (en) href = '/en' + (href === '/' ? '/' : href);
+            if (en) href = '/en' + toEn(href);
           }
           node.properties.href = b + href;
         }

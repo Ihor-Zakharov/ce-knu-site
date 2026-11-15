@@ -5,12 +5,12 @@
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
-import { T, url, langOf, langParams } from '../../../lib/i18n';
+import { T, url, langOf, sectionParams } from '../../../lib/i18n';
 import { people, page, slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
 import '../../../styles/lists.css';
 
-export const getStaticPaths = langParams;
+export const getStaticPaths = () => sectionParams('personas', 'personas');   // /personas/ і /en/people/
 const lang = langOf(Astro.params.lang);
 const t = T[lang];
 const uk = lang === 'uk';

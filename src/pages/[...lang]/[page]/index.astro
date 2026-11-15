@@ -5,7 +5,7 @@
 import Base from '../../../layouts/Base.astro';
 import PageHero from '../../../components/PageHero.astro';
 import { getCollection, getEntry, render } from 'astro:content';
-import { langOf, url, type Lang } from '../../../lib/i18n';
+import { langOf, langSlug, url, type Lang } from '../../../lib/i18n';
 import { slugOf } from '../../../lib/content';
 import { HEROES } from '../../../lib/heroes';
 import { UI, RESEARCH_AWARDS } from '../../../lib/pages';
@@ -16,12 +16,12 @@ export async function getStaticPaths() {
   const all = await getCollection('pages');
   return all.filter(p => !SKIP.includes(slugOf(p.id)) && !slugOf(p.id).includes('/')).map(p => {
     const lang = p.id.split('/')[0] as Lang;
-    return { params: { lang: lang === 'en' ? 'en' : undefined, page: slugOf(p.id) }, props: { entry: p } };
+    return { params: { lang: lang === 'en' ? 'en' : undefined, page: langSlug(lang, slugOf(p.id)) }, props: { entry: p } };
   });
 }
 const { entry } = Astro.props;
 const lang = langOf(Astro.params.lang);
-const kind = Astro.params.page as string;
+const kind = slugOf(entry.id);                               // канонічний розділ (documents), адреса може бути англійською (regulations)
 const u = UI[lang];
 const { Content, headings } = await render(entry);
 const h2 = headings.filter(h => h.depth === 2);

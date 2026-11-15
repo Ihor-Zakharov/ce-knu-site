@@ -101,7 +101,7 @@
 }
 
 /* ── Новина ───────────────────────────────────────────────────── */
-.np-hd { padding-block: clamp(12px, 1.6vw, 24px) clamp(8px, 1vw, 16px); }
+.np-hd { padding-block: clamp(16px, 2vw, 28px) clamp(8px, 1vw, 16px); }   /* верх — як у .ph--compact */
 .np-head { max-width: 960px; margin-top: clamp(16px, 2vw, 28px); }
 .np-head .np-title { font-size: clamp(2rem, 1.4rem + 1.8vw, 3rem); font-weight: 400; line-height: 1.1; letter-spacing: -.025em; max-width: 28ch; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto; }
 .np-meta { margin-top: 14px; font-size: 14.5px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: lining-nums tabular-nums; }
@@ -180,7 +180,7 @@ a.pl-card:hover .pl-n, a.pl-card:focus-visible .pl-n { color: var(--action); }
 }
 
 /* ── Сторінка людини ──────────────────────────────────────────── */
-.pp-hd { padding-block: clamp(12px, 1.6vw, 24px) clamp(16px, 2vw, 28px); }
+.pp-hd { padding-block: clamp(16px, 2vw, 28px); }   /* як у .ph--compact */
 .pp-profile { display: grid; grid-template-columns: 160px minmax(0, 1fr); grid-template-areas: "ph id" "ph role" "ph ."; grid-template-rows: auto auto 1fr; column-gap: 32px; row-gap: 14px; margin-top: clamp(16px, 2vw, 28px); max-width: 1100px; }
 .pp-ph { grid-area: ph; position: relative; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden; background: var(--surface-2); }
 .pp-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }

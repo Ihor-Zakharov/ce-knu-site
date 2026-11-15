@@ -43,7 +43,7 @@
  "shortcuts": [
   {
    "name": "Admission",
-   "url": "entrant/",
+   "url": "admission/",
    "icons": [
     {
      "src": "../icons/icon-192.png",
@@ -53,8 +53,8 @@
    ]
   },
   {
-   "name": "Employers",
-   "url": "stateholders/",
+   "name": "For employers",
+   "url": "employers/",
    "icons": [
     {
      "src": "../icons/icon-192.png",

@@ -19,7 +19,7 @@ const soft = (a, b, u) => .5 - .5 * Math.cos(Math.PI * clamp((u - a) / (b - a)))
 const root = document.documentElement;
 const css = v => getComputedStyle(root).getPropertyValue(v).trim();
 const rgb = h => { const n = parseInt(h.replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
-const isDark = () => (root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);
+const isDark = () => root.dataset.theme === 'dark';   // тема системи не враховується: типова — світла
 
 export function showcase(figure) {
   const cv = figure.querySelector('canvas'), c = cv.getContext('2d');
@@ -207,7 +207,6 @@ export function showcase(figure) {
 
   theme();
   document.addEventListener('themechange', () => { theme(); draw(); });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { theme(); draw(); });   // тема системи без вибору на сайті
   if (REDUCED) { ex.forEach(e => e.still?.()); if (autoBtn) autoBtn.hidden = true; }
   safe(cur, () => ex[cur].enter?.(0));
   reflectPlay(); progress();

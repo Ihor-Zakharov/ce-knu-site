@@ -1,6 +1,7 @@
 // Перевірка повноти перенесення (критерій 7.1 «Повнота вмісту»).
 // Запуск після збирання: npm run check:content [-- <шлях до current-site/ce>]
-//  1. кожна новина, сторінка й персоналія чинного сайту має сторінку в dist/ обома мовами за старою адресою;
+//  1. кожна новина, сторінка й персоналія чинного сайту має сторінку в dist/ обома мовами: українською — за старою адресою,
+//     англійською — за тією самою з англійською назвою розділу (src/lib/routes.mjs);
 //  2. кожен документ із files/ лежить у dist/files/;
 //  3. кожне зображення, вжите на чинному сайті, вжите й у новому вмісті — в обох мовах;
 //  4. кожен файл uk/ має переклад en/, і переклад справді англійський;
@@ -9,6 +10,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { toEn } from '../src/lib/routes.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // чинний сайт: аргумент, або current-site/ce у корені репозиторію команди, або локальна копія поруч
@@ -28,7 +30,8 @@ if (!hasOld) console.warn(`! Чинний сайт не знайдено (${OLD}
 
 const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(join(d, e.name)) : [join(d, e.name)]);
 const meta = f => Object.fromEntries([...readFileSync(f, 'utf8').matchAll(/^\.\. (\w+):(?!:)\s?(.*)$/gm)].map(m => [m[1], m[2].trim()]));
-const page = (lang, p) => join(DIST, lang === 'en' ? 'en' : '', p, 'index.html');
+const enPath = p => toEn('/' + p).slice(1);                 // personas/boiko → people/boiko
+const page = (lang, p) => join(DIST, lang === 'en' ? 'en' : '', lang === 'en' ? enPath(p) : p, 'index.html');
 
 // ── 1. адреси чинного сайту → сторінки нового обома мовами ──
 if (hasOld) {
@@ -40,7 +43,7 @@ if (hasOld) {
   for (const f of readdirSync(join(OLD, 'pages/personas')).filter(f => f.endsWith('.rst'))) urls.push(`personas/${meta(join(OLD, 'pages/personas', f)).slug}`);
   urls.push('news');
   for (const u of urls) for (const lang of ['uk', 'en']) {
-    if (existsSync(page(lang, u))) ok.pages++; else fail('сторінка', `${lang === 'en' ? '/en' : ''}/${u}${u ? '/' : ''} — немає`);
+    if (existsSync(page(lang, u))) ok.pages++; else fail('сторінка', `${lang === 'en' ? '/en/' + enPath(u) : '/' + u}${u ? '/' : ''} — немає`);
   }
 
   // ── 2. документи ──

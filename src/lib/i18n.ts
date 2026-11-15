@@ -1,13 +1,16 @@
 // Мови, адреси й тексти інтерфейсу. Вміст сторінок — у src/content, тут лише «обв'язка».
+import { EN_SLUG, toEn, fromEn } from './routes.mjs';
+
 export type Lang = 'uk' | 'en';
 export const LANGS: Lang[] = ['uk', 'en'];
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-/** Адреса сторінки з урахуванням мови й базового шляху: url('en', '/news/') → /en/news/ */
+/** Адреса сторінки з урахуванням мови й базового шляху: url('en', '/news/') → /en/news/,
+ *  url('en', '/entrant/') → /en/admission/ (англійські назви розділів — src/lib/routes.mjs) */
 export function url(lang: Lang, path = '/') {
   const p = path.startsWith('/') ? path : '/' + path;
-  return BASE + (lang === 'en' ? '/en' : '') + p;
+  return BASE + (lang === 'en' ? '/en' + toEn(p) : p);
 }
 /** Файл із public/ (документи PDF тощо) */
 export const asset = (path: string) => BASE + (path.startsWith('/') ? path : '/' + path);
@@ -15,11 +18,18 @@ export const asset = (path: string) => BASE + (path.startsWith('/') ? path : '/'
 /** Ключ мови з параметра маршруту [...lang] */
 export const langOf = (p?: string): Lang => (p === 'en' ? 'en' : 'uk');
 export const langParams = () => [{ params: { lang: undefined } }, { params: { lang: 'en' } }];
+/** Розділ із власним шаблоном ([...lang]/[entrant]/…): українською — /entrant/, англійською — /en/admission/ */
+export const sectionParams = (key: string, slug: keyof typeof EN_SLUG) => [
+  { params: { lang: undefined, [key]: slug } },
+  { params: { lang: 'en', [key]: EN_SLUG[slug] } },
+];
+/** Сегмент адреси мовою сторінки: langSlug('en', 'documents') → 'regulations' */
+export const langSlug = (lang: Lang, slug: string) => (lang === 'en' ? toEn('/' + slug).slice(1) : slug);
 
-/** Шлях без мовного префікса — щоб перемикач мов вів на ту саму сторінку іншою мовою */
+/** Канонічний шлях без мовного префікса (/en/admission/ → /entrant/) — щоб перемикач мов вів на ту саму сторінку іншою мовою */
 export function stripLang(pathname: string) {
   const p = pathname.startsWith(BASE) ? pathname.slice(BASE.length) || '/' : pathname;
-  return p.replace(/^\/en(\/|$)/, '/');
+  return /^\/en(\/|$)/.test(p) ? fromEn(p.replace(/^\/en(\/|$)/, '/')) : p;
 }
 
 export const NAV = [
@@ -30,7 +40,7 @@ export const NAV = [
   { path: '/documents/', uk: 'Документи', en: 'Regulations', ch: 'DOCS' },
   { path: '/graduates/', uk: 'Випускники', en: 'Alumni', ch: 'ALUM' },
   { path: '/personas/', uk: 'Персоналії', en: 'People', ch: 'STAFF' },
-  { path: '/stateholders/', uk: 'Роботодавцям', en: 'Employers', ch: 'EMPL' },
+  { path: '/stateholders/', uk: 'Роботодавцям', en: 'For employers', ch: 'EMPL' },
 ] as const;
 
 export const T = {

@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../../../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
-import { T, url, langOf, type Lang } from '../../../../lib/i18n';
+import { T, url, langOf, langSlug, type Lang } from '../../../../lib/i18n';
 import { slugOf } from '../../../../lib/content';
 import { personLd } from '../../../../lib/seo';
 import '../../../../styles/lists.css';
@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   const all = await getCollection('people', p => !!p.data.legacy);
   return all.map(p => {
     const lang = p.id.split('/')[0] as Lang;
-    return { params: { lang: lang === 'en' ? 'en' : undefined, slug: slugOf(p.id) }, props: { entry: p } };
+    return { params: { lang: lang === 'en' ? 'en' : undefined, personas: langSlug(lang, 'personas'), slug: slugOf(p.id) }, props: { entry: p } };
   });
 }
 const { entry } = Astro.props;

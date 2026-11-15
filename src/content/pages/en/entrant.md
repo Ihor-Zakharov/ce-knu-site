@@ -128,8 +128,8 @@ Note: full admission information can be found in the ["Rules of Admission to Tar
 ## What additional opportunities do students of Taras Shevchenko National University of Kyiv have
 
 1.  Out-of-town students are provided with a [dormitory](https://rex.knu.ua/gurtozhytok-dlya-abituriyentiv/)
-2.  On the territory of the [student campus](https://studmisto.knu.ua/) there is the [University Clinic of Taras Shevchenko National University of Kyiv](http://univ.kiev.ua/ua/departments/uc), which provides timely medical care to students and staff of the University.
+2.  On the territory of the [student campus](https://studmisto.knu.ua/) there is the [University Clinic of Taras Shevchenko National University of Kyiv](https://knu.ua/ua/departments/uc), which provides timely medical care to students and staff of the University.
 3.  A canteen where both students and teachers of the University eat. It is located in the neighbouring building, connected by an internal passage, and has four spacious halls.
 4.  The University also offers the opportunity to obtain an additional military speciality at the [Military Institute](https://mil.knu.ua/). Two years of study at the military department make it possible to obtain the rank of reserve officer in a military speciality.
-5.  For physical education classes and sports, the University has a [sports building](http://sport.univ.kiev.ua/) with halls, a swimming pool and a stadium.
+5.  For physical education classes and sports, the University has a [sports building](http://sport.knu.ua/) with halls, a swimming pool and a stadium.
 6.  The [University Student Parliament](http://sp.knu.ua/) gives young people the opportunity both to socialise with their peers and to try their hand at active public life. In addition, there are vibrant parties, quests, sports competitions, beauty contests and social events.

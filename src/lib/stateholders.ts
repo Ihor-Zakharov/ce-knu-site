@@ -15,7 +15,6 @@ export const PROOF_KICKER: Record<Lang, string[]> = {
 export const COPY = {
   uk: {
     meta_description: 'Випускники кафедри комп’ютерної інженерії КНУ знають Verilog, FPGA, Embedded C, Python, ML і мережі. Пропозиції щодо навчання: ce.frecs@knu.ua.',
-    eyebrow: 'Роботодавцям',
     h1: 'Від хмарного ML до ПЛІС для оборонних систем',
     lead: 'Схеми, код і мережі в одній програмі КНУ. Підкажіть кафедрі, чого вчити студентів далі.',
     cta_mail: 'Написати кафедрі',
@@ -40,7 +39,6 @@ export const COPY = {
   },
   en: {
     meta_description: 'Graduates of KNU’s Department of Computer Engineering know Verilog, FPGA, Embedded C, Python, ML and networking. Write to us at ce.frecs@knu.ua.',
-    eyebrow: 'For employers',
     h1: 'From cloud ML to FPGAs for defence systems',
     lead: 'Circuits, code and networks in one KNU programme. Tell us what students should learn next.',
     cta_mail: 'Email the department',
